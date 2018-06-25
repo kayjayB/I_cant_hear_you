@@ -2,10 +2,11 @@
 \usepackage{KJN}
 \usepackage{graphicx}
 \usepackage{url}
+\usepackage{tikz}
 
 \newcommand{\ttt}{\texttt}
 
-\title{ELEN4010 - Minutes}
+\title{ELEN4002/ELEN4012 - Minutes}
 
 \author{}
 \thanks{School of Electrical \& Information Engineering, University of the
@@ -22,10 +23,120 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 \subsection*{Attendees:}
 Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
 \subsection*{Agenda:} 
-Obtain an overview of the requirements for the project planning document
+Obtain an overview of the requirements for the project outline specification
 
 \subsection*{Minutes of meeting:}
 Start date: 09/03/2018 \\
 Start time: 13:00
+
+Requirements for the document:
+\begin{enumerate}
+	\item Specifications of the project
+	\item Milestones: Using Gantt Chart or timeline
+	\item Preliminary budget and resources 
+	\item Risks or Mitigation: What do you do if you can't get a piece of equipment (what do you fall back on)
+\end{enumerate}
+
+The minimum specifications for the project are as follows: 
+\begin{itemize}
+	\item There must be two hearing aids (one per ear)
+	\item Each hearing aid must correct for the audiogram for that ear - To do this, you tweak the filter for each ear
+	\item Directionality feature comes in mainly in processing - It is filtering of a signal based on direction (can possibly be done using cross correlation). This filtering changes the signal to noise ratio 
+	\item Ideas for directionality: The user changes the direction using a potentiometer or the user always hears best in the direction they are facing
+	\item You must be able to turn off directionality 
+	\item Testing the device using humans is not specified in the brief of the project, but it can be done 
+\end{itemize}
+
+Testing the device:
+\begin{itemize}
+	\item Can use a signal generator to produce pure tones (single harmonic) and then examine the resulting signal after processing 
+	\item To test directionality, the sound source can be moved and the SNR examined
+	\item It is also necessary to produce signals in the presence of noise and test using them
+\end{itemize}
+
+Audiogram:
+\begin{itemize}
+	\item An audiogram is the response of each ear to different frequencies
+	\item The magnitude in dB is with reference to some standard
+	\item The layout of an audiogram is given in \figref{fig:audiogram}
+\end{itemize}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=3]
+\draw[->] (0,0) -- (1,0) node[right] {$Frequency (Hz)$}; 
+\draw[->] (0,0) -- (0,1) node[above] {$Magnitude (dB)$};
+\end{tikzpicture}
+\caption{Audiogram}
+\label{fig:audiogram}
+\end{figure}
+
+Budget:
+\begin{itemize}
+	\item Is a huge constraint in the project
+	\item It doesn't include any things you have in the house such as headphones 
+\end{itemize}
+
+Ethics Clearance:
+\begin{itemize}
+	\item For open day, you don't need ethics clearance
+	\item We need to decide how many people we would like to use to test the device
+	\item We need to specify who the people are (colleagues and lecturers)
+	\item Provide a protocol for testing
+\end{itemize}
+
+
+\section*{MEETING 2}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+Review ethics clearance application
+
+\subsection*{Minutes of meeting:}
+Start date: 03/04/2018 \\
+Start time: 13:00
+
+The ethics form was reviewed and appropriate changes were made
+
+\section*{MEETING 3}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+Obtain an overview of the requirements for the project planning document
+
+\subsection*{Minutes of meeting:}
+Start date: 20/06/2018 \\
+Start time: 13:00
+
+Project Planning Document:
+\begin{itemize}
+	\item Needs to Gantt chart which shows how the work will be split
+	\item The document is a plan of the project assuming that everything is going to go exactly according to plan 
+	\item Needs to detail the full project implementation - can possibly include circuit diagrams and flow charts or algorithms
+\end{itemize}
+
+Engineering notebook:
+\begin{itemize}
+	\item Use it as a diary - include dates and times for all entries
+	\item Write down anything that you've done on that day - eg. sketch of a circuit, phone number of a supplier
+	\item Put summaries of your minutes in the engineering notebook
+\end{itemize}
+
+The aim of the project is to develop a low cost hearing aid that is very simple to use. This means that the device only has a few buttons and is not fidly. If we can achieve this, we can possibly work with Emoyo to develop a new low cost hearing aid solution.
+
+The optimal directionality for the project would be that you are able to tune the direction using a dial, able to hear in the direction you are facing and able to turn of the directionality. This could be implemented using a combination of directional and non-directional microphones.
+
+People to contact for the project:
+\begin{itemize}
+	\item James Braid - Contacts in speech and hearing if necessary
+	\item Keegan Malan - Ask for use of Kuduwave to test device and to obtain audiograms
+\end{itemize}
+
+To Do:
+\begin{itemize}
+	\item Remind Prof. Rubin to email us audiograms
+	\item Remind Prof. Rubin to enquire about a trial version of MATLAB for the project
+\end{itemize}
+
+Going forward, meetings are to be held once a week. Prof. Rubin will be away from the 29/06/2018 until **** and during this time, skype meetings will be held.
 
 \end{document}

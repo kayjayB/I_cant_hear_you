@@ -74,6 +74,101 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 %
 \section{INTRODUCTION}
 
+\section{PROJECT SPECIFICATIONS}
+\subsection{Problem Analysis}
+\subsection{Requirements and Specifications}
+\subsection{Assumptions}
+assuming we can use the kudu wave
+\subsection{Success Criteria}
+\subsection{Constraints}
+
+\section{PROJECT BACKGROUND}
+\subsection{Literature Review}
+The aim of the filter bank is to divide the audible frequency range into a number of bands, so that different amplifications can be applied to different ranges.
+
+\section{PROJECT METHODOLOGIES AND MANAGEMENT}
+\subsection{Project Phases}
+The project has been divided into 11 development phases, which encapsulate the entire project, from ethics clearance to the presentation. Three of these phases occurred prior to the submission of this document. The phases are detailed in the following sections.
+
+\subsubsection*{Phase 1: Obtain Ethics Clearance} $    $
+
+This phase involved obtaining ethics clearance for the project. This clearance is necessary for clinical testing of the hearing aid, using human input. The procedure for obtaining clearance involves setting out the testing procedure, creating consent forms and creating the questionnaire's for the participants to complete. This phase was completed between the \nth{29} March and the \nth{6} April. Ethics clearance was granted on the \nth{11} May. Both partners were involved in the completion of this phase.
+
+\subsubsection*{Phase 2: Research} $    $
+
+This phase involved performing the research for the project. This included research into compensatory gain, directionality, filtering and the conversion of digital signals to sound signals. This phase occurred from the \nth{25} June to the \nth{1} July. However, it must be noted that research will be an ongoing process throughout the entire duration of the project. Kayla-Jade performed research into gain and filtering and Kelvin investigated directionality and conversions. Thereafter, the research was shared and both partners familiarised themselves with both sets of research.
+
+\subsubsection*{Phase 3: Hardware Design } $    $
+
+In this phase, the circuit diagrams required in the project were designed. Analog circuits are required to acquire the sound signal, condition it and convert it to digital. The circuit includes the microphone, audio amplifier, anti-aliasing filter, microprocessor (for analog to digital conversion and digital to analog conversion). The circuit also includes a potentiometer, which acts as a dial to tune the directionality of the hearing aid. Furthermore, the hearing aid will include a power button to turn the device on or off, and a toggle switch to switch between directional and omni-directional amplification modes. The resultant sound will be relayed to the user using headphones which interact with a headphone jack. The entire system will be powered using rechargeable batteries. A preliminary circuit diagram of the hardware component of the system is given in \figref{fig:circuit}. This phase was completed between the \nth{2} July and the \nth{6} July. The two partners performed this phase together.
+
+\begin{figure}[h]
+	\centering
+%	\includegraphics[width=1\columnwidth]{}
+	\caption{Preliminary circuit diagram for the system}
+	\raggedright
+	\label{fig:circuit}	
+\end{figure}
+
+\subsubsection*{Phase 4: Construction of Hardware } $    $
+
+This phase involves the construction of the circuit that was designed in Phase 3. The circuit will be prototyped on a breadboard before being finalised on a PCB board. The phase will begin on the \nth{9} of July and will end on the \nth{16}. Kelvin will perform the construction of the hardware.
+
+\subsubsection*{Phase 5: Implementation of Compensatory Amplification} $    $
+
+In this phase, the compensatory amplification aspect of the hearing aid will be implemented. This phase has numerous sub-phases:
+\begin{itemize}
+	\item Sub-phase 1: Interpolation of audiograms 
+	\item Sub-phase 2: Development of the filter bank
+	\item Sub-phase 3: Designing the gains for each filter based on the audiogram
+	\item Sub-phase 4: Attack and release times for changing the gain per frequency range 
+	\item Sub-phase 5: Dynamic compression of signals
+	\item Sub-phase 6: Optimisation of code from the previous stages to allow for real-time signal processing
+\end{itemize}
+
+In sub-phase 1, the data from the audiogram will be hard-coded onto MATLAB, and will be linearly interpolated to increase resolution. In sub-phase 2, the filter bank for the auditory compensation will be designed and implemented. 
+**** Come back here!!! ****
+
+The first two sub-phases will be implemented concurrently with phase 4 by Kayla-Jade. Thereafter, sub-phases 3 and 4 will be implemented by Kayla-Jade, while Kelvin concurrently implements sub-phases 5 and 6.
+
+
+\subsubsection*{Phase 6: Implementation of the Software Required for Directionality} $    $
+
+In this phase, the software required to implement directionality will be implemented. This software will interface with the dial built into the hardware to tune the direction in which the sound must be amplified. The two partners will implement this phase together. 
+*** Date ***
+
+\subsubsection*{Phase 7: Laboratory testing of the full system} $    $
+
+Following the implementation of the entire system, full system testing is required. The system will be tested in a laboratory setting, using a signal generator to generate pure tones. By generating pure tones of specific frequencies and feeding these tones to the hearing aid, the ability of the device to apply compensatory amplification, and to apply amplification to the correct frequencies, can be quantified. The frequency of the sinusoidal pure tone signals will be set to range from the lower to the upper bounds of the frequency range of human hearing. Additionally, high frequency noise will be added to the signals such that the performance of the device can be evaluated in the presence of noise.
+
+In order to test the directionality of the hearing aid, a sound wave with a single harmonic will be produced and played from several directions relative to the hearing aid. The resulting signals will be processed by the hearing aid and then plotted. This will allow for the degree of amplification and attenuation to be visualised and quantified.
+
+Both partners will perform the laboratory testing.
+
+\subsubsection*{Phase 8: Clinical testing of the full system} $    $
+
+Phase 7 involves the testing of the audiogram in a clinical setting, using human participants. First, staff from the school of Electrical and Information Engineering will be asked to participate in the clinical testing. Prior to performing the tests, an audiogram will be collected from each participant. A hearing aid will then be customised for each participant. Thereafter, a second audiogram will be obtained with the participant wearing the hearing aid. The microphone will be mounted on a model head (made out of polystyrene) and the KUDUwave headset will be placed on top of the fake head. The participant will then wear the earphones which receive the processed signals and a second audiogram will be obtained. The two audiograms will then be compared in order to assess the effectiveness of the device.
+
+\begin{figure}[h]
+	\centering
+	%	\includegraphics[width=1\columnwidth]{}
+	\caption{Schematic of the testing procedure}
+	\raggedright
+	\label{fig:testing}	
+\end{figure}
+
+Both partners will perform the clinical testing.
+
+\subsubsection*{Phase 9: Demonstration} $    $
+
+This phase involves the preparation for open day. This includes creating a poster and a video explaining the project. It also includes preparing the demonstration for open day. Both partners will be involved in all aspects of the phase.
+
+\subsubsection*{Phase 10: Documentation} $    $
+
+This phase involves the writing of the final project report. The report will be worked on throughout the entire project, but in this phase, it will be the sole focus. The partners will each work on their reports individually.
+
+\subsubsection*{Phase 11: Presentation} $    $
+Phase 11 is the final phase of the project which involves the preparation of the presentation. This will be done by the partners together.
 
 \section{CONCLUSION}
 

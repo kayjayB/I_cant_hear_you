@@ -86,6 +86,15 @@ assuming we can use the kudu wave
 \subsection{Literature Review}
 The aim of the filter bank is to divide the audible frequency range into a number of bands, so that different amplifications can be applied to different ranges.
 
+
+Directional hearing aids were created as a method of improving the signal to noise ratio (SNR) in hearing aids \cite{trends_in_amplification}. They do this by changing the SNR based on the spatial location of the required signals relative to the unwanted signals \cite{trends_in_amplification}. This can assist in improving a user's speech recognition in a noisy environment \cite{trends_in_amplification}.
+ 
+In order to implement directionality, two different types of microphones can be used: omni-directional and directional \cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. To achieve directionality with omni-directional microphones, two must be used, with one placed at the back of the hearing aid and one at the front \cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. If a directional microphone is used, one one microphone is required \cite{trends_in_amplification}. Most hearing aids allow the user to switch between a directional and an omni-directional mode \cite{trends_in_amplification}. If a directional microphone is used, an omni-directional microphone is also required for when the user selects omni-directional mode \cite{trends_in_amplification}.
+
+There have been numerous implementations of the directionality of a hearing aid. An adaptive directionality system was implemented by \cite{An_ultra_low_power_analogue_directionality} and \cite{Evaluation_of_digital_hearing_aid_algorithms}. With an adaptive system, the hearing aids focus automatically in the direction of the sound with the greatest signal to noise ratio \cite{An_ultra_low_power_analogue_directionality}. Using two omni-directional microphones, adaptive directionality is implemented by cross-correlating the signals from the front and back microphones and using the cross-correlated signals to determine an adaptive weight for altering the position of the nulls (the angles of greatest attenuation) \cite{An_ultra_low_power_analogue_directionality}. However, research has not been done into changing the directionality of the device to a direction selected by the user.
+
+In order to achieve directionality, different delays between the microphones are used. By changing the delays, different attenuation patterns can be acquired \cite{trends_in_amplification}. The three most commonly used patterns are cardioid, hyper-cardioid and bi-directional \cite{trends_in_amplification}.
+
 \section{SYSTEM DESIGN}
 
 A block diagram of the full system is given in \figref{fig:block}.
@@ -100,7 +109,6 @@ A block diagram of the full system is given in \figref{fig:block}.
 
 The microprocessor block consists of all of the signal processing required for the functioning of the hearing aid. The required signal processing is expanded upon in \figref{fig:microBlock}.
 
-
 \begin{figure*}[t]
 	\centering
 	\includegraphics[width=0.8\textwidth]{microBlockDiagrm.png}
@@ -110,13 +118,17 @@ The microprocessor block consists of all of the signal processing required for t
 \end{figure*}
 
 \subsection{Compensatory Amplification}
-
+uniform bandwidth filter bank
+fir filters
+1/3 octave bandwidth - according to ANSI S1.11??
 \subsection{Directionality}
 
 \subsection{Hardware} \label{sec:hardware}
-Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone and is used alone when the omni-directional mode is selected. The rear microphone is used when directional mode is selected. The signals from the microphones are amplified and then passed through an anti-aliasing filter. The filter has a cutoff frequency of 25~kHz
+Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack.
 
-The circuit includes the microphone, audio amplifier, anti-aliasing filter, microprocessor (for analog to digital conversion and digital to analog conversion). The circuit also includes a potentiometer, which acts as a dial to tune the directionality of the hearing aid. Furthermore, the hearing aid will include a power button to turn the device on or off, and a toggle switch to switch between directional and omni-directional amplification modes. The resultant sound will be relayed to the user using headphones which interact with a headphone jack. The entire system will be powered using rechargeable batteries. A preliminary circuit diagram of the hardware component of the system is given in \figref{fig:circuit}.
+In order to tune the directionality of the hearing aid, a potentiometer, which acts as a dial, will be used. The signal from the potentiometer is also converted to digital by the ADC for signal processing. The hearing aid will include a power button to turn the device on or off, and a toggle switch to switch between directional and omni-directional amplification modes. The entire system will be powered using rechargeable batteries. 
+
+A circuit diagram of the hardware components of the system is given in \figref{fig:circuit}.
 
 \begin{figure}[h]
 	\centering
@@ -129,7 +141,7 @@ The circuit includes the microphone, audio amplifier, anti-aliasing filter, micr
 \subsection{Laboratory Full System Testing} \label{sec:laboratory}
 In order to obtain objective results that are free from human bias, the system will be tested in a laboratory using a signal generator to generate pure tones. By generating pure tones of specific frequencies and feeding these tones to the hearing aid, the ability of the device to apply compensatory amplification, and to apply amplification to the correct frequencies, can be quantified. The frequency of the sinusoidal pure tone signals will be set to range from the lower to the upper bounds of the frequency range of human hearing. Additionally, high frequency noise will be added to the signals such that the performance of the device can be evaluated in the presence of noise.
 
-In order to test the directionality of the device, one speaker will be placed in a fixed position. The hearing aid will be placed in the centre of a rotating platform with the dial facing towards the speaker. A pure tone signal is played from the speaker and the resulting output signal from the hearing aid is saved. The platform is then rotated by 5\textdegree and the procedure is repeated. This is done for 360\textdegree. Once signals have been acquired corresponding to each 5\textdegree increment, a polar plot of the signals will be created. In the polar plot, the angle of the signals is taken as the angle of the hearing aid relative the dial (the 0\textdegree reference point). This will allow for an analysis of the degree of amplification and attenuation of signals in all directions with the directionality being fixed in one direction.
+In order to test the directionality of the device, one speaker will be placed in a fixed position. The hearing aid will be placed in the centre of a rotating platform with the dial facing towards the speaker. A pure tone signal is played from the speaker and the resulting output signal from the hearing aid is saved. The platform is then rotated by 5\textdegree\ and the procedure is repeated. This is done for 360\textdegree\. Once signals have been acquired corresponding to each 5\textdegree\ increment, a polar plot of the signals will be created. In the polar plot, the angle of the signals is taken as the angle of the hearing aid relative the dial (the 0\textdegree\ reference point). This will allow for an analysis of the degree of amplification and attenuation of signals in all directions with the directionality being fixed in one direction.
 
 \subsection{Clinical Full System Testing} \label{sec:clinical}
 In order to verify the performance of the hearing aid, clinical tests are required. This will allow for a quantification of the value that the hearing aid provides to the participant.
@@ -153,7 +165,7 @@ The method of the clinical testing will now be detailed. First, staff from the s
 	\label{fig:testing}	
 \end{figure}
 
-In order to test the directionality of the device, eight speakers will be set up in a circle, separated by 45$\textdegree$ angles. The participant will be asked to sit in a chair which faces 0$\textdegree$ while wearing the hearing aid. Pure tone sounds will be played from a single speaker at a time and the participant will be asked to tune the dial controlling the directionality until the sound is at its loudest. The angle of the dial will then be recorded and compared to the angle of the speaker, thus allowing for a quantification of the error present in the directionality. 
+In order to test the directionality of the device, eight speakers will be set up in a circle, separated by 45\textdegree\ angles. The participant will be asked to sit in a chair which faces 0\textdegree\  while wearing the hearing aid. Pure tone sounds will be played from a single speaker at a time and the participant will be asked to tune the dial controlling the directionality until the sound is at its loudest. The angle of the dial will then be recorded and compared to the angle of the speaker, thus allowing for a quantification of the error present in the directionality. 
 
 \section{PROJECT METHODOLOGIES AND MANAGEMENT}
 \subsection{Project Phases}

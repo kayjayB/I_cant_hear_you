@@ -87,7 +87,8 @@ assuming we can use the kudu wave
 The aim of the filter bank is to divide the audible frequency range into a number of bands, so that different amplifications can be applied to different ranges.
 
 
-
+Directional hearing aids were created as a method of improving the signal to noise ratio (SNR) in hearing aids \cite{trends_in_amplification}. They do this by changing the SNR based on the spatial location of the required signals relative to the unwanted signals \cite{trends_in_amplification}. This can assist in improving a user's speech recognition in a noisy environment \cite{trends_in_amplification}.
+ 
 In order to implement directionality, two different types of microphones can be used: omni-directional and directional \cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. To achieve directionality with omni-directional microphones, two must be used, with one placed at the back of the hearing aid and one at the front \cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. If a directional microphone is used, one one microphone is required \cite{trends_in_amplification}. Most hearing aids allow the user to switch between a directional and an omni-directional mode \cite{trends_in_amplification}. If a directional microphone is used, an omni-directional microphone is also required for when the user selects omni-directional mode \cite{trends_in_amplification}.
 
 There have been numerous implementations of the directionality of a hearing aid. An adaptive directionality system was implemented by \cite{An_ultra_low_power_analogue_directionality} and \cite{Evaluation_of_digital_hearing_aid_algorithms}. With an adaptive system, the hearing aids focus automatically in the direction of the sound with the greatest signal to noise ratio \cite{An_ultra_low_power_analogue_directionality}. Using two omni-directional microphones, adaptive directionality is implemented by cross-correlating the signals from the front and back microphones and using the cross-correlated signals to determine an adaptive weight for altering the position of the nulls (the angles of greatest attenuation) \cite{An_ultra_low_power_analogue_directionality}. However, research has not been done into changing the directionality of the device to a direction selected by the user.
@@ -117,7 +118,9 @@ The microprocessor block consists of all of the signal processing required for t
 \end{figure*}
 
 \subsection{Compensatory Amplification}
-
+uniform bandwidth filter bank
+fir filters
+1/3 octave bandwidth - according to ANSI S1.11??
 \subsection{Directionality}
 
 \subsection{Hardware} \label{sec:hardware}

@@ -152,7 +152,20 @@ fir filters
 1/3 octave bandwidth - according to ANSI S1.11??
 
 \subsection{Directionality} \label{sec:directionality}
-In order to achieve tunable directionality, a software directional microphone will be used. In the software directional microphone, the signals from two omni-directional microphones are captured and combined in order to create a directional pattern.
+In order to achieve tunable directionality, a software directional microphone will be used. In the software directional microphone, the signals from two omni-directional microphones are captured and combined in order to create a directional pattern \cite{Distortion_of_interaural_time_cues}. The two microphones will be situated in front and behind the hearing aid device. A desirable directional pattern will be acquired by delaying the signal acquired by the rear microphone and subtracting it from the signal acquired from the front microphone. This configuration is known as a differential microphone array \cite{Distortion_of_interaural_time_cues}.
+
+The directionality feature will be designed such that the user will be able to specify the desired direction of amplification using a potentiometer dial. The analog output voltage of the dial will be read by the ADC of the microcontroller and converted to a time delay. This time delay will be applied to the rear microphone signal and subtracted from the front microphone signal. Thereafter, the direction of maximum gain will be in the same direction that the potentiometer dial is pointing. A block diagram showing this process can be found in Figure~\ref{fig:directionalityBlockDiagram}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.1\textwidth]{directionalityBlockDiagram.png}
+	\caption{Block diagram of user tunable directionality feature}
+	\raggedright
+	\label{fig:directionalityBlockDiagram}	
+\end{figure}
+
+In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound \textit{c} is constantly 343~$m.s^{-1}$.
+
+The directional pattern of a cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree, the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree direction and maximum attenuation in the 180\textdegree direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
 
 \subsection{Hardware} \label{sec:hardware}
 Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack.

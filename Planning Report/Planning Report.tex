@@ -86,8 +86,8 @@ The design, construction and testing of a pair of hearing aids is required. The 
 The hearing aid device also requires an aspect of directionality. The user must be able to manually tune the device to choose a direction for sound amplification other than the one they are facing. The directionality feature must be able to be toggled on and off in order for the user to be able to hear in all directions when needed. Achieving functionality in these areas would be regarded as meeting the minimum specifications for the project. 
 
 All implemented features must undergo rigorous testing in order to determine the success rate of the device. Laboratory tests must be conducted to obtain an objective basis for evaluation. Clinical tests will also be conducted for the purpose of obtaining a human opinion of how effective the device is at improving individual hearing. 
+
 \subsection{Assumptions}
-assuming we can use the kudu wave
 A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device.
 
 All hardware in reasonable time frame.
@@ -95,11 +95,11 @@ All hardware in reasonable time frame.
 The design, implementation and testing of the hearing aid device will be seen to be successful if the following criteria are met:
 
 \begin{itemize}
-	\item Time delay between actual and perceived sound of less than 10ms\\
-	\item Passband ripple of 1dB for each filter band (ANSI standard)\\
-	\item Stop band attenuation of -60dB for each filter band (ANSI standard)\\
-	\item Polar pattern of the device has the same polar pattern as a two omnidirectional antenna array\\
-	\item Positive feedback from questionnaires of clinical testing??????????\\
+	\item Time delay between actual and perceived sound of less than 10ms
+	\item Passband ripple of 1dB for each filter band (ANSI standard)
+	\item Stop band attenuation of -60dB for each filter band (ANSI standard)
+	\item Polar pattern of the device has the same polar pattern as a two omnidirectional antenna array
+	\item Positive feedback from questionnaires of clinical testing??????????
 	\item Comparison of manually tuned directional angle with angle of sound source are similar????????. 	
 \end{itemize}
 
@@ -150,6 +150,7 @@ The microprocessor block consists of all of the signal processing required for t
 uniform bandwidth filter bank
 fir filters
 1/3 octave bandwidth - according to ANSI S1.11??
+
 \subsection{Directionality} \label{sec:directionality}
 In order to achieve tunable directionality, a software directional microphone will be used. In the software directional microphone, the signals from two omni-directional microphones are captured and combined in order to create a directional pattern.
 

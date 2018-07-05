@@ -4,6 +4,7 @@
 \usepackage{subcaption}
 \usepackage{textcomp}
 \usepackage{makecell}
+\usepackage{balance}
 \usepackage[super]{nth}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -32,52 +33,50 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \section{INTRODUCTION}
-Hearing loss is a prevalent problem in the world, that is caused by a number of factors including age, disease and trauma \cite{Evaluation_of_a_hearing_compensation_algorithm}. In order to compensate for hearing loss, a digital hearing aid can be used \cite{Evaluation_of_a_hearing_compensation_algorithm}. This report details the design of a digital hearing aid and provides the project plan for the design and implementation of the project. 
+Hearing loss is a prevalent problem in the world, which is caused by a number of factors including age, disease and trauma \cite{Evaluation_of_a_hearing_compensation_algorithm}. In order to compensate for hearing loss, a digital hearing aid can be used \cite{Evaluation_of_a_hearing_compensation_algorithm}. This report details the design of a digital hearing aid and provides the project plan for the implementation and testing of the system. 
 
 \section{PROJECT SPECIFICATIONS}
 \subsection{Problem Analysis}
-Conductive hearing loss is prevalent in the world and may result in members of society experiencing social stigmatization and isolation as well as a decrease in quality of life. Current developments of hearing aid devices are expensive and therefore are inaccessible to less wealthy people.
+Conductive hearing loss is prevalent in the world and may result in members of society experiencing social stigmatization and isolation as well as a decrease in quality of life. Existing hearing aids are expensive and are therefore inaccessible to less wealthy people.
 
-For these reasons, there is a need for the development of an affordable hearing aid device that is able to apply compensatory amplification in accordance with the audiograms of specific individuals. Additionally, the hearing aid should have a directionality feature that is manually tunable by the user for the purpose of adjust to different noisy environments. 
+For these reasons, there is a need for the development of an affordable hearing aid device that is able to apply compensatory amplification in accordance with an individual's audiograms. Additionally, the hearing aid should have a directionality feature that is manually tunable by the user thus allowing the user to hear in specific directions in a noisy environment. 
 
 \subsection{Requirements and Specifications}
-The design, construction and testing of a pair of hearing aids is required. The device to be developed must be able to apply individual-specific compensatory amplification for each ear according to acquired audiograms. 
+The design, construction and testing of a pair of hearing aids is required. The device to be developed must be able to apply individual-specific compensatory amplification for each ear according to an individual's audiograms. 
 
-The hearing aid device also requires an aspect of directionality. The user must be able to manually tune the device to choose a direction for sound amplification other than the one they are facing. The directionality feature must be able to be toggled on and off in order for the user to be able to hear in all directions when needed. Achieving functionality in these areas would be regarded as meeting the minimum specifications for the project. 
+The hearing aid device also requires an aspect of directionality. The user must be able to manually tune the device to choose a direction for sound amplification, thus allowing them to hear sounds in a chosen direction. The directionality feature must be able to be toggled on and off in order for the user to be able to hear in all directions when needed. Achieving functionality in these areas would be regarded as meeting the specifications for the project. 
 
 All implemented features must undergo rigorous testing in order to determine the success rate of the device. Laboratory tests must be conducted to obtain an objective basis for evaluation. Clinical tests will also be conducted for the purpose of obtaining a human opinion of how effective the device is at improving individual hearing. 
 
 \subsection{Assumptions}
-A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device. Another assumption is that the hardware required for the project will be delivered within a reasonable time-frame. Finally, it is assumed that the ear phones that are acquired when purchasing a cell phone are of high enough quality to be used for the hearing aid.
+A major assumption that has been made is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device. Another assumption is that the hardware required for the project will be delivered within a reasonable time-frame. Finally, it is assumed that the ear phones that are acquired when purchasing a cell phone are of high enough quality to be used for the hearing aid.
 
 \subsection{Success Criteria}
 The design, implementation and testing of the hearing aid device will be seen to be successful if the following criteria are met:
 
 \begin{itemize}
 	\item Time delay between actual and perceived sound of less than 10ms
-	\item Passband ripple of 1dB for each filter band (ANSI standard)
-	\item Stop band attenuation of -60dB for each filter band (ANSI standard)
-	\item Polar pattern of the device has the same polar pattern as a two omnidirectional antenna array
-	\item Positive feedback from questionnaires of clinical testing??????????
-	\item Comparison of manually tuned directional angle with angle of sound source are similar????????. 	
+	\item Passband ripple of 1dB for each filter band according to ANSI standards
+	\item Stop band attenuation of -60dB for each filter band according to ANSI standards
+	\item Polar pattern of the device matches the selected polar pattern with less than a 5\% error
+	\item Over 60\% of participants indicated that their hearing was improved while wearing the hearing aid	
+	\item The audiograms obtained while wearing the hearing aid match the expected audiograms within a 5\% error
 \end{itemize}
 
 \subsection{Constraints}
-All project groups were allocated a budget of R~1200. While this will direct the group towrds the development of a low cost device,it has offered a constraint on the development of the hearing aid in a sense that the group will be limited to purchasing required hardware of a lower quality compared to that utilized in existing literature. This constraint will have an effect on the overall quality of the hearing aid.
+All project groups were allocated a budget of R~1200. While this will direct the group towards the development of a low cost device, it has offered a constraint on the development of the hearing aid since the group will be limited to purchasing hardware of a lower quality compared to that utilized in existing literature. This constraint is likely to have an effect on the overall quality of the hearing aid. An additional constraint that will effect the quality of the hearing aid is the limited time available for the completion of the project. 
 
-An additional constraint that will effect the quality of the hearing aid is the available time for the completion of the project. 
-
-Audiograms offer an indication of an individuals capability of hearing monotone sounds across the audible frequency range. It does not offer any information on an individual's ability to hear sounds in a noisy environment. Therefore the compensatory amplification feature is constrained to the information provided bu the audiogram. 
+Audiograms offer an indication of an individuals capacity to hear monotone sounds across the audible frequency range. It does not offer any information on an individual's ability to hear sounds in a noisy environment. Therefore the compensatory amplification feature is constrained to the information provided by an audiogram. 
 
 \section{PROJECT BACKGROUND}
 \subsection{Literature Review}
-One of the main functions of a digital hearing aid is to apply gain to input signals based on an individual's audiogram~\cite{Survey_of_Filter_Bank_Algorithms}. This means that signals with different frequencies are amplified by different values, thus allowing for frequencies that the participant has difficulty hearing to be amplified more than other frequencies~\cite{Complexity_effective_auditory_compensation}. In order to divide the frequency range to apply compensatory gain, it is suggested by \cite{Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation, design_of_IIR_based_digital_hearing_aids, 16-Band_Reconfigurable_Hearing_Aid, Digital_filter_bank_for_hearing_aid, Loudness_compensation_method_based_on_human_auditory} to use a filter bank. This will segment the frequency range into a number of bands allowing for a unique gain, matching the audiogram at that frequency, to be applied to each band~\cite{16-Band_Reconfigurable_Hearing_Aid}. According to the ANSI S1.11 standard, the frequency range 0-20~kHz (the audible range) should be divided into 43 bands each with a bandwidth of 1/3 of an octave~\cite{Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation}. Thus, in order to apply compensatory gain to the entire audible range, 43 filters are required. However, the use of 43 filters is computationally intensive and will result in the introduction of large delays in the system. Since it is stated by \cite{An_Ultra_Low-power_Programmable_DSP_System} and \cite{Complexity-effective_auditory_compensation_controllable_filter} that the group delay must be less than 10~ms, the use of 43 filters is not a feasible solution. As such, \cite{16-Band_Reconfigurable_Hearing_Aid, Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation} suggest that gain should only be applied to the frequency range of speech (250~Hz to 8~kHz), which implies the use of 18 filters.
+One of the main functions of a digital hearing aid is to apply gain to an input signal based on an individual's audiogram~\cite{Survey_of_Filter_Bank_Algorithms}. This means that signals with different frequencies are amplified by different values, thus allowing for frequencies that the participant has difficulty hearing to be amplified more than other frequencies~\cite{Complexity_effective_auditory_compensation}. In order to divide the frequency range to apply compensatory gain, it is suggested by \cite{Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation, design_of_IIR_based_digital_hearing_aids, 16-Band_Reconfigurable_Hearing_Aid, Digital_filter_bank_for_hearing_aid, Loudness_compensation_method_based_on_human_auditory} to use a filter bank. This will segment the frequency range into a number of bands allowing for a unique gain, matching the audiogram at that frequency, to be applied to each band~\cite{16-Band_Reconfigurable_Hearing_Aid}. According to the ANSI S1.11 standard, the frequency range 0-20~kHz (the audible range) should be divided into 43 bands each with a 1/3 octave bandwidth~\cite{Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation}. Thus, in order to apply compensatory gain to the entire audible range, 43 filters are required. However, the use of 43 filters is computationally intensive and will result in the introduction of large delays in the system. Since it is stated by \cite{An_Ultra_Low-power_Programmable_DSP_System} and \cite{Complexity-effective_auditory_compensation_controllable_filter} that the group delay of the hearing aid must be less than 10~ms, the use of 43 filters is not a feasible solution. As such, \cite{16-Band_Reconfigurable_Hearing_Aid, Survey_of_Filter_Bank_Algorithms, Complexity_effective_auditory_compensation} suggest that gain should only be applied to the frequency range of speech (250~Hz to 8~kHz), which implies the use of 18 filters.
 
 A number of different filters are used for the implementation of the filter bank. FIR filters have a linear phase response and are stable and as such they are used by \cite{Digital_filter_bank_for_hearing_aid} and \cite{Complexity-effective_auditory_compensation_controllable_filter}. However, they are computationally expensive due to the large number of multiplications, and as such \cite{Complexity_effective_auditory_compensation} proposes the use of IIR filters. \cite{Loudness_compensation_method_based_on_human_auditory} suggests the use of a gammatone filter bank which mimics the mechanism of the cochlea, thus allowing for more natural sounding auditory compensation. 
 
-When amplifying audio signals, it is necessary to apply dynamic compression to the signals. This is to ensure that the amplified signal never exceeds a person's comfort threshold \cite{Complexity_effective_auditory_compensation, Loudness_compensation_method_based_on_human_auditory}. As such, each amplified signal must be compared to the comfort threshold and if is exceeds the threshold, the gain must be reduced \cite{Complexity_effective_auditory_compensation}.
+When amplifying audio signals, it is necessary to apply dynamic compression to the signals. This is to ensure that the amplified signal never exceeds a person's comfort threshold \cite{Complexity_effective_auditory_compensation, Loudness_compensation_method_based_on_human_auditory}. As such, each amplified signal must be compared to the comfort threshold and if it exceeds the threshold, the gain must be reduced \cite{Complexity_effective_auditory_compensation}.
 
-Directional hearing aids were created as a method of improving the signal to noise ratio (SNR) in hearing aids~\cite{trends_in_amplification}. They do this by changing the SNR based on the spatial location of the required signals relative to the unwanted signals~\cite{trends_in_amplification}. This can assist in improving a user's speech recognition in a noisy environment~\cite{trends_in_amplification}. 
+Directional hearing aids were created as a method of improving the signal to noise ratio (SNR) in hearing aids~\cite{trends_in_amplification}. By amplifying the signals in one direction and attenuating the signals in the other directions, the SNR is changed based on the spatial location of the required signals relative to the unwanted signals~\cite{trends_in_amplification}. This can assist in improving a user's speech recognition in a noisy environment~\cite{trends_in_amplification}. 
  
 In order to implement directionality, two different types of microphones can be used: omni-directional and directional~\cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. To achieve directionality with omni-directional microphones, two must be used, with one placed at the back of the hearing aid and one at the front~\cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. By using software created time delays, a software directional microphone is created \cite{Distortion_of_interaural_time_cues}. If a directional microphone is used, one one microphone is required~\cite{trends_in_amplification}. Most hearing aids allow the user to switch between a directional and an omni-directional mode~\cite{trends_in_amplification}. If a directional microphone is used, an omni-directional microphone is also required for when the user selects omni-directional mode~\cite{trends_in_amplification}.
 
@@ -315,8 +314,10 @@ A breakdown of the components and resources required for the implementation and 
 
 \section{CONCLUSION}
 The design and project plan for the implementation of an adaptive hearing aid has been presented. The main components of the project are the implementation of compensatory amplification, directionality and the development of the required hardware. The final essential component is the testing of the device, consisting of laboratory and clinical testing. The project will be implemented using MATLAB and Simulink and will make use of an Arduino Due microcontroller. The overall cost of the project is expected to be R1528. The main risks to the project are the lack of availability of the resources needed to test the device.
-
+\balance
 \bibliographystyle{witseie}
 \bibliography{labproject}
+
+
 
 \end{document}

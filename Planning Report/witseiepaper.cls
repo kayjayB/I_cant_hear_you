@@ -525,17 +525,13 @@ page \thepage \space undefined}}%
 \def\@maketitle{{\parskip 0pt \newpage \null
 %   \advance \rightskip by 15mm
 %   \advance \leftskip  by 15mm
-
-
-%%%% make abstract smaller!
-
    {\fontfamily{ptm}\fontseries{b}\fontsize{12pt}{\f@baselineskip}\selectfont \@title \par}
-   \vskip 10pt {\lineskip .5em
-   {\fontfamily{ptm}\fontseries{b}\fontsize{12pt}{\f@baselineskip}\selectfont \@author}\par}
-   \noindent{\itshape\small\vskip 10pt {\sl \@thanks}\par}
-   \noindent{\small\vskip 10pt {\fontfamily{ptm}\fontseries{b}\fontsize{9pt}{\f@baselineskip}\selectfont Abstract:} \@abstract\par}
+   \vskip 12pt {\lineskip .5em
+   {\fontfamily{ptm}\fontseries{b}\fontsize{10pt}{\f@baselineskip}\selectfont \@author}\par}
+   \noindent{\itshape\small\vskip 12pt {\sl \@thanks}\par}
+   \noindent{\small\vskip 20pt {\fontfamily{ptm}\fontseries{b}\fontsize{9pt}{\f@baselineskip}\selectfont Abstract:} \@abstract\par}
    \noindent{\small\vskip 9pt {\fontfamily{ptm}\fontseries{b}\fontsize{9pt}{\f@baselineskip}\selectfont Key words:} \@keywords\par}
-   \vskip 14pt}}
+   \vskip 27pt}}
 
 \def\maketitle{\par
    \begingroup

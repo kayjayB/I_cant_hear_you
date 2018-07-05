@@ -63,7 +63,7 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 %
 \abstract{ }
 
-\keywords{}
+\keywords{Compensatory Amplification, Directionality,}
 
 \maketitle
 \thispagestyle{empty}
@@ -89,9 +89,8 @@ The hearing aid device also requires an aspect of directionality. The user must 
 All implemented features must undergo rigorous testing in order to determine the success rate of the device. Laboratory tests must be conducted to obtain an objective basis for evaluation. Clinical tests will also be conducted for the purpose of obtaining a human opinion of how effective the device is at improving individual hearing. 
 
 \subsection{Assumptions}
-A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device.
+A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device. Another assumption is that the hardware required for the project will be delivered within a reasonable time-frame. Finally, it is assumed that the ear phones that are acquired when purchasing a cell phone are of high enough quality to be used for the hearing aid.
 
-All hardware in reasonable time frame.
 \subsection{Success Criteria}
 The design, implementation and testing of the hearing aid device will be seen to be successful if the following criteria are met:
 
@@ -143,7 +142,7 @@ The microprocessor block consists of all of the signal processing required for t
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=0.8\textwidth]{microBlockDiagrm.png}
+	\includegraphics[width=0.8\textwidth]{microBlockDiagrm.pdf}
 	\caption{Block diagram of the software components of the hearing aid}
 	\raggedright
 	\label{fig:microBlock}	
@@ -184,7 +183,7 @@ The directional pattern of a hyper-cardioid is expected to be sufficient to ampl
 \end{figure}
 
 \subsection{Hardware} \label{sec:hardware}
-Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack.
+Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack. The earphones to be used are those that are acquired for free when purchasing a cell phone. These were selected as they are readily available, and are thus inexpensive.
 
 In order to tune the directionality of the hearing aid, a potentiometer, which acts as a dial, will be used. The signal from the potentiometer is also converted to digital by the ADC for signal processing. The hearing aid will include a power button to turn the device on or off, and a toggle switch to switch between directional and omni-directional amplification modes. The entire system will be powered using rechargeable batteries. 
 

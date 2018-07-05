@@ -1,52 +1,11 @@
 \documentclass[10pt,twocolumn]{witseiepaper}
 
-%
-% All KJN's macros and goodies (some shameless borrowing from SPL)
 \usepackage{KJN}
 \usepackage{subcaption}
-\usepackage{listings}
-\usepackage{amsmath}
-\usepackage{epstopdf}
-\usepackage{xcolor}
 \usepackage{textcomp}
-\usepackage{listings}
-\usepackage{alltt}
-\usepackage{matlab-prettifier}
-\usepackage{graphicx}
-\usepackage{changes}
 \usepackage{makecell}
-\usepackage{verbatim}
 \usepackage[super]{nth}
-\usepackage{algorithm,algpseudocode}
-\usepackage{mathtools, cuted}
-\usepackage{stfloats}% <-- added
-\usepackage{balance}
-\usepackage[font=small]{caption}
-\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
-\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
-\definecolor{mylilas}{RGB}{170,55,241}
-%\usepackage{flafter}
 
-\lstset{language=Matlab, % Set colour for matlab code
-	breaklines=true,%
-	morekeywords={matlab2tikz},
-	keywordstyle=\color{blue},%
-	morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
-	identifierstyle=\color{black},%
-	stringstyle=\color{mylilas},
-	commentstyle=\color{mygreen},%
-	showstringspaces=false,%without this there will be a symbol in the places where there is a space
-	numbers=left,%
-	numberstyle={\tiny \color{black}},% size of the numbers
-	numbersep=9pt, % this defines how far the numbers are from the text
-	emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
-	%emph=[2]{word1,word2}, emphstyle=[2]{style},    
-}
-
-
-%
-% PDF Info
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -63,7 +22,7 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 %
 \abstract{ }
 
-\keywords{Compensatory Amplification, Directionality,}
+\keywords{Audiogram, Compensatory Amplification, Tunable Directionality}
 
 \maketitle
 \thispagestyle{empty}
@@ -172,7 +131,7 @@ The directionality feature will be designed such that the user will be able to s
 
 In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound, \textit{c}, is 343~$m.s^{-1}$.
 
-The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree, the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree direction and maximum attenuation in the 180\textdegree direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
+The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree\ , the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree\ direction and maximum attenuation in the 180\textdegree\ direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
 
 \begin{figure}[h]
 	\centering

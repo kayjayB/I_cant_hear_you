@@ -1,52 +1,11 @@
 \documentclass[10pt,twocolumn]{witseiepaper}
 
-%
-% All KJN's macros and goodies (some shameless borrowing from SPL)
 \usepackage{KJN}
 \usepackage{subcaption}
-\usepackage{listings}
-\usepackage{amsmath}
-\usepackage{epstopdf}
-\usepackage{xcolor}
 \usepackage{textcomp}
-\usepackage{listings}
-\usepackage{alltt}
-\usepackage{matlab-prettifier}
-\usepackage{graphicx}
-\usepackage{changes}
 \usepackage{makecell}
-\usepackage{verbatim}
 \usepackage[super]{nth}
-\usepackage{algorithm,algpseudocode}
-\usepackage{mathtools, cuted}
-\usepackage{stfloats}% <-- added
-\usepackage{balance}
-\usepackage[font=small]{caption}
-\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
-\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
-\definecolor{mylilas}{RGB}{170,55,241}
-%\usepackage{flafter}
 
-\lstset{language=Matlab, % Set colour for matlab code
-	breaklines=true,%
-	morekeywords={matlab2tikz},
-	keywordstyle=\color{blue},%
-	morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
-	identifierstyle=\color{black},%
-	stringstyle=\color{mylilas},
-	commentstyle=\color{mygreen},%
-	showstringspaces=false,%without this there will be a symbol in the places where there is a space
-	numbers=left,%
-	numberstyle={\tiny \color{black}},% size of the numbers
-	numbersep=9pt, % this defines how far the numbers are from the text
-	emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
-	%emph=[2]{word1,word2}, emphstyle=[2]{style},    
-}
-
-
-%
-% PDF Info
-%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
@@ -63,7 +22,7 @@ Witwatersrand, Private Bag 3, 2050, Johannesburg, South Africa}
 %
 \abstract{ }
 
-\keywords{}
+\keywords{Audiogram, Compensatory Amplification, Tunable Directionality}
 
 \maketitle
 \thispagestyle{empty}
@@ -89,9 +48,8 @@ The hearing aid device also requires an aspect of directionality. The user must 
 All implemented features must undergo rigorous testing in order to determine the success rate of the device. Laboratory tests must be conducted to obtain an objective basis for evaluation. Clinical tests will also be conducted for the purpose of obtaining a human opinion of how effective the device is at improving individual hearing. 
 
 \subsection{Assumptions}
-A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device.
+A major assumption that has been made at this stage is that the KUDUwave will be accessible to the group. This device will be used to obtain audiograms of human participants without aid and while using the hearing aid device. Another assumption is that the hardware required for the project will be delivered within a reasonable time-frame. Finally, it is assumed that the ear phones that are acquired when purchasing a cell phone are of high enough quality to be used for the hearing aid.
 
-All hardware in reasonable time frame.
 \subsection{Success Criteria}
 The design, implementation and testing of the hearing aid device will be seen to be successful if the following criteria are met:
 
@@ -143,7 +101,7 @@ The microprocessor block consists of all of the signal processing required for t
 
 \begin{figure*}[t]
 	\centering
-	\includegraphics[width=0.8\textwidth]{microBlockDiagrm.png}
+	\includegraphics[width=0.8\textwidth]{microBlockDiagrm.pdf}
 	\caption{Block diagram of the software components of the hearing aid}
 	\raggedright
 	\label{fig:microBlock}	
@@ -173,7 +131,7 @@ The directionality feature will be designed such that the user will be able to s
 
 In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound, \textit{c}, is 343~$m.s^{-1}$.
 
-The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree, the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree direction and maximum attenuation in the 180\textdegree direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
+The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree\ , the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree\ direction and maximum attenuation in the 180\textdegree\ direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
 
 \begin{figure}[h]
 	\centering
@@ -184,7 +142,7 @@ The directional pattern of a hyper-cardioid is expected to be sufficient to ampl
 \end{figure}
 
 \subsection{Hardware} \label{sec:hardware}
-Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack.
+Analog circuitry is required to acquire the sound signal, condition it and convert it to digital. To acquire the signal, two omni-directional microphones are used. The front microphone is the primary microphone which is used alone when the omni-directional mode is selected. The rear microphone is used along with the front microphone when directional mode is selected. The signals from the microphones are amplified and then passed through an eighth order switched capacitor anti-aliasing filter. The filter has a cutoff frequency of 25~kHz, which was selected to ensure that the entire audible range is left unattenuated, while still attenuating the unwanted signal components. Once the signals have been filtered, they are converted to digital by the analog to digital converter (ADC) of an Arduino Due microcontroller. Thereafter, the signals undergo signal processing, as discussed above, before being converted back to analog signals by the Arduino's digital to analog converters. The analog signal corresponding to ear each is then relayed to the appropriate ear using earphones which interact with a headphone jack. The earphones to be used are those that are acquired for free when purchasing a cell phone. These were selected as they are readily available, and are thus inexpensive.
 
 In order to tune the directionality of the hearing aid, a potentiometer, which acts as a dial, will be used. The signal from the potentiometer is also converted to digital by the ADC for signal processing. The hearing aid will include a power button to turn the device on or off, and a toggle switch to switch between directional and omni-directional amplification modes. The entire system will be powered using rechargeable batteries. 
 
@@ -227,8 +185,10 @@ The method of the clinical testing will now be detailed. First, staff from the s
 
 In order to test the directionality of the device, eight speakers will be set up in a circle, separated by 45\textdegree\ angles. The participant will be asked to sit in a chair which faces 0\textdegree\  while wearing the hearing aid. Pure tone sounds will be played from a single speaker at a time and the participant will be asked to tune the dial controlling the directionality until the sound is at its loudest. The angle of the dial will then be recorded and compared to the angle of the speaker, thus allowing for a quantification of the error present in the directionality. 
 
-\section{PROJECT METHODOLOGIES AND MANAGEMENT}
-\subsection{Project Phases}
+\section{PROJECT MANAGEMENT}
+This section details the project management to be used in the project, including the project timeline and the management of team work in the project.
+
+\subsection{Project Timeline and Work Breakdown}
 The project has been divided into 11 development phases, which encapsulate the entire project, from ethics clearance to the presentation. Three of these phases occurred prior to the submission of this document. The phases are detailed in the following sections.
 
 \subsubsection*{Phase 1: Obtain Ethics Clearance} $    $
@@ -305,6 +265,14 @@ Phase 11 is the final phase of the project which involves the preparation of the
 \end{figure*}
 
 
+\subsection{Team-work and Work Allocation}
+
+The team will be loosely following Agile methodologies in the implementation of the project. In doing so, there will be a daily stand-up meeting where the work that each member did the previous day will be discussed. This will allow for any potential problems to be fixed as soon as they occur. It will also help to ensure that the project schedule is being followed. If the project falls behind schedule, the stand-up meetings will allow for the schedule to be re-evaluated before the backlog gets too severe.
+
+The project management application \textit{Trello} will be used to assign tasks to each member of the team. The team will also use the application to record any problems they encounter and to indicate which tasks they have completed. 
+
+While each member has their own tasks that they will work on, the other team member will be available to offer assistance at any time.
+>>>>>>> d6004f0d0cfba9ff1b242de2819cc7ee63eda46a
 
 \section{PROJECT RISK ANALYSIS}
 

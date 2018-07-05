@@ -74,13 +74,13 @@ One of the main functions of a digital hearing aid is to apply gain to an input 
 
 A number of different filters are used for the implementation of the filter bank. FIR filters have a linear phase response and are stable and as such they are used by \cite{Digital_filter_bank_for_hearing_aid} and \cite{Complexity-effective_auditory_compensation_controllable_filter}. However, they are computationally expensive due to the large number of multiplications, and as such \cite{Complexity_effective_auditory_compensation} proposes the use of IIR filters. \cite{Loudness_compensation_method_based_on_human_auditory} suggests the use of a gammatone filter bank which mimics the mechanism of the cochlea, thus allowing for more natural sounding auditory compensation. 
 
-When amplifying audio signals, it is necessary to apply dynamic compression to the signals. This is to ensure that the amplified signal never exceeds a person's comfort threshold \cite{Complexity_effective_auditory_compensation, Loudness_compensation_method_based_on_human_auditory}. As such, each amplified signal must be compared to the comfort threshold and if it exceeds the threshold, the gain must be reduced \cite{Complexity_effective_auditory_compensation}.
+When amplifying audio signals, it is necessary to apply dynamic compression to the signals. This is to ensure that the amplified signal never exceeds a person's comfort threshold \cite{Complexity_effective_auditory_compensation, Loudness_compensation_method_based_on_human_auditory}. As such, each amplified signal must be compared to the comfort threshold and if it exceeds the threshold, the gain must be reduced~\cite{Complexity_effective_auditory_compensation}.
 
 Directional hearing aids were created as a method of improving the signal to noise ratio (SNR) in hearing aids~\cite{trends_in_amplification}. By amplifying the signals in one direction and attenuating the signals in the other directions, the SNR is changed based on the spatial location of the required signals relative to the unwanted signals~\cite{trends_in_amplification}. This can assist in improving a user's speech recognition in a noisy environment~\cite{trends_in_amplification}. 
  
 In order to implement directionality, two different types of microphones can be used: omni-directional and directional~\cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. To achieve directionality with omni-directional microphones, two must be used, with one placed at the back of the hearing aid and one at the front~\cite{An_ultra_low_power_analogue_directionality, trends_in_amplification}. By using software created time delays, a software directional microphone is created \cite{Distortion_of_interaural_time_cues}. If a directional microphone is used, one one microphone is required~\cite{trends_in_amplification}. Most hearing aids allow the user to switch between a directional and an omni-directional mode~\cite{trends_in_amplification}. If a directional microphone is used, an omni-directional microphone is also required for when the user selects omni-directional mode~\cite{trends_in_amplification}.
 
-There have been numerous implementations of the directionality of a hearing aid. An adaptive directionality system was implemented by \cite{An_ultra_low_power_analogue_directionality} and \cite{Evaluation_of_digital_hearing_aid_algorithms}. With an adaptive system, the hearing aids focus automatically in the direction of the sound with the greatest signal to noise ratio \cite{An_ultra_low_power_analogue_directionality}. Using two omni-directional microphones, adaptive directionality is implemented by cross-correlating the signals from the front and back microphones and using the cross-correlated signals to determine an adaptive weight for altering the position of the nulls (the angles of greatest attenuation) \cite{An_ultra_low_power_analogue_directionality}. However, research has not been done into changing the directionality of the device to a direction selected by the user.
+There have been numerous implementations of the directionality of a hearing aid. An adaptive directionality system was implemented by \cite{An_ultra_low_power_analogue_directionality} and \cite{Evaluation_of_digital_hearing_aid_algorithms}. With an adaptive system, the hearing aids focus automatically on the direction of the sound with the greatest signal to noise ratio \cite{An_ultra_low_power_analogue_directionality}. By making use of two omni-directional microphones, adaptive directionality is implemented by cross-correlating the signals from the front and back microphones. The cross-correlated signals are then used to determine an adaptive weight for altering the position of the nulls (the angles of greatest attenuation)~\cite{An_ultra_low_power_analogue_directionality}. However, research has not been done into changing the directionality of the device to a direction selected by the user.
 
 In order to achieve directionality, different delays between the microphones are used. By changing the delays, different attenuation patterns can be acquired \cite{trends_in_amplification, Distortion_of_interaural_time_cues}. The three most commonly used patterns are cardioid, hyper-cardioid and bi-directional \cite{trends_in_amplification}.
 
@@ -109,14 +109,14 @@ The microprocessor block consists of all of the signal processing required for t
 The software components of the system will be programmed using MATLAB and Simulink and thereafter burned onto the Arduino Due microcontroller. By using Simulink, the Arduino can be programmed to function autonomously without needing to be connected to a laptop.
 
 \subsection{Compensatory Amplification} \label{sec:amplification}
-In performing the auditory compensatory, amplification will only be applied to the frequency range of speech. As such, 18 filters will be used, each with a bandwidth of 1/3 of an octave. Since phase relationships are crucial in implementing directionality, FIR filters will be used for their linear phase response. In complying with the ANSI standards for filters, third order filters will be used, implying an attenuation of 60dB/decade.
+In performing the auditory compensatory, amplification will only be applied to the frequency range of speech. As such, 18 filters will be used, each with a bandwidth of 1/3 of an octave. Since phase relationships are crucial in implementing directionality, FIR filters will be used for their linear phase response. In complying with the ANSI standards for filters, the filters will be designed such that the stop band attenuation is -60~dB. Since the bandwidth (in Hz) of each filter is different, the order of the filters will vary. The designed filters will be bandpass filters which only attenuate all but a selected range of frequencies.
 
-The input signal from each microphone (in directional mode) and from the front microphone (in omni-directional mode) will be passed through the filter bank. This will result in 18 bands of the signal being isolated from one another. Thereafter, a gain matching the audiogram for that frequency range will be applied to each band. In doing so, each signal in the band is multiplied by the gain. Thereafter, each signal is compared to the comfort threshold, and if it exceeds the threshold, its amplitude is reduced until it equals the threshold. Finally, the resultant signals will be added together to produce the compensated signal. 
+The input signal from each microphone (in directional mode) and from the front microphone (in omni-directional mode) will be passed through the filter bank. This will result in the 18 bands of the signal being isolated from one another. Thereafter, a gain matching the audiogram for that frequency range will be applied to each band. In doing so, each signal in the band is multiplied by the gain. Thereafter, each signal is compared to the comfort threshold, and if it exceeds the threshold, its amplitude is reduced until it equals the threshold. Finally, the resultant signals will be added together to produce the compensated signal. 
 
-In order to calculate the required gains for each frequency band, the audiogram requires linear interpolation to increase the resolution as an audiogram only consists of 12 points. In order to ensure that the shape of the audiogram is maintained, a large number of points are required (greater than 1000). The gain for each frequency band will then be selected as the gain on the interpolated audiogram corresponding to the nominal centre frequency of the band.
+In order to calculate the required gains for each frequency band, the audiogram requires linear interpolation to increase the resolution. This is necessary since an audiogram only consists of 12 points. In order to ensure that the shape of the audiogram is maintained, a large number of points are required (greater than 1000). The gain for each frequency band will then be selected as the gain on the interpolated audiogram corresponding to the nominal centre frequency of the band.
 
 \subsection{Directionality} \label{sec:directionality}
-In order to achieve tunable directionality, a software directional microphone will be used. In the software directional microphone, the signals from two omni-directional microphones are captured and combined in order to create a directional pattern \cite{Distortion_of_interaural_time_cues}. The two microphones will be situated in front and behind the hearing aid device. A desirable directional pattern will be acquired by delaying the signal acquired by the rear microphone and subtracting it from the signal acquired from the front microphone. This configuration is known as a differential microphone array \cite{Distortion_of_interaural_time_cues}.
+In order to achieve tunable directionality, a software directional microphone will be used. In the software directional microphone, the signals from two omni-directional microphones are captured and combined in order to create a directional pattern \cite{Distortion_of_interaural_time_cues}. The two microphones will be situated on the front and back of the hearing aid device. The desired directional pattern will be acquired by delaying the signal acquired by the rear microphone and subtracting it from the signal acquired from the front microphone. This configuration is known as a differential microphone array \cite{Distortion_of_interaural_time_cues}.
 
 The directionality feature will be designed such that the user will be able to specify the desired direction of amplification using a potentiometer dial. The analog output voltage of the dial will be read by the ADC of the microcontroller and converted to a time delay. This time delay will be applied to the rear microphone signal and subtracted from the front microphone signal. Thereafter, the direction of maximum gain will be in the same direction that the potentiometer dial is pointing. A block diagram showing this process can be found in \figref{fig:directionalityBlockDiagram}.
 
@@ -130,7 +130,7 @@ The directionality feature will be designed such that the user will be able to s
 
 In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound, \textit{c}, is 343~$m.s^{-1}$.
 
-The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree\ , the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree\ direction and maximum attenuation in the 180\textdegree\ direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
+The directional pattern of a hyper-cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree\ , the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree\ direction and maximum attenuation in the 180\textdegree\ direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in \figref{fig:polar}. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
 
 \begin{figure}[h]
 	\centering
@@ -189,6 +189,16 @@ This section details the project management to be used in the project, including
 
 \subsection{Project Timeline and Work Breakdown}
 The project has been divided into 11 development phases, which encapsulate the entire project, from ethics clearance to the presentation. Three of these phases occurred prior to the submission of this document. The phases are detailed in the following sections.
+
+The project Gantt chart is given in \figref{fig:ganttChart}. In the chart, KJB refers to Kayla-Jade Butkow and KDS refers to Kelvin da Silva.
+
+\begin{figure*}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{GanttChart.png}
+	\caption{Gantt chart for the project}
+	\raggedright
+	\label{fig:ganttChart}	
+\end{figure*}
 
 \subsubsection*{Phase 1: Obtain Ethics Clearance} $    $
 
@@ -255,15 +265,6 @@ Phase 10 will be completed from the \nth{29} of August to the \nth{2} of Septemb
 \subsubsection*{Phase 11: Presentation} $    $
 Phase 11 is the final phase of the project which involves the preparation of the presentation. This will be done by the partners together. The phase will occur between the \nth{3} and the \nth{12} of September.
 
-\begin{figure*}[h]
-	\centering
-	\includegraphics[width=1\textwidth]{GanttChart.png}
-	\caption{Gantt chart of the project.}
-	\raggedright
-	\label{fig:ganttChart}	
-\end{figure*}
-
-
 \subsection{Team-work and Work Allocation}
 
 The team will be loosely following Agile methodologies in the implementation of the project. In doing so, there will be a daily stand-up meeting where the work that each member did the previous day will be discussed. This will allow for any potential problems to be fixed as soon as they occur. It will also help to ensure that the project schedule is being followed. If the project falls behind schedule, the stand-up meetings will allow for the schedule to be re-evaluated before the backlog gets too severe.
@@ -271,7 +272,6 @@ The team will be loosely following Agile methodologies in the implementation of 
 The project management application \textit{Trello} will be used to assign tasks to each member of the team. The team will also use the application to record any problems they encounter and to indicate which tasks they have completed. 
 
 While each member has their own tasks that they will work on, the other team member will be available to offer assistance at any time.
->>>>>>> d6004f0d0cfba9ff1b242de2819cc7ee63eda46a
 
 \section{PROJECT RISK ANALYSIS}
 
@@ -313,7 +313,7 @@ A breakdown of the components and resources required for the implementation and 
 \end{table*}
 
 \section{CONCLUSION}
-The design and project plan for the implementation of an adaptive hearing aid has been presented. The main components of the project are the implementation of compensatory amplification, directionality and the development of the required hardware. The final essential component is the testing of the device, consisting of laboratory and clinical testing. The project will be implemented using MATLAB and Simulink and will make use of an Arduino Due microcontroller. The overall cost of the project is expected to be R1528. The main risks to the project are the lack of availability of the resources needed to test the device.
+The design and project plan for the implementation of an adaptive hearing aid has been presented. The main components of the project are the implementation of compensatory amplification, directionality and the development of the required hardware. The final essential component is the testing of the device, consisting of laboratory and clinical testing. The project will be implemented using MATLAB and Simulink and will make use of an Arduino Due microcontroller. The overall cost of the project is expected to be R1528. The main risk to the project are the lack of availability of the resources needed to test the device.
 \balance
 \bibliographystyle{witseie}
 \bibliography{labproject}

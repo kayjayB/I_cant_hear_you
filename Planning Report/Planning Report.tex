@@ -168,7 +168,7 @@ The directionality feature will be designed such that the user will be able to s
 	\label{fig:directionalityBlockDiagram}	
 \end{figure}
 
-In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound \textit{c} is constantly 343~$m.s^{-1}$.
+In order to create a software directional microphone, certain physical configurations need to be adhered to. One of these considerations is that of the inter-microphone distance \textit{d}. This distance must be equal to half of the wave length of the frequency of interest \cite{Distortion_of_interaural_time_cues}. Since the speech frequency range is of interest, the half wavelength of the centre of the speech range is chosen as the separation distance between the two microphones. Therefore this distance will be 42.875~mm assuming that the speed of sound, \textit{c}, is 343~$m.s^{-1}$.
 
 The directional pattern of a cardioid is expected to be sufficient to amplify sounds coming from the the direction of interest to the user while attenuating noise from other directions. If it is assumed that the front of the hearing aid device is 0\textdegree, the time delay is required to be equal to $\frac{d}{c}$ to ensure that maximum amplification in the 0\textdegree direction and maximum attenuation in the 180\textdegree direction are experienced \cite{Distortion_of_interaural_time_cues}. The polar pattern plot for this case can be found in Figure~. The direction of the polar pattern maximum will be manipulated by varying the time delay using the potentiometer dial. 
 
@@ -232,47 +232,53 @@ This phase involves the construction of the circuit that was designed in Phase 3
 
 In this phase, the compensatory amplification aspect of the hearing aid will be implemented. This phase has numerous sub-phases:
 \begin{itemize}
-	\item Sub-phase 1: Interpolation of audiograms 
+	\item Sub-phase 1: Interpolation of audiograms and selection of the gains for each filter based on the audiogram
 	\item Sub-phase 2: Development of the filter bank
-	\item Sub-phase 3: Designing the gains for each filter based on the audiogram
-	\item Sub-phase 4: Attack and release times for changing the gain per frequency range 
-	\item Sub-phase 5: Dynamic compression of signals
-	\item Sub-phase 6: Optimisation of code from the previous stages to allow for real-time signal processing
+	\item Sub-phase 3: Attack and release times for changing the gain per frequency range 
+	\item Sub-phase 4: Code for ADC and DAC
+	\item Sub-phase 5: Optimisation of code from the previous stages to allow for real-time signal processing
 \end{itemize}
 
 In sub-phase 1, the data from the audiogram will be hard-coded onto MATLAB, and will be linearly interpolated to increase resolution. In sub-phase 2, the filter bank for the auditory compensation will be designed and implemented. 
 **** Come back here!!! ****
 
-The first two sub-phases will be implemented concurrently with phase 4 by Kayla-Jade. Thereafter, sub-phases 3 and 4 will be implemented by Kayla-Jade, while Kelvin concurrently implements sub-phases 5 and 6.
+The first two sub-phases will be implemented concurrently with phase 4 by Kayla-Jade. 
+
+The phase will be completed between the \nth{9} of July and the \nth{27} of July.
 
 
 \subsubsection*{Phase 6: Implementation of the Software Required for Directionality} $    $
 
 In this phase, the software required to implement directionality will be implemented. This software will interface with the dial built into the hardware to tune the direction in which the sound must be amplified. The two partners will implement this phase together. 
-*** Date ***
+
+This phase will be completed between the \nth{28} of July and the \nth{5} of August.
 
 \subsubsection*{Phase 7: Laboratory testing of the full system} $    $
 
 Following the implementation of the entire system, full system testing is required. 
 
-Both partners will perform the laboratory testing.
+Both partners will perform the laboratory testing from the \nth{6} until the \nth{10} of August.
 
 \subsubsection*{Phase 8: Clinical testing of the full system} $    $
 
 Phase 7 involves the testing of the audiogram in a clinical setting, using human participants. The procedure to be implemented in this phase is that described in \secref{sec:clinical}
 
-Both partners will perform the clinical testing.
+Both partners will perform the clinical testing. The phase will occur between the \nth{13} and the \nth{21} of August.
 
 \subsubsection*{Phase 9: Demonstration} $    $
 
 This phase involves the preparation for open day. This includes creating a poster and a video explaining the project. It also includes preparing the demonstration for open day. Both partners will be involved in all aspects of the phase.
 
+Phase 9 will be completed from the \nth{22} to the \nth{28} of August.
+
 \subsubsection*{Phase 10: Documentation} $    $
 
-This phase involves the writing of the final project report. The report will be worked on throughout the entire project, but in this phase, it will be the sole focus. The partners will each work on their reports individually.
+This phase involves the writing of the final project report. The report will be worked on throughout the entire project, but in this phase, it will be the sole focus. The partners will each work on their reports individually. 
+
+Phase 10 will be completed from the \nth{29} of August to the \nth{2} of September.
 
 \subsubsection*{Phase 11: Presentation} $    $
-Phase 11 is the final phase of the project which involves the preparation of the presentation. This will be done by the partners together.
+Phase 11 is the final phase of the project which involves the preparation of the presentation. This will be done by the partners together. The phase will occur between the \nth{3} and the \nth{12} of September.
 
 
 \section{PROJECT RISK ANALYSIS}

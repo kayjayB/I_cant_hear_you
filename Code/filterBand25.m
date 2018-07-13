@@ -10,10 +10,10 @@ function Hd = filterBand25
 % All frequency values are in Hz.
 Fs = 40000;  % Sampling Frequency
 
-Fstop1 = 266;             % First Stopband Frequency
+Fstop1 = 250;             % First Stopband Frequency
 Fpass1 = 282;             % First Passband Frequency
 Fpass2 = 355;             % Second Passband Frequency
-Fstop2 = 377.5;             % Second Stopband Frequency
+Fstop2 = 400;             % Second Stopband Frequency
 Dstop1 = 0.001;           % First Stopband Attenuation
 Dpass  = 0.057501127785;  % Passband Ripple
 Dstop2 = 0.001;           % Second Stopband Attenuation

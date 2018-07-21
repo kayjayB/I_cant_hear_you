@@ -16,9 +16,12 @@ for i=1: length(audiogramdB)
 end
 
 %% Sound reader
-audioInput = dsp.AudioFileReader('Filename', 'B_eng_f1.wav');  
+audioInput = dsp.AudioFileReader('Filename', 'B_eng_m1.wav');  
 audioWriter = audioDeviceWriter('SampleRate',audioInput.SampleRate);
 
+
+%% Filters
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters();
 %% Amplification
 
 % To have a measure of reference, play the original audio once

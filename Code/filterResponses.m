@@ -19,3 +19,6 @@ filter39 = filterBand39;
 fvtool(filter24, 1, filter25, 1, filter26, 1, filter27, 1, filter28, ...
  filter29, 1, filter30, 1, filter31, 1, filter32, 1, filter33, ...
  filter34, 1, filter35, 1, filter36, 1, filter37, 1, filter38, 1, filter39);
+
+%%
+fvtool( filter34, 1, filter35, 1, filter36, 1);

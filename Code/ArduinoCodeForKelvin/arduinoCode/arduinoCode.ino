@@ -60,7 +60,7 @@ void loop() {
   for(i=0;i<5;i++){
     while((ADC->ADC_ISR & 0x80)==0); // wait for conversion
     values[i]=ADC->ADC_CDR[7]; //get values
-    analogWrite(DAC0,values[i]);
+//    analogWrite(DAC0,values[i]);
   }
   stop_time = micros();
 
@@ -76,11 +76,11 @@ void loop() {
 
 
   
-//for(i=0;i<5;i++){
-//  analogWriteResolution(12);
-//  analogWrite(DAC0,values[i]);
-//  analogWrite(DAC1,values[i]);
-//  delayMicroseconds(14);
-//}
+for(i=0;i<5;i++){
+  //analogWriteResolution(12);
+  analogWrite(DAC0,values[i]);
+  analogWrite(DAC1,values[i]);
+  //delayMicroseconds(1);
+}
 }
 

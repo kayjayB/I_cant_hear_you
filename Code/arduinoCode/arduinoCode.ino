@@ -1,34 +1,48 @@
-const int analogInputA0 = A0;  
+A#include <FIR.h>
+
+#include "src/filterLibrary/filterBand39Function.h"
+#include "src/filterLibrary/filterBand39Function_types.h"
+#include "src/filterLibrary/rt_nonfinite.h"
+#include "src/filterLibrary/rtGetInf.h"
+#include "src/filterLibrary/rtGetNaN.h"
+#include <stddef.h>
+#include <stdlib.h>
+
+static void argInit_1x1025_real32_T(float result[1025]);
+
+static void argInit_1x1025_real32_T(float result[1025])
+{
+  int idx1;
+  for (idx1 = 0; idx1 < 1025; idx1++) {
+    result[idx1] = 0.0F;
+  }
+}
+
+float ADC_value[1025];
+float output[1025];
+const float audiogram[16]={15, 13.7, 12, 10, 10, 10, 10, 11.25, 13 , 15, 13.75, 12.125, 10, 7.5, 7.25, 20};
+unsigned int j;
+const int analogInputA0 = A0;
 
 void setup() {
-   Serial.begin(115200); // Set up serial communciation at a baud rate of 115200 bits/sec
-  ADCSRA &= ~(bit (ADPS0) | bit (ADPS1) | bit (ADPS2)); // clear all prescaler bits
- 
-  Serial.println('a') ;
-  char a = 'b';
-  while (a !='a')
-  { 
-    a=Serial.read()  ; 
-  }
- ADCSRA |= bit (ADPS2) ; // set a prescaler of 16. This sets the ADC clock frequency to 1000kHz
-   analogReadResolution(12);
-  analogWriteResolution(12);
+  Serial.begin(230400); // Begin Serial port
+  //pinMode(1, INPUT);
+  //ADCSRA &= ~(1 << ADPS2) | (1 << ADPS1) | (1 <<
+  //ADPS0); // ADC settings
+  //ADCSRA |= 1 << ADPS2; // set 1 MHz frequency
+  filterBand39Function_initialize();
+  argInit_1x1025_real32_T(output);
+  
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  // read the input on analog pin 0:
-  if (Serial.available()>0 ) // make sure that there is data being serially transmitted
-  {
-    mode=Serial.read(); //read the byte
-    if (mode == 'R')    
-    {
-      int micInput = analogRead(analogInputA0);
-      float micVoltage = micInput * (3.3 / 4095.0);
-      // print out the value you read:
-      Serial.println(micVoltage);
-    }
-    delay(1) ;
- //analogWrite(DAC0,micInput);
+  
+  for (j = 0; j < 1024; j++) {
+    ADC_value[j] = analogRead(analogInputA0);
   }
+  filterFrames(ADC_value, audiogram, output);
+  //  for(j=0;j<100;j++) {
+  //    Serial.println(ADC_value [j]);
+  //    }
+  //delay(10);
 }

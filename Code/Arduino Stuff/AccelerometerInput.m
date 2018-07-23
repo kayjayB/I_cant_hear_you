@@ -5,7 +5,7 @@ function x =AccelerometerInput(acc)
     fprintf(acc.s, 'R');
     
     % read in from arduino in unsigned integer format
-    data(1)=fscanf(acc.s,'%u');
+    data(1)=fscanf(acc.s,'%f');
     
     x=data(1);
 

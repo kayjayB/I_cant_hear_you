@@ -1,0 +1,16 @@
+function output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram)
+    bandOutput = zeros(length(buffer), 16);
+    for i=1:16
+        filterBand = oneThirdOctaveFilterBank{i};
+        bandOutput(:,i) = filterBand(buffer);
+        bandOutput(:,i) = bandOutput(:,i) * audiogram(i);
+    end
+   output = bandOutput(:,1)+ bandOutput(:,2)+ bandOutput(:,3)+ ...
+       bandOutput(:,4) +bandOutput(:,5)+ bandOutput(:,6)+ ...
+       bandOutput(:,7)+ bandOutput(:,8)+ bandOutput(:,9)+ ...
+       bandOutput(:,10)+ bandOutput(:,11)+ bandOutput(:,12)+ ...
+       bandOutput(:,13)+ bandOutput(:,14)+ bandOutput(:,15)+ ...
+       bandOutput(:,16);
+
+end
+

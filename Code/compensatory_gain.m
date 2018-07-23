@@ -16,8 +16,8 @@ for i=1: length(audiogramdB)
 end
 
 %% Sound reader
-audioInput = dsp.AudioFileReader('Filename', 'B_eng_m1.wav');  
-audioWriter = audioDeviceWriter('SampleRate',audioInput.SampleRate);
+audioInput2 = dsp.AudioFileReader('Filename', 'Audio\B_eng_f1.wav');  
+audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
 
 
 %% Filters
@@ -31,8 +31,8 @@ oneThirdOctaveFilterBank = createOneThirdOctaveFilters();
 %  end
 % %Wait until audio is played to the end
 % 
-release(audioInput);       % Close input file
-release(audioWriter);               % Close audio output device
+release(audioInput2);       % Close input file
+release(audioWriter2);               % Close audio output device
 
 SpecAna = dsp.SpectrumAnalyzer('PlotAsTwoSidedSpectrum',false, ...
     'SampleRate',40000, ...
@@ -44,13 +44,13 @@ SpecAna.ChannelNames = {'Original signal','Amplified signal'};
 counter = 1;
 
 figure
-while ~isDone(audioInput)
+while ~isDone(audioInput2)
     
-    buffer = audioInput();  % Load a frame of audio
+    buffer = audioInput2();  % Load a frame of audio
 
     output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram);
 
-    audioWriter(output);
+    audioWriter2(output);
   
     n=length(output);   % create a scaling variable equal to the 
                             % length of the data

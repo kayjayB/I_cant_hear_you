@@ -1,7 +1,6 @@
-function oneThirdOctaveFilterBank = createOneThirdOctaveFilters()
+function oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N)
 
     BW = '1/3 octave'; 
-    N = 10;
     F0 = 1000;
     Fs = 40000;
     oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...

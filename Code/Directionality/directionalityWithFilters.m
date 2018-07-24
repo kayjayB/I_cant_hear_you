@@ -1,64 +1,69 @@
 clc
 clear
-% f = 4000;
-% c = 343;
-% d = (c/4000)/2;
-% %d=12*10^-3;
-% tau = 0.5*d/c;
-% theta = 0:0.01:2*pi;
-% t0 = tau + (d/c)*cos(theta);
-% phase = pi/2 -((0.5*2*pi*f)*t0);
-% B = sqrt(2-2*cos(2*pi*f*t0));
-% %H = B.*exp(1i*phase);
-% 
-% figure
-% polarplot(theta,B)
 
-f = 3000;
+%% create filter to get center frequencies %%
+BW = '1/3 octave'; 
+N = 22;
+F0 = 1000;
+Fs = 22050;
+oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...
+    'CenterFrequency', F0, 'Bandwidth', BW, 'SampleRate', Fs);
+F0 = getANSICenterFrequencies(oneThirdOctaveFilter);
+F0(F0<250) = [];
+F0(F0>8000) = [];
+%%
+f = F0;
 n = 4; %no of microphones
-lambda = 343/f;
-%d=lambda/2;
-d=5*10^-2;
-theta=0:(1/18)*pi:pi;
-phaseDelay = -(2*pi*(d/lambda))*cos(theta);
+lambda = 343./f;
 
-weightTableAngles = zeros(length(phaseDelay),n);
+d=16*10^-2;
+theta=0:(1/18)*pi:pi;
+
+phaseDelay = zeros(16, length(theta));
+for i=1:16
+phaseDelay(i,:) = -(2*pi*(d/lambda(i)))*cos(theta);
+end
+
+weightTableAngles = zeros(length(phaseDelay),n*16); % 16 filters
 
 %r=1;
-for r=1:length(theta)
-    for microphone=n:-1:1
-       weightTableAngles(r,n+1-microphone)= phaseDelay(r)*(microphone-1);
+index = 1;
+for counter = 0:4:16*n-n
+    for r=1:length(theta)
+        for microphone=n:-1:1
+           weightTableAngles(r,n+1-microphone+counter)= phaseDelay(index, r)*(microphone-1);
+        end  
     end
+    index = index +1;
 end
 %%
-
-weightTableAngles = conj(weightTableAngles);
-
 %convert weight table in terms of imaginary numbers
 A=1;
-weightTableImag = zeros(length(phaseDelay),n);
-for r=1:length(theta)
-    for microphone=1:n
-        weightTableImag(r,microphone)= A*(cos(weightTableAngles(r,microphone))+1i*sin(weightTableAngles(r,microphone)));
+weightTableImag = zeros(length(phaseDelay),n*16);
+index = 1;
+for counter = 0:4:16*n-n
+    for r=1:length(theta)
+        for microphone=1:n
+            weightTableImag(r,microphone+counter)= A*(cos(weightTableAngles(r,microphone+counter))+1i*sin(weightTableAngles(r,microphone+counter)));
+        end
     end
 end
-
+weightTableImag= conj(weightTableImag);
 %%
 %Array formation
 
-taper = weightTableImag(10,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3]);
 n = 4; %no of microphones
-array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
+array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
 
 pos = getElementPosition(array);
 
-figure;
-viewArray(array,'ShowIndex','all','ShowTaper',true);
+%figure;
+%viewArray(array,'ShowIndex','all','ShowTaper',true);
 
 figure;
-polarplot = plotResponse(array,f,c,'RespCut','Az','Format','Polar');
+polarplot = plotResponse(array,f(4),c,'RespCut','Az','Format','Polar');
 % directivity = get(polarplot,'XData');
 % angle=get(polarplot,'YData');
 % 
@@ -67,8 +72,8 @@ polarplot = plotResponse(array,f,c,'RespCut','Az','Format','Polar');
 angle=-180:1:180;
 Ddata= directivity(array,f,angle,'PropagationSpeed',c);
 
-figure
-plot(angle,Ddata);
+%figure
+%plot(angle,Ddata);
 
 D=zeros(1,181);
 for i=1:181
@@ -91,14 +96,11 @@ y=sin(2*pi*2000*t)';
 audiowrite('3kHzSine.wav',y,samplingFreq);
 [y,samplingFreq]=audioread('3kHzSine.wav');
 
+angleTone=[90;0];
 
-%sound(y,samplingFreq)
-
-angleTone=[58;0];
-
-fs=8000;
+fs=22050;
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...
-    'SampleRate',fs,'NumSubbands',1000,'ModulatedInput',...
+    'SampleRate',fs,'NumSubbands',5000,'ModulatedInput',...
     false);
 
 t_duration = 3;  % 3 seconds
@@ -110,41 +112,60 @@ noisePwr = 1e-4; % noise power
 % preallocate
 NSampPerFrame = 1000;
 NTSample = t_duration*fs;
-sigArray = zeros(NTSample,n);
-tone = zeros(NTSample,1);
-
+%%
 % set up audio device writer
-audioWriter = audioDeviceWriter('SampleRate',fs, ...
+toneFileReader = dsp.AudioFileReader('SamplesPerFrame',NSampPerFrame);
+
+audioWriter = audioDeviceWriter('SampleRate',toneFileReader.SampleRate, ...
         'SupportVariableSizeInput', true);
 isAudioSupported = (length(getAudioDevices(audioWriter))>1);
 
-toneFileReader = dsp.AudioFileReader('3kHzSine.wav',...
-    'SamplesPerFrame',NSampPerFrame);
 
+simulatedAngle = 90; % (from dial)
+correspondingRow = simulatedAngle/10 +1;
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+bandOutput = zeros(NSampPerFrame, n*16);
+result = zeros(NSampPerFrame, 16);
+
+finalllllResult = zeros(1000,1);
 %simulate
 %playOutput=zeros(length(tone),1);
-for m = 1:NSampPerFrame:NTSample
-    sig_idx = m:m+NSampPerFrame-1;
+while ~isDone(toneFileReader)
     x1 = toneFileReader();
     temp = collector([x1],...
         [angleTone]); %+ ...
         %sqrt(noisePwr)*randn(NSampPerFrame,n); %this adds the noise
-       %%filter %%
-    playOutput = sum(temp,2);
-    if isAudioSupported
-        %play(audioWriter,0.5*temp(:,3));
-        play(audioWriter,0.25*playOutput);
+
+    index =1;
+    for i=0:4:16*n-n
+        for j=1:4
+            filterBand = oneThirdOctaveFilterBank{index};
+            bandOutput(:,i+j) = filterBand(temp(:, j));
+            bandOutput(:,i+j) = bandOutput(:,i+j) * weightTableImag(correspondingRow, i+j);
+        end
+        index = index+1;
     end
-    sigArray(sig_idx,:) = temp;
-    tone(sig_idx) = x1;
+    
+    for i=1:1000
+        for j=4:4:16*n
+            result(i,j/4) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
+            result(i,j/4) = abs(result(i,j/4));
+        end
+    end
+
+    playOutput = sum(result,2);
+   % audioWriter(playOutput);
+    
+    finalllllResult =  [finalllllResult; playOutput];
+    
 end
 
-outputData=sum(sigArray,2);
-
-figure
-plot(outputData/4)
 
 
+% figure
+% plot(outputData/4) 
+%%
+audioWriter(finalllllResult);
 % 
 % ang_dft = [-30; 0]; %[azimuthAng; elevationAng]
 % ang_cleanspeech = [-10; 10];

@@ -110,7 +110,7 @@ prevS = rng(2008); %to represent thermal noise of each microphone
 noisePwr = 1e-4; % noise power
 
 % preallocate
-NSampPerFrame = 100000;
+NSampPerFrame = 10000;
 NTSample = t_duration*fs;
 %%
 % set up audio device writer

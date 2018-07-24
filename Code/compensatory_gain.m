@@ -16,7 +16,8 @@ for i=1: length(audiogramdB)
 end
 
 %% Sound reader
-audioInput2 = dsp.AudioFileReader('Filename', 'Audio\B_eng_f1.wav');  
+NSampPerFrame = 10000;
+audioInput2 = dsp.AudioFileReader( 'SamplesPerFrame',NSampPerFrame);  
 audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
 
 
@@ -49,8 +50,6 @@ while ~isDone(audioInput2)
     buffer = audioInput2();  % Load a frame of audio
 
     output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram);
-
-    audioWriter2(output);
   
     n=length(output);   % create a scaling variable equal to the 
                             % length of the data
@@ -67,12 +66,14 @@ while ~isDone(audioInput2)
     magnitudeOriginal = 20*log10(abs(originalFourier));
     freqx2 = linspace(0,Fs/2,length(buffer)/2+1);
     %cla
-            plot(freqx2, magnitudeOriginal,'r');
-            hold on
-            plot(freqx, magnitudeFiltered, 'b');
-            xlim([0 8000])
-            drawnow
-            hold off
+    plot(freqx2, magnitudeOriginal,'r');
+    hold on
+    plot(freqx, magnitudeFiltered, 'b');
+    xlim([0 8000])
+    drawnow
+    hold off
+    
+    audioWriter2(output);
 
 
 %finalllllResult =  [finalllllResult; buffer];

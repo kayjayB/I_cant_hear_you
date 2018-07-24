@@ -16,12 +16,13 @@ for i=1: length(audiogramdB)
 end
 
 %% Sound reader
-audioInput2 = dsp.AudioFileReader('Filename', 'Audio\B_eng_f1.wav');  
+NSampPerFrame = 10000;
+audioInput2 = dsp.AudioFileReader( 'SamplesPerFrame',NSampPerFrame);  
 audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
 
 
 %% Filters
-oneThirdOctaveFilterBank = createOneThirdOctaveFilters();
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
 %% Amplification
 
 % To have a measure of reference, play the original audio once
@@ -42,42 +43,45 @@ SpecAna = dsp.SpectrumAnalyzer('PlotAsTwoSidedSpectrum',false, ...
 
 SpecAna.ChannelNames = {'Original signal','Amplified signal'};
 counter = 1;
-
+finalllllResult = zeros(1000,1);
 figure
 while ~isDone(audioInput2)
     
     buffer = audioInput2();  % Load a frame of audio
 
     output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram);
-
-    audioWriter2(output);
   
     n=length(output);   % create a scaling variable equal to the 
                             % length of the data
                     
-    xFourier = fft(output-mean(output))/n; % fourier transform of the data
+    xFourier = fft(output)/n; % fourier transform of the data
     xFourier = 2*xFourier(1:length(output)/2+1); % create a one sided
                                                     % frequency spectrum                                     
     magnitudeFiltered = 20*log10(abs(xFourier));
     freqx = linspace(0,Fs/2,length(output)/2+1);
     
     nOriginal=length(buffer); 
-    originalFourier = fft(buffer-mean(buffer))/nOriginal;
+    originalFourier = fft(buffer)/nOriginal;
     originalFourier = 2*originalFourier(1:length(buffer)/2+1); 
     magnitudeOriginal = 20*log10(abs(originalFourier));
     freqx2 = linspace(0,Fs/2,length(buffer)/2+1);
     %cla
-            plot(freqx2, magnitudeOriginal,'r');
-            hold on
-            plot(freqx, magnitudeFiltered, 'b');
-            xlim([250 8000])
-            drawnow
-            hold off
+    plot(freqx2, magnitudeOriginal,'r');
+    hold on
+    plot(freqx, magnitudeFiltered, 'b');
+    xlim([0 8000])
+    drawnow
+    hold off
+    
+    audioWriter2(output);
+
+
+%finalllllResult =  [finalllllResult; buffer];
             
 
 end
 
-
+plot(finalllllResult);
 %% Loop with sine waves
 % Sine1 = dsp.SineWave('SampleRate',samplingRate,'Frequency',250);
 % % Sine2 = dsp.SineWave('Frequency',300,'SampleRate',samplingRate);
@@ -116,3 +120,5 @@ end
 %     hold off
 % end
 % release(SpecAna)
+
+%% 

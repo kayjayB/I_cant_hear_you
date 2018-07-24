@@ -1,5 +1,5 @@
 BW = '1/3 octave'; 
-N = 10;
+N = 14;
 F0 = 1000;
 Fs = 40000;
 oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...

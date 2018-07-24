@@ -43,6 +43,7 @@ for counter = 1:10
      l = filterBand35Function(buffer);
 
      m = filterBand36Function(buffer);
+     
      n = filterBand37Function(buffer);
 
      o = filterBand38Function(buffer);
@@ -51,12 +52,15 @@ for counter = 1:10
 
      y = a+ b+ c+ d +e+ f+ g+ h+ i+ j+ k+ l+ m+ n+ o+ p;
 
-   z  = transferFuncEstimator(repmat(buffer,1,17),[ a, b, c, d ,e, f, g, h, i, j, k, l, m, n, o, p,y]);
-   scope(20*log10(abs(z)))
+    z  = transferFuncEstimator(repmat(buffer,1,17),[ a, b, c, d ,e, f, g, h, i, j, k, l, m, n, o, p,y]);
+    scope(20*log10(abs(z)))
 end
 
 %% Octave Filter Bank
-
+Fs = 40000;
+N = 22;
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N);
+ 
 transferFuncEstimator = dsp.TransferFunctionEstimator...
                                  ('FrequencyRange','onesided',...
                                   'SpectralAverages',20);
@@ -72,15 +76,15 @@ scope = dsp.ArrayPlot( ...
     'Title','Four-Band Crossover Filter', ...
     'ShowLegend',false);
 L = 2^14;
-yw = zeros(L,Nfc);
+yw = zeros(L,16);
 tic
 for counter = 1:10
 
     buffer = randn(L,1);
-    for i=1:Nfc
+    for i=1:16
         oneThirdOctaveFilter = oneThirdOctaveFilterBank{i};
         yw(:,i) = oneThirdOctaveFilter(buffer);
-        yw(:,i) = yw(:,i) * audiogram(i);
+        %yw(:,i) = yw(:,i) * audiogram(i);
     end
    y = yw(:,1)+ yw(:,2)+ yw(:,3)+ yw(:,4) +yw(:,5)+ yw(:,6)+ yw(:,7)+ yw(:,8)+ yw(:,9)+ yw(:,10)+ yw(:,11)+ yw(:,12)+ yw(:,13)+ yw(:,14)+ yw(:,15)+ yw(:,16);
    z  = transferFuncEstimator(repmat(buffer,1,17),[ yw(:,1), yw(:,2), yw(:,3), yw(:,4) ,yw(:,5), yw(:,6), yw(:,7), yw(:,8), yw(:,9), yw(:,10), yw(:,11), yw(:,12), yw(:,13), yw(:,14), yw(:,15), yw(:,16), y]);

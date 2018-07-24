@@ -26,12 +26,11 @@ weightTableAngles = zeros(length(phaseDelay),n);
 
 %r=1;
 for r=1:length(theta)
-    index=0;
     for microphone=n:-1:1
-       weightTableAngles(r,microphone)= phaseDelay(r)*(n-4+index);
-       index=index+1;
+       weightTableAngles(r,n+1-microphone)= phaseDelay(r)*(microphone-1);
     end
 end
+%%
 
 weightTableAngles = conj(weightTableAngles);
 
@@ -130,8 +129,9 @@ for m = 1:NSampPerFrame:NTSample
     sig_idx = m:m+NSampPerFrame-1;
     x1 = toneFileReader();
     temp = collector([x1],...
-        [angleTone]) %+ ...
+        [angleTone]); %+ ...
         %sqrt(noisePwr)*randn(NSampPerFrame,n); %this adds the noise
+       %%filter %%
     playOutput = sum(temp,2);
     if isAudioSupported
         %play(audioWriter,0.5*temp(:,3));

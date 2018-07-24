@@ -42,7 +42,7 @@ SpecAna = dsp.SpectrumAnalyzer('PlotAsTwoSidedSpectrum',false, ...
 
 SpecAna.ChannelNames = {'Original signal','Amplified signal'};
 counter = 1;
-
+finalllllResult = zeros(1000,1);
 figure
 while ~isDone(audioInput2)
     
@@ -73,11 +73,14 @@ while ~isDone(audioInput2)
             xlim([0 8000])
             drawnow
             hold off
+
+
+%finalllllResult =  [finalllllResult; buffer];
             
 
 end
 
-
+plot(finalllllResult);
 %% Loop with sine waves
 % Sine1 = dsp.SineWave('SampleRate',samplingRate,'Frequency',250);
 % % Sine2 = dsp.SineWave('Frequency',300,'SampleRate',samplingRate);
@@ -116,3 +119,5 @@ end
 %     hold off
 % end
 % release(SpecAna)
+
+%% 

@@ -3,7 +3,7 @@ clear
 
 %% create filter to get center frequencies %%
 BW = '1/3 octave'; 
-N = 22;
+N = 14;
 F0 = 1000;
 Fs = 22050;
 oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...
@@ -16,11 +16,11 @@ f = F0;
 n = 4; %no of microphones
 lambda = 343./f;
 
-d=16*10^-2;
+d=5*10^-2;
 theta=0:(1/18)*pi:pi;
 
 phaseDelay = zeros(16, length(theta));
-for i=1:16
+for i=1:length(F0)
 phaseDelay(i,:) = -(2*pi*(d/lambda(i)))*cos(theta);
 end
 
@@ -28,7 +28,7 @@ weightTableAngles = zeros(length(phaseDelay),n*16); % 16 filters
 
 %r=1;
 index = 1;
-for counter = 0:4:16*n-n
+for counter = 0:4:length(F0)*n-n
     for r=1:length(theta)
         for microphone=n:-1:1
            weightTableAngles(r,n+1-microphone+counter)= phaseDelay(index, r)*(microphone-1);
@@ -41,7 +41,7 @@ end
 A=1;
 weightTableImag = zeros(length(phaseDelay),n*16);
 index = 1;
-for counter = 0:4:16*n-n
+for counter = 0:4:length(F0)*n-n
     for r=1:length(theta)
         for microphone=1:n
             weightTableImag(r,microphone+counter)= A*(cos(weightTableAngles(r,microphone+counter))+1i*sin(weightTableAngles(r,microphone+counter)));
@@ -52,7 +52,7 @@ weightTableImag= conj(weightTableImag);
 %%
 %Array formation
 
-microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3]);
+microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3]);
 n = 4; %no of microphones
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
@@ -100,7 +100,7 @@ angleTone=[90;0];
 
 fs=22050;
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...
-    'SampleRate',fs,'NumSubbands',5000,'ModulatedInput',...
+    'SampleRate',fs,'NumSubbands',1000,'ModulatedInput',...
     false);
 
 t_duration = 3;  % 3 seconds
@@ -110,7 +110,7 @@ prevS = rng(2008); %to represent thermal noise of each microphone
 noisePwr = 1e-4; % noise power
 
 % preallocate
-NSampPerFrame = 1000;
+NSampPerFrame = 100000;
 NTSample = t_duration*fs;
 %%
 % set up audio device writer
@@ -124,46 +124,60 @@ isAudioSupported = (length(getAudioDevices(audioWriter))>1);
 simulatedAngle = 90; % (from dial)
 correspondingRow = simulatedAngle/10 +1;
 oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
-bandOutput = zeros(NSampPerFrame, n*16);
-result = zeros(NSampPerFrame, 16);
+bandOutput = zeros(NSampPerFrame, n*length(F0));
+result = zeros(NSampPerFrame, length(F0));
 
-finalllllResult = zeros(1000,1);
+finalllllResult = zeros(NSampPerFrame,1);
 %simulate
 %playOutput=zeros(length(tone),1);
 while ~isDone(toneFileReader)
     x1 = toneFileReader();
     temp = collector([x1],...
         [angleTone]); %+ ...
-        %sqrt(noisePwr)*randn(NSampPerFrame,n); %this adds the noise
 
-    index =1;
-    for i=0:4:16*n-n
+    index = 1;
+
+    for i=0:4:length(F0)*n-n
         for j=1:4
             filterBand = oneThirdOctaveFilterBank{index};
             bandOutput(:,i+j) = filterBand(temp(:, j));
-            bandOutput(:,i+j) = bandOutput(:,i+j) * weightTableImag(correspondingRow, i+j);
+            filterBand.release();
         end
         index = index+1;
     end
-    
-    for i=1:1000
-        for j=4:4:16*n
+%     audioWriter(bandOutput(:,1)+bandOutput(:,5)+bandOutput(:,9)+bandOutput(:,13)+bandOutput(:,17) +...
+%         bandOutput(:,21)+bandOutput(:,25)+bandOutput(:,29)+bandOutput(:,33)+bandOutput(:,37)+ ...
+%        bandOutput(:,41)+bandOutput(:,45)+bandOutput(:,49)+bandOutput(:,53)+bandOutput(:,57)+ ...
+%        bandOutput(:,61)+ bandOutput(:,2)+bandOutput(:,6)+bandOutput(:,10)+bandOutput(:,14)+bandOutput(:,18) +...
+%         bandOutput(:,22)+bandOutput(:,26)+bandOutput(:,30)+bandOutput(:,34)+bandOutput(:,38)+ ...
+%        bandOutput(:,42)+bandOutput(:,46)+bandOutput(:,50)+bandOutput(:,54)+bandOutput(:,58)+ ...
+%        bandOutput(:,62));
+   
+%       audioWriter(bandOutput(:,3)+bandOutput(:,7)+bandOutput(:,11)+bandOutput(:,15)+bandOutput(:,19) +...
+%         bandOutput(:,23)+bandOutput(:,27)+bandOutput(:,31)+bandOutput(:,35)+bandOutput(:,39)+ ...
+%        bandOutput(:,43)+bandOutput(:,47)+bandOutput(:,51)+bandOutput(:,55)+bandOutput(:,59)+ ...
+%        bandOutput(:,63));
+
+%    variable = bandOutput(:,4)+bandOutput(:,8)+bandOutput(:,12)+bandOutput(:,16)+bandOutput(:,20) +...
+%         bandOutput(:,24)+bandOutput(:,28)+bandOutput(:,32)+bandOutput(:,36)+bandOutput(:,40)+ ...
+%        bandOutput(:,44)+bandOutput(:,48)+bandOutput(:,52)+bandOutput(:,56)+bandOutput(:,60)+ ...
+%        bandOutput(:,64);
+%      audioWriter(variable);
+ 
+    for i=1:NSampPerFrame
+        for j=4:4:length(F0)*n
             result(i,j/4) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
-            result(i,j/4) = abs(result(i,j/4));
+          %  result(i,j/4) = abs(result(i,j/4));
         end
     end
 
     playOutput = sum(result,2);
-   % audioWriter(playOutput);
-    
-    finalllllResult =  [finalllllResult; playOutput];
+     audioWriter(playOutput/4);
+
+    finalllllResult =  [finalllllResult; playOutput/4];
     
 end
 
-
-
-% figure
-% plot(outputData/4) 
 %%
 audioWriter(finalllllResult);
 % 
@@ -219,4 +233,21 @@ audioWriter(finalllllResult);
 %     voice_laugh(sig_idx) = x3;
 % end
 
-
+%%
+release(toneFileReader);       % Close input file
+release(audioWriter);  
+x1 = toneFileReader();
+    temp = collector([x1],...
+        [angleTone]); %+ ...
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+filterBand = oneThirdOctaveFilterBank{1};
+band1Mic1 = filterBand(temp(:, 1));
+filterBand.release();
+%oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+filterBand = oneThirdOctaveFilterBank{1};
+band1Mic2 = filterBand(temp(:, 1));
+% plot(temp(:,1))
+% hold on
+plot(band1Mic1);
+hold on 
+plot(band1Mic2);

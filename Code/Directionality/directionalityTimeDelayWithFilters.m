@@ -13,7 +13,7 @@ F0(F0<250) = [];
 F0(F0>8000) = [];
 %%
 f = F0;
-n = 4; %no of microphones
+n = 10; %no of microphones
 lambda = 343./f;
 
 d=5*10^-2;
@@ -28,7 +28,7 @@ weightTableAngles = zeros(length(phaseDelay),n*16); % 16 filters
 
 %r=1;
 index = 1;
-for counter = 0:4:length(F0)*n-n
+for counter = 0:n:length(F0)*n-n
     for r=1:length(theta)
         for microphone=n:-1:1
            weightTableAngles(r,n+1-microphone+counter)= phaseDelay(index, r)*(microphone-1);
@@ -52,14 +52,13 @@ end
 %% Array formation
 
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3]);
-n = 4; %no of microphones
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
 
 %##########################################################################
 %######Simulating sounds and noise in different directions#################
 
-angleTone=[0;0];
+angleTone=[90;0];
 
 fs=22050;
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...
@@ -95,8 +94,8 @@ while ~isDone(toneFileReader)
 
     index = 1;
 
-    for i=0:4:length(F0)*n-n
-        for j=1:4
+    for i=0:n:length(F0)*n-n
+        for j=1:n
             filterBand = oneThirdOctaveFilterBank{index};
             bandOutput(:,i+j) = filterBand(temp(:, j));
             filterBand.release();
@@ -109,16 +108,16 @@ while ~isDone(toneFileReader)
     
     
     for i=1:NSampPerFrame
-        for j=4:4:length(F0)*n
-            result(i,j/4) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
+        for j=n:n:length(F0)*n
+            result(i,j/n) = bandOutput(i,j-9)+bandOutput(i,j-8)+bandOutput(i,j-7)+bandOutput(i,j-6)+bandOutput(i,j-5)+bandOutput(i,j-4)+bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
 
         end
     end
 
     playOutput = sum(result,2);
-     audioWriter(playOutput/4);
+     audioWriter(playOutput/n);
 
-    finalllllResult =  [finalllllResult; playOutput/4];
+    finalllllResult =  [finalllllResult; playOutput/n];
     
 end
 

@@ -14,7 +14,7 @@ clear
 % figure
 % polarplot(theta,B)
 
-f = 3000;
+f = 1000;
 n = 4; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
@@ -43,10 +43,12 @@ for r=1:length(theta)
     end
 end
 
+deltaT = (1/f)*(phaseDelay(5)/(2*pi))
+
 %%
 %Array formation
 
-taper = weightTableImag(10,:);
+taper = weightTableImag(7,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3]);
 n = 4; %no of microphones
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
@@ -87,14 +89,14 @@ halfPolar(angleRad,D);
 samplingFreq = 8000;
 duration = 3; %the file properties is showing duration of 5s
 t=[0: 1/samplingFreq: duration];
-y=sin(2*pi*2000*t)';
+y=sin(2*pi*3000*t)';
 audiowrite('3kHzSine.wav',y,samplingFreq);
 [y,samplingFreq]=audioread('3kHzSine.wav');
 
 
 %sound(y,samplingFreq)
 
-angleTone=[58;0];
+angleTone=[0;0];
 
 fs=8000;
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...

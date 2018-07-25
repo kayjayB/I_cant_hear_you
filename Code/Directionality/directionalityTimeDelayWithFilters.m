@@ -70,7 +70,7 @@ t_duration = 3;  % 3 seconds
 t = 0:1/fs:t_duration-1/fs;
 
 % preallocate
-NSampPerFrame = 100000;
+NSampPerFrame = 10000;
 NTSample = t_duration*fs;
 %%
 % set up audio device writer
@@ -80,14 +80,13 @@ audioWriter = audioDeviceWriter('SampleRate',toneFileReader.SampleRate, ...
         'SupportVariableSizeInput', true);
 isAudioSupported = (length(getAudioDevices(audioWriter))>1);
 
-
-simulatedAngle = 0; % (from dial)
+simulatedAngle = 90; % (from dial)
 correspondingRow = simulatedAngle/10 +1;
 oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
 bandOutput = zeros(NSampPerFrame, n*length(F0));
 result = zeros(NSampPerFrame, length(F0));
 
-finalllllResult = zeros(NSampPerFrame,1);
+% finalllllResult = zeros(NSampPerFrame,1);
 
 while ~isDone(toneFileReader)
     x1 = toneFileReader();
@@ -105,9 +104,6 @@ while ~isDone(toneFileReader)
         index = index+1;
     end
 
-
-    
-    
     for i=1:NSampPerFrame
         for j=4:4:length(F0)*n
             result(i,j/4) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
@@ -118,28 +114,28 @@ while ~isDone(toneFileReader)
     playOutput = sum(result,2);
      audioWriter(playOutput/4);
 
-    finalllllResult =  [finalllllResult; playOutput/4];
+%     finalllllResult =  [finalllllResult; playOutput/4];
     
 end
 
 %%
-audioWriter(finalllllResult);
+% audioWriter(finalllllResult);
 
 %%
-release(toneFileReader);       % Close input file
-release(audioWriter);  
-x1 = toneFileReader();
-    temp = collector([x1],...
-        [angleTone]); %+ ...
-oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
-filterBand = oneThirdOctaveFilterBank{1};
-band1Mic1 = filterBand(temp(:, 1));
-filterBand.release();
-%oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
-filterBand = oneThirdOctaveFilterBank{1};
-band1Mic2 = filterBand(temp(:, 1));
-% plot(temp(:,1))
-% hold on
-plot(band1Mic1);
-hold on 
-plot(band1Mic2);
+% release(toneFileReader);       % Close input file
+% release(audioWriter);  
+% x1 = toneFileReader();
+%     temp = collector([x1],...
+%         [angleTone]); %+ ...
+% oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+% filterBand = oneThirdOctaveFilterBank{1};
+% band1Mic1 = filterBand(temp(:, 1));
+% filterBand.release();
+% %oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+% filterBand = oneThirdOctaveFilterBank{1};
+% band1Mic2 = filterBand(temp(:, 1));
+% % plot(temp(:,1))
+% % hold on
+% plot(band1Mic1);
+% hold on 
+% plot(band1Mic2);

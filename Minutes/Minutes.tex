@@ -136,4 +136,138 @@ To Do:
 
 Going forward, meetings are to be held once a week. Prof. Rubin will be away from the 29/06/2018 until 22/07/2018 and during this time, skype meetings will be held.
 
+\section*{MEETING 4}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Dr. Derek Nitch
+\subsection*{Agenda:} 
+Consult regarding plans and intentions for the hearing aid directionality using array theory.
+
+\subsection*{Minutes of meeting:}
+Start date: 06/07/2018 \\
+Start time: 10:00
+
+Microphone Array:
+\begin{itemize}
+	\item The acoustic beam of the microphone array will not be able to be steered if the array only has two microphones.
+	\item The array must have a minimum of four microphones to enable beam steering. Having more microphones allows for a more directive beam and improved resolution when steering.
+	\item It was recommended that incoming sounds be constrained to the horizontal plane when performing simulations.
+	\item Beam steering ability should be restricted to $180^{\circ}$ in front of the user.
+	\item Inter-microphone spacing, \textit{d}, must be such that  the condition $d<\frac{c}{2 f_{max}}$ is met. \textit{c} is the propagation speed of sound ($343~m.s^{-1}$) and $f_{max}$ is the maximum frequency of interest.
+\end{itemize}
+
+Simulating array configurations:
+\begin{itemize}
+	\item Circular array with 4 or 6 microphones: There appears to be insignificant differences between each case. Azimuth polar pattern is acceptable but there is always two dominant beams in opposing directions.
+	\item Semi-circle array with posteriorly placed plate: This configuration did not prove to be suitable as there were always more than two dominant beams. Posterior plate appears to be a good idea to incident sound waves from behind the array.
+	\item Uniform linear array with posteriorly placed plate: This appears to be a promising configuration. There is a single main beam that remains dominant when steering it in a range of directions of $0^{\circ}-180^{\circ}$. The polar pattern obtained is acceptable when four microphones are used.
+\end{itemize}
+
+The minimum frequency range required to detect speech intelligibly must be determined to allow for optimal inter-microphone spacing. This will allow for a more consistent acoustic beam throughout all steering angles and a constant inter-microphone spacing.
+
+To do:
+\begin{itemize}
+	\item Find the minimum frequency range required to detect speech intelligibly and use the upper bound of this range for the spacing of the microphones.
+	\item Construct a weight table that indicates the phasing of each microphone required to focus the main acoustic beam in a specific direction. This should be done for the centre frequencies of each filter band.
+	\item Obtain polar plots to verify the relevant weightings.
+\end{itemize}
+
+\section*{MEETING 5}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+\begin{itemize}
+	\item Discuss Arduino Due RAM limitations
+	\item Discuss limiting frequencies of interest to speech frequency range and limiting directionality steering range
+	\item Work station allocation
+\end{itemize}
+
+Limiting frequency range and directionality steering range:
+\begin{itemize}
+	\item It is acceptable to limit the frequency range of interest too 0 - 8000~Hz and to limit directionality steering to the $180^{\circ}$ plane in front of the user.
+\end{itemize}
+
+RAM limitations:
+\begin{itemize}
+	\item It is expected that there will be a shortage of RAM if the designed filter bank is implemented digitally.
+	\item Implementing the complete filter bank is seen to be important because it is an ANSI standard.
+	\item It was concluded that the implementation of the hearing aid would require a dedicated IC. Additionally, the project time line is too short and the budget is too small to implement a completely modular design.
+	\item It is therefore suggested to implement a complete, non-real time software design and thereafter implement a limited electronic/hardware version using simpler electronics.
+\end{itemize}
+
+MATLAB software system design:
+\begin{itemize}
+	\item Full implementation of ANSI filter bank.
+	\item Utilize pre-recorded audio files.
+	\item Simulate detecting sound from different directions and show that directionality has been achieved.
+	\item GUI for directionality: interactive dial to specify direction of desired hearing and polar plots of directivity.
+	\item GUI for compensatory gain: Frequency spectrum of original and gained audio signals.
+\end{itemize}
+
+Hardware/electronic system design:
+\begin{itemize}
+	\item Pick three of the filter bands of the frequency bank and implement theme as analog filters.
+	\item Gain relevant signals using the micro-controller.
+	\item Focus on utilizing the processing capabilities of the micro-controller on directionality.
+\end{itemize}
+
+To do:
+It has been recommended that the entire software solution must be completed first. Thereafter, the compensatory gain portion of the hardware version must be completed. The directionally feature of the hardware version should be implemented last.
+
+
+\subsection*{Minutes of meeting:}
+Start date: 18/07/2018 \\
+Start time: 10:00
+
+
+To do:
+
+\section*{MEETING 6}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Dr. Derek Nitch
+\subsection*{Agenda:} 
+Obtain advice on how to address the poor quality audio output when an audio sample is simulated from different directions in MATLAB.
+
+\subsection*{Minutes of meeting:}
+Start date: 24/07/2018 \\
+Start time: 10:00
+
+Simulated sound collection by array:
+\begin{itemize}
+	\item Discussed how the collection has already been implemented using the \textit{phased.WidebandCollector} MATLAB function.
+	\item Check to see if there was any distortion of original audio file immediately after the microphone array. There was no distortion.
+\end{itemize}
+
+Filter bank:
+\begin{itemize}
+	\item Demonstrated the performance of the filter bank evaluating distortion of the audio before and after the filter bank. There was a clicking noise that was present in the audio.
+	\item Clicking noise was improved by passing the entire audio stream through the filter bank at once compared to when passed through in frames.
+\end{itemize}
+
+Audio with applied weights passing through filter bank:
+\begin{itemize}
+	\item Through demonstration, the audio output is severely distorted even when the collected audio is multiplied by 1.
+	\item It is found that each filter needs to be reset/released before passing consecutive frames through the filter.
+	\item Weights were being applied to collected signals incorrectly.
+	\item Weights (currently imaginary numbers) representing phase shifts have to be converted to time delays. It was suggested that by doing this and adding delayed signals of all filters bands appropriately, the distorted output audio would be improved.
+\end{itemize}
+
+To do:
+\begin{itemize}
+	\item Convert microphone weights for all angles and centre frequencies to time delays.
+	\item Implement time delays as array element shifts and add all arrays together appropriately.
+\end{itemize}
+
+\section*{MEETING 7}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+
+\subsection*{Minutes of meeting:}
+Start date: 25/07/2018 \\
+Start time: 10:00
+
+
+To do:
+
+
 \end{document}

@@ -1,8 +1,7 @@
-function oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N)
+function oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N, Fs)
 
     BW = '1/3 octave'; 
     F0 = 1000;
-    Fs = 40000;
     oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...
         'CenterFrequency', F0, 'Bandwidth', BW, 'SampleRate', Fs);
     F0 = getANSICenterFrequencies(oneThirdOctaveFilter);

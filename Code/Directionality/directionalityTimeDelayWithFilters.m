@@ -54,41 +54,43 @@ end
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3]);
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
+f = F0;
+%figure;
+%polarplot = plotResponse(array,f,c,'RespCut','Az','Format','Polar');
 
 %##########################################################################
 %######Simulating sounds and noise in different directions#################
 
-angleTone=[90;0];
+angleTone=[0;0];
 
-fs=22050;
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...
-    'SampleRate',fs,'NumSubbands',1000,'ModulatedInput',...
+    'SampleRate',Fs,'NumSubbands',5000,'ModulatedInput',...
     false);
 
 t_duration = 3;  % 3 seconds
-t = 0:1/fs:t_duration-1/fs;
+t = 0:1/Fs:t_duration-1/Fs;
 
 % preallocate
 NSampPerFrame = 10000;
-NTSample = t_duration*fs;
+NTSample = t_duration*Fs;
 %%
 % set up audio device writer
 toneFileReader = dsp.AudioFileReader('SamplesPerFrame',NSampPerFrame);
-
+toneFileReader2 = dsp.AudioFileReader('Filename', 'Audio/B_eng_f1.wav','SamplesPerFrame',NSampPerFrame);
 audioWriter = audioDeviceWriter('SampleRate',toneFileReader.SampleRate, ...
         'SupportVariableSizeInput', true);
 isAudioSupported = (length(getAudioDevices(audioWriter))>1);
 
-simulatedAngle = 90; % (from dial)
+simulatedAngle = 0; % (from dial)
 correspondingRow = simulatedAngle/10 +1;
-oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14, Fs);
 bandOutput = zeros(NSampPerFrame, n*length(F0));
 result = zeros(NSampPerFrame, length(F0));
 
-% finalllllResult = zeros(NSampPerFrame,1);
-
+angleTone2=[0;0];
 while ~isDone(toneFileReader)
     x1 = toneFileReader();
+    x2 = toneFileReader2(); 
     temp = collector([x1], [angleTone]); %+ ...
 
     index = 1;
@@ -106,14 +108,13 @@ while ~isDone(toneFileReader)
     for i=1:NSampPerFrame
         for j=n:n:length(F0)*n
             result(i,j/n) = bandOutput(i,j-9)+bandOutput(i,j-8)+bandOutput(i,j-7)+bandOutput(i,j-6)+bandOutput(i,j-5)+bandOutput(i,j-4)+bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
-
         end
     end
 
     playOutput = sum(result,2);
-     audioWriter(playOutput/n);
+    audioWriter(playOutput/n);
+    
 
-    finalllllResult =  [finalllllResult; playOutput/n];
     
 end
 

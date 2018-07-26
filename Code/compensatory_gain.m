@@ -1,6 +1,13 @@
+clear 
+clc
 %%  Filtering and playing an audio clip %%
-Fs= 40000; % sampling frequency (Hz)
+%% Sound reader
+NSampPerFrame = 10000;
+audioInput2 = dsp.AudioFileReader('Filename', 'Audio/A_eng_m1.wav', 'SamplesPerFrame',NSampPerFrame);  
+audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
 
+Fs= 40000; % sampling frequency (Hz)
+%Fs = audioInput2.SampleRate;
 %% Audiogram 
 frequencies = [250 500 1000 2000 4000 6000 8000];
 values = [15 10 10 15 10 5 20];
@@ -15,14 +22,9 @@ for i=1: length(audiogramdB)
     audiogram(i) = db2mag(audiogramdB(i));
 end
 
-%% Sound reader
-NSampPerFrame = 10000;
-audioInput2 = dsp.AudioFileReader( 'SamplesPerFrame',NSampPerFrame);  
-audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
-
 
 %% Filters
-oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14, Fs);
 %% Amplification
 
 % To have a measure of reference, play the original audio once
@@ -66,22 +68,25 @@ while ~isDone(audioInput2)
     magnitudeOriginal = 20*log10(abs(originalFourier));
     freqx2 = linspace(0,Fs/2,length(buffer)/2+1);
     %cla
+    
+   % pause(0.01)
     plot(freqx2, magnitudeOriginal,'r');
     hold on
     plot(freqx, magnitudeFiltered, 'b');
     xlim([0 8000])
     drawnow
     hold off
-    
     audioWriter2(output);
-
+    
+    
+    
 
 %finalllllResult =  [finalllllResult; buffer];
             
 
 end
 
-plot(finalllllResult);
+%plot(finalllllResult);
 %% Loop with sine waves
 % Sine1 = dsp.SineWave('SampleRate',samplingRate,'Frequency',250);
 % % Sine2 = dsp.SineWave('Frequency',300,'SampleRate',samplingRate);

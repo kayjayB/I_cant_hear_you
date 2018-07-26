@@ -170,3 +170,4 @@ plot(angle,Ddata)
 % blah =toneFileReader();
 % tempOut = sum(temp,2);
 % audioWriter(temp(:,4));
+recObj = audiorecorder

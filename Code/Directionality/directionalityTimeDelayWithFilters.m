@@ -1,5 +1,3 @@
-(* ::Package:: *)
-
 clc
 clear
 
@@ -7,7 +5,7 @@ clear
 BW = '1/3 octave'; 
 N = 14;
 F0 = 1000;
-Fs = 22050;
+Fs = 40000;
 oneThirdOctaveFilter = octaveFilter('FilterOrder', N, ...
     'CenterFrequency', F0, 'Bandwidth', BW, 'SampleRate', Fs);
 F0 = getANSICenterFrequencies(oneThirdOctaveFilter);
@@ -63,10 +61,10 @@ f = F0;
 % ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
 % ## ## ## Simulating sounds and noise in different directions ## ## ## ## ## ## ## ## #
 
-angleTone=[0;0];
+angleTone=[80;0];
 
 collector=phased.WidebandCollector('Sensor',array,'PropagationSpeed',c,...
-    'SampleRate',Fs,'NumSubbands',5000,'ModulatedInput',...
+    'SampleRate',Fs,'NumSubbands',50000,'ModulatedInput',...
     false);
 
 t_duration = 3;  % 3 seconds
@@ -78,7 +76,7 @@ NTSample = t_duration*Fs;
 %%
 % set up audio device writer
 toneFileReader = dsp.AudioFileReader('SamplesPerFrame',NSampPerFrame);
-toneFileReader2 = dsp.AudioFileReader('Filename', 'Audio/B_eng_f1.wav','SamplesPerFrame',NSampPerFrame);
+%toneFileReader2 = dsp.AudioFileReader('Filename', 'Audio/B_eng_f1.wav','SamplesPerFrame',NSampPerFrame);
 audioWriter = audioDeviceWriter('SampleRate',toneFileReader.SampleRate, ...
         'SupportVariableSizeInput', true);
 isAudioSupported = (length(getAudioDevices(audioWriter))>1);
@@ -92,7 +90,7 @@ result = zeros(NSampPerFrame, length(F0));
 angleTone2=[0;0];
 while ~isDone(toneFileReader)
     x1 = toneFileReader();
-    x2 = toneFileReader2(); 
+    %x2 = toneFileReader2(); 
     temp = collector([x1], [angleTone]); %+ ...
 
     index = 1;
@@ -124,15 +122,29 @@ end
 % audioWriter(finalllllResult);
 
 %%
+band = 12; %choose the frequency band
+simulatedAngle = 0; % (from dial)
+angle=0:1:180;
 
-ANGLE=0:10:180;
-weights=zeros(length(ANGLE),n*16);
-for i=1:160
+weights=zeros(length(theta),n);
+for i=band*n+1:band*n+n
     for j=1:19
-        weights(j,i)=cos(weightTableAngles(j,i))+1i*sin(weightTableAngles(j,i));
+        weights(j,i-band*n)=cos(weightTableAngles(j,i))+1i*sin(weightTableAngles(j,i));
     end
 end
 weights=conj(weights);
+weights=transpose(weights);
+
+steervec = phased.SteeringVector('SensorArray',array,'PropagationSpeed',c);
+
+sv=steervec(f(band),simulatedAngle);
+
+Ddata= directivity(array,f(band),angle,'PropagationSpeed',c);
+
+
+figure
+plot(angle,Ddata)
+
 
 % release(toneFileReader);       % Close input file
 % release(audioWriter);  

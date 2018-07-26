@@ -1,3 +1,5 @@
+(* ::Package:: *)
+
 clc
 clear
 
@@ -13,7 +15,7 @@ F0(F0<250) = [];
 F0(F0>8000) = [];
 %%
 f = F0;
-n = 10; %no of microphones
+n = 10; % no of microphones
 lambda = 343./f;
 
 d=5*10^-2;
@@ -26,7 +28,7 @@ end
 
 weightTableAngles = zeros(length(phaseDelay),n*16); % 16 filters
 
-%r=1;
+% r=1;
 index = 1;
 for counter = 0:n:length(F0)*n-n
     for r=1:length(theta)
@@ -42,24 +44,24 @@ weightTableTimeDelay = zeros(length(phaseDelay),n);
 for r=1:length(theta)
     for microphone=n:-1:1
         fmid = F0(index2);
-        weightTableTimeDelay(r,n+1-microphone)= weightTableAngles(r,n+1-microphone)/(fmid*2*pi);
+        weightTableTimeDelay(r,n+1-microphone)= weightTableAngles (r,n+1-microphone)/(fmid*2*pi);
     end
 end
 
-%deltaTperSample = 1/Fs;
+% deltaTperSample = 1/Fs;
 
-%numberOfShifts = round(weightTableTimeDelay/deltaTperSample);
+% numberOfShifts = round(weightTableTimeDelay/deltaTperSample);
 %% Array formation
 
-microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3]);
+microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3],'BackBaffled',true);
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
 f = F0;
 %figure;
 %polarplot = plotResponse(array,f,c,'RespCut','Az','Format','Polar');
 
-%##########################################################################
-%######Simulating sounds and noise in different directions#################
+% ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ##
+% ## ## ## Simulating sounds and noise in different directions ## ## ## ## ## ## ## ## #
 
 angleTone=[0;0];
 
@@ -122,6 +124,16 @@ end
 % audioWriter(finalllllResult);
 
 %%
+
+ANGLE=0:10:180;
+weights=zeros(length(ANGLE),n*16);
+for i=1:160
+    for j=1:19
+        weights(j,i)=cos(weightTableAngles(j,i))+1i*sin(weightTableAngles(j,i));
+    end
+end
+weights=conj(weights);
+
 % release(toneFileReader);       % Close input file
 % release(audioWriter);  
 % x1 = toneFileReader();
@@ -131,7 +143,7 @@ end
 % filterBand = oneThirdOctaveFilterBank{1};
 % band1Mic1 = filterBand(temp(:, 1));
 % filterBand.release();
-% %oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
+% % oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
 % filterBand = oneThirdOctaveFilterBank{1};
 % band1Mic2 = filterBand(temp(:, 1));
 % % plot(temp(:,1))
@@ -139,3 +151,10 @@ end
 % plot(band1Mic1);
 % hold on 
 % plot(band1Mic2);
+%%
+% release(toneFileReader);       % Close input file
+% release(audioWriter);  
+% 
+% blah =toneFileReader();
+% tempOut = sum(temp,2);
+% audioWriter(temp(:,4));

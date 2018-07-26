@@ -14,11 +14,11 @@ clear
 % figure
 % polarplot(theta,B)
 
-f = 1000;
-n = 4; %no of microphones
+f = 3000;
+n = 10; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
-d=5*10^-2;
+d=4*10^-2;
 theta=0:(1/18)*pi:pi;
 phaseDelay = -(2*pi*(d/lambda))*cos(theta);
 
@@ -43,14 +43,14 @@ for r=1:length(theta)
     end
 end
 
-deltaT = (1/f)*(phaseDelay(5)/(2*pi))
+%deltaT = (1/f)*(phaseDelay(5)/(2*pi))
 
 %%
 %Array formation
 
-taper = weightTableImag(7,:);
-microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3]);
-n = 4; %no of microphones
+taper = weightTableImag(8,:);
+microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
+
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
 c = 343; %speed of sound
 
@@ -61,6 +61,7 @@ viewArray(array,'ShowIndex','all','ShowTaper',true);
 
 figure;
 polarplot = plotResponse(array,f,c,'RespCut','Az','Format','Polar');
+%%
 % directivity = get(polarplot,'XData');
 % angle=get(polarplot,'YData');
 % 
@@ -76,7 +77,7 @@ D=zeros(1,181);
 for i=1:181
     D(i)=Ddata(i+180);
 end
-
+%%
 angleRad=linspace(0,pi,181);
 
 figure
@@ -132,7 +133,7 @@ for m = 1:NSampPerFrame:NTSample
         [angleTone]); %+ ...
         %sqrt(noisePwr)*randn(NSampPerFrame,n); %this adds the noise
        %%filter %%
-    playOutput = sum(temp,2);
+    %playOutput = sum(temp,2);
     if isAudioSupported
         %play(audioWriter,0.5*temp(:,3));
         play(audioWriter,0.25*playOutput);

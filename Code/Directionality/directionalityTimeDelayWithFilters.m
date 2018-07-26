@@ -123,7 +123,7 @@ end
 
 %%
 band = 12; %choose the frequency band
-simulatedAngle = 0; % (from dial)
+simulatedAngle = 140; % (from dial)
 angle=0:1:180;
 
 weights=zeros(length(theta),n);
@@ -139,7 +139,7 @@ steervec = phased.SteeringVector('SensorArray',array,'PropagationSpeed',c);
 
 sv=steervec(f(band),simulatedAngle);
 
-Ddata= directivity(array,f(band),angle,'PropagationSpeed',c);
+Ddata= directivity(array,f(band),angle,'PropagationSpeed',c,'Weights',sv);
 
 
 figure

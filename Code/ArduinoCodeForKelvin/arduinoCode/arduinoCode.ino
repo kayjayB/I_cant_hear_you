@@ -43,7 +43,7 @@
 
 unsigned long start_time;
 unsigned long stop_time;
-unsigned int values[5];
+unsigned int values[50];
 int sizeOfBuffer = sizeof(values);
 
 void setup() {        
@@ -51,13 +51,15 @@ void setup() {
   ADC->ADC_MR |= 0x80;  //set free running mode on ADC
   ADC->ADC_CHER = 0x80; //enable ADC on pin A0
   analogWriteResolution(12);
+  analogWrite(DAC0,0);  // Enables DAC0
+  analogWrite(DAC1,0);  // Enables DAC0
 }
 
 void loop() {
   unsigned int i;
     
   start_time = micros();
-  for(i=0;i<5;i++){
+  for(i=0;i<50;i++){
     while((ADC->ADC_ISR & 0x80)==0); // wait for conversion
     values[i]=ADC->ADC_CDR[7]; //get values
 //    analogWrite(DAC0,values[i]);
@@ -76,10 +78,12 @@ void loop() {
 
 
   
-for(i=0;i<5;i++){
+for(i=0;i<50;i++){
   //analogWriteResolution(12);
-  analogWrite(DAC0,values[i]);
-  analogWrite(DAC1,values[i]);
+  //analogWrite(DAC0,values[i]);
+  dacc_set_channel_selection(DACC_INTERFACE, 0);       //select DAC channel 0
+  dacc_write_conversion_data(DACC_INTERFACE, values[i]);//write on DAC
+  //analogWrite(DAC1,values[i]);
   //delayMicroseconds(1);
 }
 }

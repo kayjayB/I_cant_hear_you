@@ -123,7 +123,7 @@ end
 
 %%
 band = 12; %choose the frequency band
-simulatedAngle = 140; % (from dial)
+simulatedAngle = 90; % (from dial)
 angle=0:1:180;
 
 weights=zeros(length(theta),n);
@@ -141,9 +141,55 @@ sv=steervec(f(band),simulatedAngle);
 
 Ddata= directivity(array,f(band),angle,'PropagationSpeed',c,'Weights',sv);
 
+guiData = zeros(length(angle),length(theta));
+for i=1:length(theta)
+    guiSteerVector=steervec(f(band),rad2deg(theta(i)));
+    temp=directivity(array,f(band),angle,'PropagationSpeed',c,'Weights',guiSteerVector);
+    for j=1:1:length(angle)
+        guiData(j,i)=temp(j);
+    end
+end
 
+guiDataMag=db2mag(guiData);
+
+normalised = zeros(length(angle),length(theta));
+maximum=max(guiDataMag);
+minimum=min(guiDataMag);
+for i=1:length(theta)
+    for j=1:1:length(angle)
+        %normalised(j,i)=(guiData(j,i)-minimum(i))/(maximum(i)-minimum(i));
+        normalised(j,i)=(guiDataMag(j,i))/(maximum(i));
+    end
+end
+
+guiDataX=zeros(length(angle),length(theta));
+guiDataY=zeros(length(angle),length(theta));
+
+for i=1:length(theta)
+    for j=1:1:length(angle)
+        guiDataX(j,i)= normalised(j,i)*cos(deg2rad(angle(j)));
+    end
+end
+
+for i=1:length(theta)
+    for j=1:1:length(angle)
+        guiDataY(j,i)= normalised(j,i)*sin(deg2rad(angle(j)));
+    end
+end
+
+column=(simulatedAngle/10)+1;
 figure
-plot(angle,Ddata)
+plot(guiDataX(:,column),guiDataY(:,column))
+xlim([-1 1]);
+xticks([-1 -0.8 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.8 1]);
+xticklabels({'1.0','0.8','0.6','0.4','0.2','0','0.2','0.4','0.6','0.8','1.0'})
+ylim([0 1]);
+line([0 0],[0 1],'Color','Black')
+line
+%line([0 0],[-1 1],'Color','Black')
+
+%line([0 0],[1 1],'Color','Black')
+%grid on
 
 
 % release(toneFileReader);       % Close input file
@@ -171,3 +217,6 @@ plot(angle,Ddata)
 % tempOut = sum(temp,2);
 % audioWriter(temp(:,4));
 recObj = audiorecorder
+
+
+

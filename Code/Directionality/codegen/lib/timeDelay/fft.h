@@ -1,13 +1,13 @@
 //
 // Trial License - for use to evaluate programs for possible purchase as
 // an end-user only.
-// File: nextpow2.h
+// File: fft.h
 //
 // MATLAB Coder version            : 4.0
-// C/C++ source code generated on  : 01-Aug-2018 12:42:33
+// C/C++ source code generated on  : 01-Aug-2018 16:22:00
 //
-#ifndef NEXTPOW2_H
-#define NEXTPOW2_H
+#ifndef FFT_H
+#define FFT_H
 
 // Include Files
 #include <stddef.h>
@@ -16,12 +16,13 @@
 #include "timeDelay_types.h"
 
 // Function Declarations
-extern double nextpow2(double n);
+extern void fft(const double x[50], double varargin_1, creal_T y_data[], int
+                y_size[1]);
 
 #endif
 
 //
-// File trailer for nextpow2.h
+// File trailer for fft.h
 //
 // [EOF]
 //

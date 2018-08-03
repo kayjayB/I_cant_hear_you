@@ -37,20 +37,28 @@ for counter = 0:n:length(F0)*n-n
     index = index +1;
 end
 index2 =1;
-weightTableTimeDelay = zeros(length(phaseDelay),n);
+weightTableTimeDelayTemp = zeros(length(phaseDelay),n);
 
 for r=1:length(theta)
     for microphone=n:-1:1
         fmid = F0(index2);
-        weightTableTimeDelay(r,n+1-microphone)= weightTableAngles (r,n+1-microphone)/(fmid*2*pi);
+        weightTableTimeDelayTemp(r,n+1-microphone)= weightTableAngles(r,n+1-microphone)/(fmid*2*pi);
     end
 end
-
+weightTableTimeDelay= zeros(length(phaseDelay),8);
+weightTableTimeDelay(:,1) = weightTableTimeDelayTemp(:,1);
+weightTableTimeDelay(:,3) = weightTableTimeDelayTemp(:,2);
+weightTableTimeDelay(:,5) = weightTableTimeDelayTemp(:,3);
+weightTableTimeDelay(:,7) = weightTableTimeDelayTemp(:,4);
+weightTableTimeDelay(:,2) = weightTableTimeDelayTemp(:,1);
+weightTableTimeDelay(:,4) = weightTableTimeDelayTemp(:,2);
+weightTableTimeDelay(:,6) = weightTableTimeDelayTemp(:,3);
+weightTableTimeDelay(:,8) = weightTableTimeDelayTemp(:,4);
 % deltaTperSample = 1/Fs;
 
 % numberOfShifts = round(weightTableTimeDelay/deltaTperSample);
 %% Array formation
-
+n=8;
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 8e3],'BackBaffled',true);
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x');
 c = 343; %speed of sound
@@ -76,7 +84,6 @@ NTSample = t_duration*Fs;
 %%
 % set up audio device writer
 toneFileReader = dsp.AudioFileReader('SamplesPerFrame',NSampPerFrame);
-toneFileReader2 = dsp.AudioFileReader('SamplesPerFrame',NSampPerFrame);
 audioWriter = audioDeviceWriter('SampleRate',toneFileReader.SampleRate, ...
         'SupportVariableSizeInput', true);
 isAudioSupported = (length(getAudioDevices(audioWriter))>1);
@@ -88,9 +95,8 @@ bandOutput = zeros(NSampPerFrame, n*length(F0));
 result = zeros(NSampPerFrame, length(F0));
 
 angleTone2=[0;0];
-while ~isDone(toneFileReader)
+%while ~isDone(toneFileReader)
     x1 = toneFileReader();
-    x2 = toneFileReader2(); 
     temp = collector([x1], [angleTone]); %+ ...
 
     %i=0:n:length(F0)*n-n;
@@ -107,75 +113,27 @@ while ~isDone(toneFileReader)
     
     i=1:1:NSampPerFrame; 
     j=n:n:length(F0)*n;
-    %result(i,j/n) = bandOutput(i,j-9)+bandOutput(i,j-8)+bandOutput(i,j-7)+bandOutput(i,j-6)+bandOutput(i,j-5)+bandOutput(i,j-4)+bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
-    result(i,j/n) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
+    result(i,j/n) = bandOutput(i,j-7)+bandOutput(i,j-6)+bandOutput(i,j-5)+bandOutput(i,j-4)+bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
+    %result(i,j/n) = bandOutput(i,j-3)+bandOutput(i,j-2)+bandOutput(i,j-1)+bandOutput(i,j);
 
 
 
     playOutput = sum(result,2);
     audioWriter(playOutput/n);
         
-end
+%end
+
+
+% result = 1:1:200;
+%   for idx1 = 1:50
+%     for idx0 = 1:8 
+%       result(idx0 + 8 * idx1)
+%     end
+%   end
+% %%  
+%     for idx0 = 1:4:50*4 
+%       result(idx0)
+%     end
 
 %%
-% audioWriter(finalllllResult);
 
-%%
-band = 12; %choose the frequency band
-simulatedAngle = 140; % (from dial)
-angle=0:1:180;
-
-weights=zeros(length(theta),n);
-for i=band*n+1:band*n+n
-    for j=1:19
-        weights(j,i-band*n)=cos(weightTableAngles(j,i))+1i*sin(weightTableAngles(j,i));
-    end
-end
-weights=conj(weights);
-weights=transpose(weights);
-
-steervec = phased.SteeringVector('SensorArray',array,'PropagationSpeed',c);
-
-sv=steervec(f(band),simulatedAngle);
-
-Ddata= directivity(array,f(band),angle,'PropagationSpeed',c,'Weights',sv);
-
-figure
-plot(angle,Ddata)
-
-
-% release(toneFileReader);       % Close input file
-% release(audioWriter);  
-% x1 = toneFileReader();
-%     temp = collector([x1],...
-%         [angleTone]); %+ ...
-% oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
-% filterBand = oneThirdOctaveFilterBank{1};
-% band1Mic1 = filterBand(temp(:, 1));
-% filterBand.release();
-% % oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14);
-% filterBand = oneThirdOctaveFilterBank{1};
-% band1Mic2 = filterBand(temp(:, 1));
-% % plot(temp(:,1))
-% % hold on
-% plot(band1Mic1);
-% hold on 
-% plot(band1Mic2);
-%%
-% release(toneFileReader);       % Close input file
-% release(audioWriter);  
-% 
-% blah =toneFileReader();
-% tempOut = sum(temp,2);
-% audioWriter(temp(:,4));
-
-result = 1:1:200;
-  for idx1 = 1:4
-    for idx0 = 1:50 
-      result(idx0 + 50 * idx1)
-    end
-  end
-%%  
-    for idx0 = 1:4:50*4 
-      result(idx0)
-    end

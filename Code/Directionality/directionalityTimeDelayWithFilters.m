@@ -216,7 +216,20 @@ line
 % blah =toneFileReader();
 % tempOut = sum(temp,2);
 % audioWriter(temp(:,4));
-recObj = audiorecorder
+recObj = audiorecorder;
+
+angle=0:1:180;
+omniDataX=zeros(1,length(angle));
+omniDataY=zeros(1,length(angle));
+for i=1:length(angle)
+    omniDataX(1,i)=cos(deg2rad(angle(i)));
+end
+for i=1:length(angle)
+    omniDataY(1,i)=sin(deg2rad(angle(i)));
+end
+
+figure
+plot(omniDataX, omniDataY)
 
 
 

@@ -1,4 +1,5 @@
 #include <bluesteinSetup.h>
+#include <compressor.h>
 #include <exp.h>
 #include <fft.h>
 #include <fft1.h>
@@ -6,15 +7,17 @@
 #include <ifftshift.h>
 #include <mpower.h>
 #include <nextpow2.h>
+#include <rangeCompression.h>
+#include <rangeCompression_initialize.h>
+#include <rangeCompression_rtwutil.h>
+#include <rangeCompression_terminate.h>
+#include <rangeCompression_types.h>
 #include <round.h>
 #include <rt_nonfinite.h>
 #include <rtGetInf.h>
 #include <rtGetNaN.h>
 #include <rtwtypes.h>
 #include <timeDelay.h>
-#include <timeDelay_initialize.h>
-#include <timeDelay_terminate.h>
-#include <timeDelay_types.h>
 #include <tmwtypes.h>
 
 #include <stddef.h>
@@ -24,11 +27,12 @@
 //static void argInit_1x4_real_T(double result[4]);
 static void argInit_50x4_real_T(double result[200]);
 
-double Fs = 40000;
+double Fs = 20000;
 double input[400];
 double directionalOutput[400];
 double outputAmplification[400];
 double result[50];
+double compressedOutput[50];
 float ADC_value1[5];
 float ADC_value2[5];
 float outputFilter12[5];
@@ -80,9 +84,15 @@ static void argInit_50x4_real_T(double result[400])
 }
 
 void setup() {
-  Serial.begin(9600); // Begin Serial port
+  Serial.begin(115200); // Begin Serial port
+
+  //adc_disable_all_channel(ADC);
   ADC->ADC_MR |= 0x80;  //set free running mode on ADC
-  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7
+  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A8
+
+  // bitSet(ADC->ADC_MR,10); 
+  // bitSet(ADC->ADC_MR,11);
+  // bitSet(ADC->ADC_MR,13); 
   analogWriteResolution(12);
 
   // DAC Setup
@@ -91,7 +101,6 @@ void setup() {
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
-
 
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
@@ -102,8 +111,9 @@ void loop() {
   // Correct way to loop
   for (int idx1 = 0; idx1 < 8; idx1++) {
     for (int idx0 = 0; idx0 < 50; idx0++) {
-      while ((ADC->ADC_ISR & 0x80) == 0);
+      while ((ADC->ADC_ISR & 0xFF) != 0xFF);
       input[idx0 + 50 * idx1] = ADC->ADC_CDR[ADC_counter];
+      input[idx0 + 50 * idx1] = ((input[idx0 + 50 * idx1]*3.3)/4095) - 1.5875;
       ADC_counter --;
       if (ADC_counter == -1)
       {
@@ -115,43 +125,45 @@ void loop() {
   memcpy(weightings, weightTable[0], 8 * sizeof(double) );
   timeDelay(input, weightings, Fs, directionalOutput);
 
-  //     for (int idx0 = 0; idx0 < 8; idx0++) {
-  //      Serial.print("Weightings: ");
-  //      Serial.print(weightings[idx0]);
-  //       Serial.print("Weighting Table: ");
-  //      Serial.println(weightTable[0][idx0]);
-  //    }
+    //   for (int idx0 = 0; idx0 < 8; idx0++) {
+    //    Serial.print("Weightings: ");
+    //    Serial.print(weightings[idx0]);
+    //     Serial.print("Weighting Table: ");
+    //    Serial.println(weightTable[0][idx0]);
+    //  }
 
 
 //  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-//    Serial.println(directionalOutput[idx0]);
+//    Serial.println(input[idx0]);
 //  }
 
-  // // Apply gains to the first filter signals
-  // for (int j = 0; j < 400; j = j + 2) {
-  //   outputAmplification[j] = directionalOutput[j]*gain12;
-  // }
+  // Apply gains to the first filter signals
+  for (int j = 0; j < 400; j = j + 2) {
+    outputAmplification[j] = directionalOutput[j]*gain12;
+  }
   
-  // // Apply gains to the second filter signals
-  // for (int j = 1; j < 400; j = j + 2) {
-  //   outputAmplification[j] = directionalOutput[j]*gain15;
-  // }
+  // Apply gains to the second filter signals
+  for (int j = 1; j < 400; j = j + 2) {
+    outputAmplification[j] = directionalOutput[j]*gain15;
+  }
 
   // Adding the microphone signals together
   for (int idx1 = 0; idx1 < 50; idx1++) {
     double temp = 0;
     for (int idx0 = 0; idx0 < 8; idx0++) {
-      temp += input[idx0 + 8 * idx1] ;
+      temp += outputAmplification[idx0 + 8 * idx1] ;
     }
-    result[idx1] = temp;
+    result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
   }
 
+  rangeCompression(result, Fs, compressedOutput);
+
     for (int idx0 = 0; idx0 < 50; idx0++) {
+      compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
+      //compressedOutput[idx0] = (result[idx0]);
       // Serial.print(result[idx0]);
       // Serial.print(",");
-      // Serial.print(result[idx0]);
-      // Serial.print("\n");
-      Serial.println(result[idx0]);
+      Serial.println(compressedOutput[idx0]);
   }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);

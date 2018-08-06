@@ -2,7 +2,7 @@ import serial
 import keyboard
 
 serial_port = '/dev/cu.usbmodem1421';
-baud_rate = 9600; #In arduino, Serial.begin(baud_rate)
+baud_rate = 115200; #In arduino, Serial.begin(baud_rate)
 write_to_file_path = "output.txt";
 
 output_file = open(write_to_file_path, "w+");

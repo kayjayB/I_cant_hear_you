@@ -2,7 +2,7 @@ clear
 clc
 %%  Filtering and playing an audio clip %%
 %% Sound reader
-NSampPerFrame = 10000;
+NSampPerFrame = 2000;
 audioInput2 = dsp.AudioFileReader('Filename', 'Audio/A_eng_m1.wav', 'SamplesPerFrame',NSampPerFrame);  
 audioWriter2 = audioDeviceWriter('SampleRate',audioInput2.SampleRate);
 
@@ -36,7 +36,7 @@ oneThirdOctaveFilterBank = createOneThirdOctaveFilters(14, Fs);
 % 
 release(audioInput2);       % Close input file
 release(audioWriter2);               % Close audio output device
-
+dRC = compressor('SampleRate', Fs);
 SpecAna = dsp.SpectrumAnalyzer('PlotAsTwoSidedSpectrum',false, ...
     'SampleRate',40000, ...
     'NumInputPorts',2,...
@@ -52,6 +52,7 @@ while ~isDone(audioInput2)
     buffer = audioInput2();  % Load a frame of audio
 
     output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram);
+    output = dRC(output);
   
     n=length(output);   % create a scaling variable equal to the 
                             % length of the data

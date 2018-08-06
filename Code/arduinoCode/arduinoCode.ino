@@ -127,15 +127,15 @@ void loop() {
 //    Serial.println(directionalOutput[idx0]);
 //  }
 
-  // Apply gains to the first filter signals
-  for (int j = 0; j < 400; j = j + 2) {
-    outputAmplification[j] = directionalOutput[j]*gain12;
-  }
+  // // Apply gains to the first filter signals
+  // for (int j = 0; j < 400; j = j + 2) {
+  //   outputAmplification[j] = directionalOutput[j]*gain12;
+  // }
   
-  // Apply gains to the second filter signals
-  for (int j = 1; j < 400; j = j + 2) {
-    outputAmplification[j] = directionalOutput[j]*gain15;
-  }
+  // // Apply gains to the second filter signals
+  // for (int j = 1; j < 400; j = j + 2) {
+  //   outputAmplification[j] = directionalOutput[j]*gain15;
+  // }
 
   // Adding the microphone signals together
   for (int idx1 = 0; idx1 < 50; idx1++) {
@@ -147,10 +147,11 @@ void loop() {
   }
 
     for (int idx0 = 0; idx0 < 50; idx0++) {
-      Serial.print(result[idx0]);
-      Serial.print(",");
-      Serial.print(result[idx0]);
-      Serial.print("\n");
+      // Serial.print(result[idx0]);
+      // Serial.print(",");
+      // Serial.print(result[idx0]);
+      // Serial.print("\n");
+      Serial.println(result[idx0]);
   }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);

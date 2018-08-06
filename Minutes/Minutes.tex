@@ -181,6 +181,10 @@ Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
 	\item Work station allocation
 \end{itemize}
 
+\subsection*{Minutes of meeting:}
+Start date: 18/07/2018 \\
+Start time: 10:00
+
 Limiting frequency range and directionality steering range:
 \begin{itemize}
 	\item It is acceptable to limit the frequency range of interest too 0 - 8000~Hz and to limit directionality steering to the $180^{\circ}$ plane in front of the user.
@@ -191,7 +195,7 @@ RAM limitations:
 	\item It is expected that there will be a shortage of RAM if the designed filter bank is implemented digitally.
 	\item Implementing the complete filter bank is seen to be important because it is an ANSI standard.
 	\item It was concluded that the implementation of the hearing aid would require a dedicated IC. Additionally, the project time line is too short and the budget is too small to implement a completely modular design.
-	\item It is therefore suggested to implement a complete, non-real time software design and thereafter implement a limited electronic/hardware version using simpler electronics.
+	\item It has therefore been decided that a complete, non-real time software design must be implemented. Thereafter a limited electronic/hardware version using simpler electronics will be implemented.
 \end{itemize}
 
 MATLAB software system design:
@@ -213,13 +217,6 @@ Hardware/electronic system design:
 To do:
 It has been recommended that the entire software solution must be completed first. Thereafter, the compensatory gain portion of the hardware version must be completed. The directionally feature of the hardware version should be implemented last.
 
-
-\subsection*{Minutes of meeting:}
-Start date: 18/07/2018 \\
-Start time: 10:00
-
-
-To do:
 
 \section*{MEETING 6}
 \subsection*{Attendees:}
@@ -247,27 +244,74 @@ Audio with applied weights passing through filter bank:
 \begin{itemize}
 	\item Through demonstration, the audio output is severely distorted even when the collected audio is multiplied by 1.
 	\item It is found that each filter needs to be reset/released before passing consecutive frames through the filter.
-	\item Weights were being applied to collected signals incorrectly.
+	\item Weights were being applied to collected signals incorrectly as frequency domain weightings were being applied to time domain signals
 	\item Weights (currently imaginary numbers) representing phase shifts have to be converted to time delays. It was suggested that by doing this and adding delayed signals of all filters bands appropriately, the distorted output audio would be improved.
 \end{itemize}
+
+Analog filter bank:
+When we pick the filter bands, put them as far apart as possible. This will mean that the order of the filters does not have a large effect on their performance.
 
 To do:
 \begin{itemize}
 	\item Convert microphone weights for all angles and centre frequencies to time delays.
 	\item Implement time delays as array element shifts and add all arrays together appropriately.
+	\item Vectorise all the for loops in order to speed up the execution time of the code
 \end{itemize}
 
 \section*{MEETING 7}
 \subsection*{Attendees:}
 Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
 \subsection*{Agenda:} 
+\begin{itemize}
+	\item Weekly progress report
+	\item Polar plot frequencies for the GUI
+	\item How do we calculate the required gain for the compensatory amplification?
+	\item How closely does the software have to match the hardware?
+\end{itemize}
 
 \subsection*{Minutes of meeting:}
 Start date: 25/07/2018 \\
-Start time: 10:00
+Start time: 12:00
 
+Polar Plot:
+Pick a few frequencies (5) and plot them to show the polar patterns at different frequencies
+
+Compensatory gain:
+\begin{itemize}
+	\item The required gains are just the gains on the audiogram
+	\item We have implemented the compensatory gain correctly
+\end{itemize}
+
+Software vs hardware:
+\begin{itemize}
+	\item We can use any number of microphones in hardware - the hardware and software number of microphones do not have to match
+	\item We don't have to implement the 3 of the software filters in hardware
+	\item However, it is not ideal to use 3 bands that span the entire frequency range of speech as this will not accurately show how the compensatory amplification works
+	\item It is fine to use three bands that are very far apart
+	\item We should expand as much as we can in the software to create a full hearing aid simulation
+\end{itemize}
+
+Report:
+\begin{itemize}
+	\item It is essential that we talk about the cost and time limitations
+	\item We must have a discussion about where the project needs to go to be implemented in real life (in the future recommendations section)
+\end{itemize}
 
 To do:
+At the end of the project, remind Prof. Rubin to thank Kirsten at Optinum for the MATLAB licences.
+
+\section*{MEETING 8}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+\begin{itemize}
+	\item 
+\end{itemize}
+
+\subsection*{Minutes of meeting:}
+Start date: 01/07/2018 \\
+Start time: 10:00
+
 
 
 \end{document}

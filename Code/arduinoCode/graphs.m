@@ -1,3 +1,5 @@
 Matrix = csvread("output.txt");
 
-plot(Matrix)
+plot(Matrix(:,1))
+% hold on
+% plot(Matrix(:,2))

@@ -47,7 +47,6 @@ float sum;
 int ADC_counter = 7;
 double weightings[8];
 
-
 const double weightTable[19][8] = { { -0.000437317784256560, -0.000437317784256560, -0.000291545189504373, -0.000291545189504373, -0.000145772594752187, -0.000145772594752187, 0, 0},
   { -0.000430673944465980, -0.000430673944465980, -0.000287115962977320, -0.000287115962977320, -0.000143557981488660, -0.000143557981488660, 0, 0},
   { -0.000410944294804333, -0.000410944294804333, -0.000273962863202889, -0.000273962863202889, -0.000136981431601444, -0.000136981431601444, 0, 0},
@@ -103,9 +102,16 @@ void setup() {
   ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
   ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
   ADC->ADC_EMR = 0;
+  REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00020000;
+  ADC->ADC_MR |= 0x40; // Set fast wakeup mode
+  ADC->ADC_MR |= ADC_MR_LOWRES_BITS_12;
 
-  analogReadResolution(12);
-  //analogWriteResolution(12);
+  //Interupt Setup
+  NVIC_SetPriority(ADC_IRQn, 3);    
+  adc_disable_interrupt(ADC, 0xFFFFFFFF);
+  adc_enable_interrupt(ADC,ADC_IER_EOC7);
+  NVIC_EnableIRQ(ADC_IRQn);  
+
 
   // DAC Setup
   analogWrite(DAC1, 0);
@@ -129,36 +135,33 @@ void loop() {
       while ((ADC->ADC_ISR & 0xFF) != 0xFF);
       input[idx0 + 50 * idx1] = ADC->ADC_CDR[ADC_counter];
       input[idx0 + 50 * idx1] = (input[idx0 + 50 * idx1]*0.00080586) - 1.5875; //3.3/4095
-      ADC_counter --;
-      if (ADC_counter == -1)
+      ADC_counter--;
+      if (ADC_counter == 8)
       {
         ADC_counter = 7;
       }
     }
   }
+
   t = micros()-t0;  // calculate elapsed time
 
-  Serial.print("Time per sample: ");
-  Serial.println((float)t/400);
-  Serial.print("Frequency: ");
-  Serial.println((float)400*1000000/t);
-  Serial.println();
-  delay(1000);
+  // Serial.print("Time per sample: ");
+  // Serial.println((float)t/400);
+  // Serial.print("Frequency: ");
+  // Serial.println((float)400*1000000/t);
+  // Serial.println();
+  // delay(1000);
+
+  // PDC_ADC->PERIPH_RPR = (uint32_t) buf; // address of buffer
+  // PDC_ADC->PERIPH_RCR = BUFFER_SIZE; 
+  // PDC_ADC->PERIPH_PTCR = PERIPH_PTCR_RXTEN; // enable receive
 
   memcpy(weightings, weightTable[0], 8 * sizeof(double) );
   timeDelay(input, weightings, Fs, directionalOutput);
 
-    //   for (int idx0 = 0; idx0 < 8; idx0++) {
-    //    Serial.print("Weightings: ");
-    //    Serial.print(weightings[idx0]);
-    //     Serial.print("Weighting Table: ");
-    //    Serial.println(weightTable[0][idx0]);
-    //  }
-
-
-//  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-//    Serial.println(input[idx0]);
-//  }
+ for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+   Serial.println(input[idx0]);
+ }
 
   // Apply gains to the first filter signals
   for (int j = 0; j < 400; j = j + 2) {
@@ -190,5 +193,36 @@ void loop() {
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   
-  delay(100);
+  delay(10);
 }
+
+// ADC Interrupt handler.
+// void ADC_Handler(void)
+// { 
+
+ 
+//   if ((adc_get_status(ADC) & ADC_IER_EOC7) == ADC_IER_EOC7) 
+//   { 
+//     adc_disable_interrupt(ADC, ADC_IER_EOC7);
+//     adcResult = ADC->ADC_CDR[7]; //clears the EOC7 bit
+      
+//     if (averagedEnvironment == 1) {                                    
+//       fadcResult = speechFilter.processReading(adcResult);
+//       } else if (averagedEnvironment == 2){                             
+//        fadcResult = musicFilter.processReading(adcResult); 
+//         } else if (averagedEnvironment == 3){                           
+//           fadcResult = noiseFilter.processReading(adcResult/4);
+//         }
+
+//     dacc_write_conversion_data(DACC_INTERFACE, fadcResult);
+
+//    if (alternate && adcCounter < sampleCount){
+//     interuptVector[adcCounter] = (adcResult - 1551.5);
+//     adcCounter++;
+//     alternate = 0;
+//       } else if(adcCounter < sampleCount){
+//        alternate = 1;
+//        }  
+//   }
+//   adc_enable_interrupt(ADC,ADC_IER_EOC7);
+// }

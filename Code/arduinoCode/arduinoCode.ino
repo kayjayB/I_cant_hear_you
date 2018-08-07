@@ -86,14 +86,26 @@ static void argInit_50x4_real_T(double result[400])
 void setup() {
   Serial.begin(115200); // Begin Serial port
 
-  //adc_disable_all_channel(ADC);
-  ADC->ADC_MR |= 0x80;  //set free running mode on ADC
-  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A8
+  pmc_enable_periph_clk (ID_ADC);
 
-  // bitSet(ADC->ADC_MR,10); 
-  // bitSet(ADC->ADC_MR,11);
-  // bitSet(ADC->ADC_MR,13); 
-  analogWriteResolution(12);
+  adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN, ADC_STARTUP_FAST);
+
+  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+
+  ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
+  ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
+
+  PIOA->PIO_PDR |= PIO_PDR_P16; //Disable PIO Controller
+  ADC->ADC_MR = ADC_MR_PRESCAL(2); // set ADC prescale to 2
+  ADC->ADC_MR |= 0x80;  //set free running mode on ADC. Don't wait for triggers
+  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+
+  ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
+  ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
+  ADC->ADC_EMR = 0;
+
+  analogReadResolution(12);
+  //analogWriteResolution(12);
 
   // DAC Setup
   analogWrite(DAC1, 0);
@@ -108,12 +120,15 @@ void setup() {
 
 void loop() {
 
+  long t0, t;
+
+  t0 = micros();
   // Correct way to loop
   for (int idx1 = 0; idx1 < 8; idx1++) {
     for (int idx0 = 0; idx0 < 50; idx0++) {
       while ((ADC->ADC_ISR & 0xFF) != 0xFF);
       input[idx0 + 50 * idx1] = ADC->ADC_CDR[ADC_counter];
-      input[idx0 + 50 * idx1] = ((input[idx0 + 50 * idx1]*3.3)/4095) - 1.5875;
+      input[idx0 + 50 * idx1] = (input[idx0 + 50 * idx1]*0.00080586) - 1.5875; //3.3/4095
       ADC_counter --;
       if (ADC_counter == -1)
       {
@@ -121,6 +136,14 @@ void loop() {
       }
     }
   }
+  t = micros()-t0;  // calculate elapsed time
+
+  Serial.print("Time per sample: ");
+  Serial.println((float)t/400);
+  Serial.print("Frequency: ");
+  Serial.println((float)400*1000000/t);
+  Serial.println();
+  delay(1000);
 
   memcpy(weightings, weightTable[0], 8 * sizeof(double) );
   timeDelay(input, weightings, Fs, directionalOutput);
@@ -160,13 +183,12 @@ void loop() {
 
     for (int idx0 = 0; idx0 < 50; idx0++) {
       compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
-      //compressedOutput[idx0] = (result[idx0]);
       // Serial.print(result[idx0]);
       // Serial.print(",");
-      Serial.println(compressedOutput[idx0]);
+     // Serial.println(compressedOutput[idx0]);
   }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   
-  delay(2);
+  delay(100);
 }

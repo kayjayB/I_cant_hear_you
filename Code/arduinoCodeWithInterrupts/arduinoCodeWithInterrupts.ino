@@ -27,8 +27,23 @@
 //static void argInit_1x4_real_T(double result[4]);
 static void argInit_50x4_real_T(double result[200]);
 
+const int sampleCount = 400; //50*8
 double Fs = 20000;
-double input[400];
+
+volatile double input[sampleCount];
+double inputVector[sampleCount];
+volatile int sample_counter=0;
+volatile bool alternate = 1;
+unsigned int adcResult0 = 0;
+unsigned int adcResult1 = 0;
+unsigned int adcResult2 = 0;
+unsigned int adcResult3 = 0;
+unsigned int adcResult4 = 0;
+unsigned int adcResult5 = 0;
+unsigned int adcResult6 = 0;
+unsigned int adcResult7 = 0;
+unsigned int adcResult8 = 0;
+
 double directionalOutput[400];
 double outputAmplification[400];
 double result[50];
@@ -89,8 +104,8 @@ void setup() {
 
   adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN, ADC_STARTUP_FAST);
 
-  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
-
+  //ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+  ADC->ADC_CHER = 0xF0;
   ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
   ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
 
@@ -129,19 +144,6 @@ void loop() {
   long t0, t;
 
   t0 = micros();
-  // Correct way to loop
-  for (int idx1 = 0; idx1 < 8; idx1++) {
-    for (int idx0 = 0; idx0 < 50; idx0++) {
-      while ((ADC->ADC_ISR & 0xFF) != 0xFF);
-      input[idx0 + 50 * idx1] = ADC->ADC_CDR[ADC_counter];
-      input[idx0 + 50 * idx1] = (input[idx0 + 50 * idx1]*0.00080586) - 1.5875; //3.3/4095
-      ADC_counter--;
-      if (ADC_counter == 8)
-      {
-        ADC_counter = 7;
-      }
-    }
-  }
 
   t = micros()-t0;  // calculate elapsed time
 
@@ -152,12 +154,15 @@ void loop() {
   // Serial.println();
   // delay(1000);
 
-  // PDC_ADC->PERIPH_RPR = (uint32_t) buf; // address of buffer
-  // PDC_ADC->PERIPH_RCR = BUFFER_SIZE; 
-  // PDC_ADC->PERIPH_PTCR = PERIPH_PTCR_RXTEN; // enable receive
-
   memcpy(weightings, weightTable[0], 8 * sizeof(double) );
-  timeDelay(input, weightings, Fs, directionalOutput);
+
+  for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
+
+  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+   Serial.println(inputVector[idx0]);
+  }
+
+  timeDelay(inputVector, weightings, Fs, directionalOutput);
 
  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
    Serial.println(input[idx0]);
@@ -192,7 +197,55 @@ void loop() {
   }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
-  
+  sample_counter = 0;
   delay(10);
 }
 
+// ADC Interrupt handler.
+void ADC_Handler(void)
+{ 
+  if ((adc_get_status(ADC) & ADC_IER_EOC7) == ADC_IER_EOC7) 
+  { 
+    adc_disable_interrupt(ADC, ADC_IER_EOC7);
+
+    // Read in all the ADC values
+    adcResult0 = ADC->ADC_CDR[7];
+    adcResult1 = ADC->ADC_CDR[6];
+    adcResult2 = ADC->ADC_CDR[5];
+    adcResult3 = ADC->ADC_CDR[4];
+    // adcResult4 = ADC->ADC_CDR[3];
+    // adcResult5 = ADC->ADC_CDR[2];
+    // adcResult6 = ADC->ADC_CDR[1];
+    // adcResult7 = ADC->ADC_CDR[0];
+
+    if (alternate && sample_counter < sampleCount)
+    {
+      // input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
+      // input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
+      // input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
+      // input[3 + sample_counter] = adcResult3*0.00080586 - 1.5875;
+      // input[4 + sample_counter] = adcResult4*0.00080586 - 1.5875;
+      // input[5 + sample_counter] = adcResult5*0.00080586 - 1.5875;
+      // input[6 + sample_counter] = adcResult6*0.00080586 - 1.5875;
+      // input[7 + sample_counter] = adcResult7*0.00080586 - 1.5875;
+
+      input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
+      input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
+      input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
+      input[3 + sample_counter] = adcResult3*0.00080586 - 1.5875;
+      input[4 + sample_counter] = adcResult0*0.00080586 - 1.5875;
+      input[5 + sample_counter] = adcResult1*0.00080586 - 1.5875;
+      input[6 + sample_counter] = adcResult2*0.00080586 - 1.5875;
+      input[7 + sample_counter] = adcResult3*0.00080586 - 1.5875;
+
+      sample_counter+=8;
+      alternate = 0;
+
+    } 
+    else if(sample_counter < sampleCount)
+    {
+      alternate = 1;
+    }
+  }
+  adc_enable_interrupt(ADC,ADC_IER_EOC7);
+}

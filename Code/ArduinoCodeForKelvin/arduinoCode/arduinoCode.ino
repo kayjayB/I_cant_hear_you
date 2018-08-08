@@ -50,16 +50,40 @@ void setup() {
   Serial.begin(9600);  
   ADC->ADC_MR |= 0x80;  //set free running mode on ADC
   ADC->ADC_CHER = 0x80; //enable ADC on pin A0
+
+//  pmc_enable_periph_clk (ID_ADC);
+//
+//  adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN, ADC_STARTUP_FAST);
+//
+//  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+//
+//  ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
+//  ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
+//
+//  PIOA->PIO_PDR |= PIO_PDR_P16; //Disable PIO Controller
+//  ADC->ADC_MR = ADC_MR_PRESCAL(2); // set ADC prescale to 2
+//  ADC->ADC_MR |= 0x80;  //set free running mode on ADC. Don't wait for triggers
+//  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+//
+//  ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
+//  ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
+//  ADC->ADC_EMR = 0;
+  
   analogWriteResolution(12);
-  analogWrite(DAC0,0);  // Enables DAC0
+  //analogWrite(DAC0,0);  // Enables DAC0
   analogWrite(DAC1,0);  // Enables DAC0
+   DACC->DACC_MR = DACC_MR_TRGEN_DIS                    // Free running mode
+                  | DACC_MR_USER_SEL_CHANNEL1          // select channel 1
+                  //| DACC_MR_REFRESH (25)
+                  //| DACC_MR_STARTUP_8
+                  | DACC_MR_MAXS;
 }
 
 void loop() {
   unsigned int i;
     
   start_time = micros();
-  for(i=0;i<50;i++){
+  for(i=0;i<sizeOfBuffer;i++){
     while((ADC->ADC_ISR & 0x80)==0); // wait for conversion
     values[i]=ADC->ADC_CDR[7]; //get values
 //    analogWrite(DAC0,values[i]);
@@ -78,10 +102,15 @@ void loop() {
 
 
   
-for(i=0;i<50;i++){
-  //analogWriteResolution(12);
-  //analogWrite(DAC0,values[i]);
-  dacc_set_channel_selection(DACC_INTERFACE, 0);       //select DAC channel 0
+for(i=0;i<sizeOfBuffer;i++){
+//  float temp=0;
+//  for (int j=0; j<5; j++) {
+//  //analogWriteResolution(12);
+//  //analogWrite(DAC0,values[i]);
+//    temp += values[i*5+j];
+//  }
+//  temp = temp/5;
+  dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 0
   dacc_write_conversion_data(DACC_INTERFACE, values[i]);//write on DAC
   //analogWrite(DAC1,values[i]);
   //delayMicroseconds(1);

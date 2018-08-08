@@ -14,7 +14,7 @@ clear
 % figure
 % polarplot(theta,B)
 
-f = 3100;
+f = 3340;
 n = 4; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
@@ -48,7 +48,7 @@ end
 %%
 %Array formation
 
-taper = weightTableImag(4,:);
+taper = weightTableImag(8,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
@@ -71,13 +71,13 @@ angle=-180:1:180;
 Ddata= directivity(array,f,angle,'PropagationSpeed',c);
 
 figure
-plot(angle,Ddata);
+%plot(angle,Ddata);
 
 D=zeros(1,181);
 for i=1:181
     D(i)=Ddata(i+180);
 end
-%%
+
 angleRad=linspace(0,pi,181);
 
 figure

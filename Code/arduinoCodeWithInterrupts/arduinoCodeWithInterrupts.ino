@@ -24,15 +24,16 @@
 #include <stdlib.h>
 #include <math.h>
 
-//static void argInit_1x4_real_T(double result[4]);
 static void argInit_50x4_real_T(double result[200]);
+int directionalityAngle(volatile int x);
 
 const int sampleCount = 400; //50*8
-double Fs = 20000;
+double Fs = 18000;
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
-volatile int sample_counter=0;
+volatile int sample_counter = 0;
+volatile int potentiometerValue = 0;
 volatile bool alternate = 1;
 unsigned int adcResult0 = 0;
 unsigned int adcResult1 = 0;
@@ -55,12 +56,14 @@ float outputFilter15[5];
 //const float audiogram[16]={15, 13.7, 12, 10, 10, 10, 10, 11.25, 13, 15, 13.75, 12.125, 10, 7.5, 7.25, 20};
 const float audiogram[16] = {5.623, 4.842, 3.981, 3.162, 3.162, 3.162, 3.162, 3.652, 4.467, 5.623, 4.870, 4.039, 3.162, 2.371, 2.304, 10.0};
 unsigned int j;
+int angle = 0;
 const int analogInputA0 = A0;
 const float gain12 = audiogram[11];
 const float gain15 = audiogram[14]; // filt 12 and filt 15
 float sum;
 int ADC_counter = 7;
 double weightings[8];
+long t0, t;
 
 const double weightTable[19][8] = { { -0.000437317784256560, -0.000437317784256560, -0.000291545189504373, -0.000291545189504373, -0.000145772594752187, -0.000145772594752187, 0, 0},
   { -0.000430673944465980, -0.000430673944465980, -0.000287115962977320, -0.000287115962977320, -0.000143557981488660, -0.000143557981488660, 0, 0},
@@ -102,17 +105,17 @@ void setup() {
 
   pmc_enable_periph_clk (ID_ADC);
 
-  adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN, ADC_STARTUP_FAST);
+  adc_init (ADC, SystemCoreClock, ADC_FREQ_MAX*2, 3);
 
-  //ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
-  ADC->ADC_CHER = 0xF0;
   ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
   ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
 
   PIOA->PIO_PDR |= PIO_PDR_P16; //Disable PIO Controller
   ADC->ADC_MR = ADC_MR_PRESCAL(2); // set ADC prescale to 2
   ADC->ADC_MR |= 0x80;  //set free running mode on ADC. Don't wait for triggers
-  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+  //ADC->ADC_CHER = 0xF0; //enable ADC on pin A0-A3 // for A0 to A8 use 0x4FF
+  //ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+  ADC->ADC_CHER = 0xF8; //enable ADC on pin A0-A4 // for A0 to A8 use 0x4FF
 
   ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
   ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
@@ -120,13 +123,13 @@ void setup() {
   REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00020000;
   ADC->ADC_MR |= 0x40; // Set fast wakeup mode
   ADC->ADC_MR |= ADC_MR_LOWRES_BITS_12;
+  adc_disable_ts(ADC);
 
   //Interupt Setup
   NVIC_SetPriority(ADC_IRQn, 3);    
   adc_disable_interrupt(ADC, 0xFFFFFFFF);
   adc_enable_interrupt(ADC,ADC_IER_EOC7);
   NVIC_EnableIRQ(ADC_IRQn);  
-
 
   // DAC Setup
   analogWrite(DAC1, 0);
@@ -137,15 +140,12 @@ void setup() {
 
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
+
+  t0 = micros();
 }
 
 void loop() {
 
-  long t0, t;
-
-  t0 = micros();
-
-  t = micros()-t0;  // calculate elapsed time
 
   // Serial.print("Time per sample: ");
   // Serial.println((float)t/400);
@@ -154,19 +154,25 @@ void loop() {
   // Serial.println();
   // delay(1000);
 
-  memcpy(weightings, weightTable[0], 8 * sizeof(double) );
+  //angle = directionalityAngle(potentiometerValue);
+  angle = 9;
+  memcpy(weightings, weightTable[angle], 8 * sizeof(double));
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
-  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-   Serial.println(inputVector[idx0]);
-  }
+  // for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+  //  Serial.println(inputVector[idx0]);
+  // }
+
+  // for (int idx0 = 0; idx0 < 8; idx0++) {
+  //   Serial.print("Row in weight table: ");
+  //   Serial.print(angle);
+  //   Serial.print(" Weightings: ");
+  //   Serial.println(weightings[idx0],10);
+  // }
+
 
   timeDelay(inputVector, weightings, Fs, directionalOutput);
-
- for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-   Serial.println(input[idx0]);
- }
 
   // Apply gains to the first filter signals
   for (int j = 0; j < 400; j = j + 2) {
@@ -189,12 +195,13 @@ void loop() {
 
   rangeCompression(result, Fs, compressedOutput);
 
-    for (int idx0 = 0; idx0 < 50; idx0++) {
-      compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
-      // Serial.print(result[idx0]);
-      // Serial.print(",");
-     // Serial.println(compressedOutput[idx0]);
-  }
+  //   for (int idx0 = 0; idx0 < 50; idx0++) {
+  //     compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
+  //     Serial.print(angle);
+  //     // Serial.print(result[idx0]);
+  //     Serial.print(",");
+  //     Serial.println(compressedOutput[idx0]);
+  // }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
@@ -208,18 +215,32 @@ void ADC_Handler(void)
   { 
     adc_disable_interrupt(ADC, ADC_IER_EOC7);
 
-    // Read in all the ADC values
-    adcResult0 = ADC->ADC_CDR[7];
-    adcResult1 = ADC->ADC_CDR[6];
-    adcResult2 = ADC->ADC_CDR[5];
-    adcResult3 = ADC->ADC_CDR[4];
+    // Read in all the ADC values - 8 channels
+    // adcResult0 = ADC->ADC_CDR[7];
+    // adcResult1 = ADC->ADC_CDR[6];
+    // adcResult2 = ADC->ADC_CDR[5];
+    // adcResult3 = ADC->ADC_CDR[4];
     // adcResult4 = ADC->ADC_CDR[3];
     // adcResult5 = ADC->ADC_CDR[2];
     // adcResult6 = ADC->ADC_CDR[1];
     // adcResult7 = ADC->ADC_CDR[0];
 
+    // Read in all the ADC values - 4 channels
+    // adcResult0 = ADC->ADC_CDR[7];
+    // adcResult1 = ADC->ADC_CDR[6];
+    // adcResult2 = ADC->ADC_CDR[5];
+    // adcResult3 = ADC->ADC_CDR[4];
+
+    // Read in all the ADC values - 4 channels + pot on channel A4
+    adcResult0 = ADC->ADC_CDR[7];
+    adcResult1 = ADC->ADC_CDR[6];
+    adcResult2 = ADC->ADC_CDR[5];
+    adcResult3 = ADC->ADC_CDR[4];
+    adcResult4 = ADC->ADC_CDR[3];
+
     if (alternate && sample_counter < sampleCount)
     {
+      // 8 channels
       // input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
       // input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
       // input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
@@ -229,6 +250,7 @@ void ADC_Handler(void)
       // input[6 + sample_counter] = adcResult6*0.00080586 - 1.5875;
       // input[7 + sample_counter] = adcResult7*0.00080586 - 1.5875;
 
+      // 4 channels
       input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
       input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
       input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
@@ -238,6 +260,9 @@ void ADC_Handler(void)
       input[6 + sample_counter] = adcResult2*0.00080586 - 1.5875;
       input[7 + sample_counter] = adcResult3*0.00080586 - 1.5875;
 
+      // pot 
+      potentiometerValue = adcResult4;
+
       sample_counter+=8;
       alternate = 0;
 
@@ -246,6 +271,41 @@ void ADC_Handler(void)
     {
       alternate = 1;
     }
+    if (sample_counter >= sampleCount)
+    {
+      t = micros()-t0;  // calculate elapsed time
+      Serial.print("Time per sample: ");
+      Serial.println((float)t/400);
+      Serial.print("Frequency: ");
+      Serial.println((float)400*1000000/t);
+      Serial.println();
+      //t0 = micros();
+
+    }
   }
   adc_enable_interrupt(ADC,ADC_IER_EOC7);
+}
+
+int directionalityAngle(volatile int x)
+{
+  if (x >= 0 && x <= 106 ) return 0;
+  else if (x >= 107 && x <= 213 ) return 1;
+  else if (x >= 214 && x <= 320 ) return 2;
+  else if (x >= 321 && x <= 427 ) return 3;
+  else if (x >= 428 && x <= 534 ) return 4;
+  else if (x >= 535 && x <= 641 ) return 5;
+  else if (x >= 642 && x <= 748 ) return 6;
+  else if (x >= 749 && x <= 855 ) return 7;
+  else if (x >= 856 && x <= 962 ) return 8;
+  else if (x >= 963 && x <= 1069 ) return 9;
+  else if (x >= 1070 && x <= 1176 ) return 10;
+  else if (x >= 1177 && x <= 1283 ) return 11;
+  else if (x >= 1284 && x <= 1390 ) return 12;
+  else if (x >= 1391 && x <= 1497 ) return 13;
+  else if (x >= 1498 && x <= 1604 ) return 14;
+  else if (x >= 1605 && x <= 1711 ) return 15;
+  else if (x >= 1712 && x <= 1818 ) return 16;
+  else if (x >= 1819 && x <= 1925 ) return 17;
+  else return 18;
+
 }

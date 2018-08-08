@@ -28,7 +28,7 @@ static void argInit_50x4_real_T(double result[200]);
 int directionalityAngle(volatile int x);
 
 const int sampleCount = 400; //50*8
-double Fs = 20000;
+double Fs = 18000;
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
@@ -63,6 +63,7 @@ const float gain15 = audiogram[14]; // filt 12 and filt 15
 float sum;
 int ADC_counter = 7;
 double weightings[8];
+long t0, t;
 
 const double weightTable[19][8] = { { -0.000437317784256560, -0.000437317784256560, -0.000291545189504373, -0.000291545189504373, -0.000145772594752187, -0.000145772594752187, 0, 0},
   { -0.000430673944465980, -0.000430673944465980, -0.000287115962977320, -0.000287115962977320, -0.000143557981488660, -0.000143557981488660, 0, 0},
@@ -104,7 +105,7 @@ void setup() {
 
   pmc_enable_periph_clk (ID_ADC);
 
-  adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN, ADC_STARTUP_FAST);
+  adc_init (ADC, SystemCoreClock, ADC_FREQ_MAX*2, 3);
 
   ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
   ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
@@ -112,8 +113,9 @@ void setup() {
   PIOA->PIO_PDR |= PIO_PDR_P16; //Disable PIO Controller
   ADC->ADC_MR = ADC_MR_PRESCAL(2); // set ADC prescale to 2
   ADC->ADC_MR |= 0x80;  //set free running mode on ADC. Don't wait for triggers
-  //ADC->ADC_CHER = 0xF0; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
-  ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+  //ADC->ADC_CHER = 0xF0; //enable ADC on pin A0-A3 // for A0 to A8 use 0x4FF
+  //ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
+  ADC->ADC_CHER = 0xF8; //enable ADC on pin A0-A4 // for A0 to A8 use 0x4FF
 
   ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
   ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
@@ -121,6 +123,7 @@ void setup() {
   REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00020000;
   ADC->ADC_MR |= 0x40; // Set fast wakeup mode
   ADC->ADC_MR |= ADC_MR_LOWRES_BITS_12;
+  adc_disable_ts(ADC);
 
   //Interupt Setup
   NVIC_SetPriority(ADC_IRQn, 3);    
@@ -137,15 +140,12 @@ void setup() {
 
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
+
+  t0 = micros();
 }
 
 void loop() {
 
-  long t0, t;
-
-  t0 = micros();
-
-  t = micros()-t0;  // calculate elapsed time
 
   // Serial.print("Time per sample: ");
   // Serial.println((float)t/400);
@@ -153,8 +153,10 @@ void loop() {
   // Serial.println((float)400*1000000/t);
   // Serial.println();
   // delay(1000);
-  angle = directionalityAngle(potentiometerValue);
-  memcpy(weightings, weightTable[angle], 8 * sizeof(double) );
+
+  //angle = directionalityAngle(potentiometerValue);
+  angle = 9;
+  memcpy(weightings, weightTable[angle], 8 * sizeof(double));
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
@@ -162,12 +164,12 @@ void loop() {
   //  Serial.println(inputVector[idx0]);
   // }
 
-  for (int idx0 = 0; idx0 < 8; idx0++) {
-    Serial.print("Row in weight table: ");
-    Serial.print(angle);
-    Serial.print(" Weightings: ");
-    Serial.println(weightings[idx0],10);
-  }
+  // for (int idx0 = 0; idx0 < 8; idx0++) {
+  //   Serial.print("Row in weight table: ");
+  //   Serial.print(angle);
+  //   Serial.print(" Weightings: ");
+  //   Serial.println(weightings[idx0],10);
+  // }
 
 
   timeDelay(inputVector, weightings, Fs, directionalOutput);
@@ -193,12 +195,13 @@ void loop() {
 
   rangeCompression(result, Fs, compressedOutput);
 
-    for (int idx0 = 0; idx0 < 50; idx0++) {
-      compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
-      // Serial.print(result[idx0]);
-      // Serial.print(",");
-     // Serial.println(compressedOutput[idx0]);
-  }
+  //   for (int idx0 = 0; idx0 < 50; idx0++) {
+  //     compressedOutput[idx0] = ((result[idx0]+ 1.5875)*4095/3.3);
+  //     Serial.print(angle);
+  //     // Serial.print(result[idx0]);
+  //     Serial.print(",");
+  //     Serial.println(compressedOutput[idx0]);
+  // }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
@@ -267,6 +270,17 @@ void ADC_Handler(void)
     else if(sample_counter < sampleCount)
     {
       alternate = 1;
+    }
+    if (sample_counter >= sampleCount)
+    {
+      t = micros()-t0;  // calculate elapsed time
+      Serial.print("Time per sample: ");
+      Serial.println((float)t/400);
+      Serial.print("Frequency: ");
+      Serial.println((float)400*1000000/t);
+      Serial.println();
+      //t0 = micros();
+
     }
   }
   adc_enable_interrupt(ADC,ADC_IER_EOC7);

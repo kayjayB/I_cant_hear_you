@@ -119,7 +119,7 @@ static void argInit_100_real_T(unsigned int result[100])
 void setup() {
   Serial.begin(115200); // Begin Serial port
 
-  argInit_50_real_T(calibration);
+  argInit_100_real_T(calibration);
 
   analogReadResolution(12); 
   pinMode(A11, INPUT);

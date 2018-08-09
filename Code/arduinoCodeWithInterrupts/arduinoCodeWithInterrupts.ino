@@ -25,11 +25,11 @@
 #include <math.h>
 
 static void argInit_50x4_real_T(double result[200]);
-static void argInit_50_real_T(unsigned int result[50]);
+static void argInit_100_real_T(unsigned int result[100]);
 int directionalityAngle(volatile int x);
 
 const int sampleCount = 400; //50*8
-double Fs = 79000;
+double Fs = 18000;
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
@@ -52,7 +52,7 @@ double directionalOutput[400];
 double outputAmplification[400];
 double result[50];
 double compressedOutput[50];
-unsigned int calibration[50];
+unsigned int calibration[100];
 float ADC_value1[5];
 float ADC_value2[5];
 float outputFilter12[5];
@@ -105,13 +105,13 @@ static void argInit_50x4_real_T(double result[400])
   }
 }
 
-static void argInit_50_real_T(unsigned int result[50])
+static void argInit_100_real_T(unsigned int result[100])
 {
   int idx0;
 
   // Loop over the array to initialize each element.
   // 4 rows and 50 columns
-  for (idx0 = 0; idx0 < 50; idx0++) {
+  for (idx0 = 0; idx0 < 100; idx0++) {
       result[idx0] = 0;
   }
 }
@@ -124,18 +124,18 @@ void setup() {
   analogReadResolution(12); 
   pinMode(A11, INPUT);
 
-  for (int i=0; i<50;i++)
+  for (int i=0; i<100;i++)
   {
     //while ((ADC->ADC_ISR & 0xFF) != 0xFF);
     calibration[i] = analogRead(A11);
    // Serial.println(calibration[i]);
     delay(5);
   }
-  for (int i=0; i<50; i++) 
+  for (int i=0; i<100; i++) 
   {
     offset += calibration[i];
   }
-  offset = offset/50; // average
+  offset = offset/100; // average
   // t0 = micros();
   offset = offset*0.00080586; 
   //Serial.println(offset, 8);
@@ -194,9 +194,9 @@ void loop() {
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
-  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-   Serial.println(inputVector[idx0]);
-  }
+  // for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+  //  Serial.println(inputVector[idx0]);
+  // }
 
   // for (int idx0 = 0; idx0 < 8; idx0++) {
   //   Serial.print("Row in weight table: ");
@@ -210,12 +210,14 @@ void loop() {
 
   // Apply gains to the first filter signals
   for (int j = 0; j < 400; j = j + 2) {
-    outputAmplification[j] = directionalOutput[j]*gain12;
+    //outputAmplification[j] = directionalOutput[j]*gain12;
+    outputAmplification[j] = directionalOutput[j]*1;
   }
   
   // Apply gains to the second filter signals
   for (int j = 1; j < 400; j = j + 2) {
-    outputAmplification[j] = directionalOutput[j]*gain15;
+    //outputAmplification[j] = directionalOutput[j]*gain15;
+    outputAmplification[j] = directionalOutput[j]*1;
   }
 
   // Adding the microphone signals together
@@ -229,13 +231,13 @@ void loop() {
 
   rangeCompression(result, Fs, compressedOutput);
 
-//   for (int idx0 = 0; idx0 < 50; idx0++) {
-//     compressedOutput[idx0] = ((result[idx0]+ offset)*4095/3.3);
-//     Serial.print(angle);
-//     // Serial.print(result[idx0]);
-//     Serial.print(",");
-//     Serial.println(compressedOutput[idx0]);
-// }
+  for (int idx0 = 0; idx0 < 50; idx0++) {
+    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
+    Serial.print(angle);
+    // Serial.print(result[idx0]);
+    Serial.print(",");
+    Serial.println(compressedOutput[idx0]);
+}
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
@@ -247,7 +249,6 @@ void loop() {
   // Serial.println();
 
   number_of_interrupts = 0;
-  delay(10);
 }
 
 // ADC Interrupt handler.
@@ -283,7 +284,8 @@ void ADC_Handler(void)
 
     if (alternate && sample_counter < sampleCount)
     {
-      // 8 channels
+      // 8 channels 
+      // to voltage
       input[0 + sample_counter] = adcResult0*0.00080586 - offset;
       input[1 + sample_counter] = adcResult1*0.00080586 - offset;
       input[2 + sample_counter] = adcResult2*0.00080586 - offset;

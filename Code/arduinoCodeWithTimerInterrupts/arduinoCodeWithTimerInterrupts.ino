@@ -20,6 +20,7 @@
 #include <timeDelay.h>
 #include <tmwtypes.h>
 
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
@@ -222,11 +223,11 @@ void loop()
    for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
     Serial.print(inputVector[idx0], 6);
     Serial.print(",");
+    Serial.print(inputVector[idx0+1], 6);
+    Serial.print(",");
     Serial.print(inputVector[idx0+2], 6);
     Serial.print(",");
-    Serial.print(inputVector[idx0+4], 6);
-    Serial.print(",");
-    Serial.println(inputVector[idx0+6], 6);
+    Serial.println(inputVector[idx0+3], 6);
    }
 
   // for (int idx0 = 0; idx0 < 8; idx0++) {

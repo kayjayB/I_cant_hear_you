@@ -142,7 +142,7 @@ void setup() {
 
   pmc_enable_periph_clk(ID_ADC);
 
-  adc_init (ADC, SystemCoreClock, ADC_FREQ_MAX*2, 3);
+  adc_init (ADC, SystemCoreClock, ADC_FREQ_MIN*2, ADC_STARTUP_FAST);
 
   ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
   ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 

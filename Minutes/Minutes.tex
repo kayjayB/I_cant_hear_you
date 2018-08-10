@@ -308,13 +308,60 @@ Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
 	\item Dynamic compression
 	\item Title changes
 	\item Planning report feedback
-	\item Amplification for both ears vs one ear
+	\item Compensatory amplification for both ears vs one ear
 \end{itemize}
 
 \subsection*{Minutes of meeting:}
-Start date: 01/07/2018 \\
+Start date: 01/08/2018 \\
 Start time: 10:00
 
+Planning report:
+\begin{itemize}
+	\item Report was good in terms of style and content
+	\item Content is not really relevant since the re-scope
+\end{itemize}
 
+Title changes:
+\begin{itemize}
+	\item Option 1: "Towards the design of an adaptive hearing aid"
+	\item Option 2: "An investigational study into the design of a low-cost adaptive hearing aid"
+	\item Meaning of adaptive in this context: Adapts to the user's audiogram and to their environment (directional/omni-directional)
+	\item Email Hugh Hunt for the title change procedure 
+	\item Option 2 is the best option
+\end{itemize}
+
+Dynamic Compression:
+\begin{itemize}
+	\item Talk to Prof Hanrahan
+\end{itemize}
+
+Compensatory amplification:
+\begin{itemize}
+	\item If we have time, it would be ideal to apply separate amplification for both ears and then to output two analog signals
+	\item If not, do one ear and say that it proves the concept that the amplification is working 
+\end{itemize}
+
+Advice from Prof Rubin:
+\begin{itemize}
+	\item For the audio amplifier, the inbuilt controllable gain might have less noise than a voltage divider
+	\item For the GUI, we must make a recording of our voices
+\end{itemize}
+
+Polar plots:
+\begin{itemize}
+	\item It is not ideal to plot the polar plot on a rectangular axis
+	\item Try to plot the line plot as a 2D scatter plot according to Equations \ref{eqn:pnew} and \ref{eqn:xy}. Then join the points together
+	\item So that the calculations don't add extra delays into the system, pre-calculate all the points and store them into a 2D array. Then just pick the correct row/column to plot
+\end{itemize}
+
+\begin{equation}
+P_{new}= \frac{P_{old} - min}{max - min} 
+\label{eqn:pnew}
+\end{equation}
+
+\begin{equation}
+(x,y)= (P_{new}\cos \theta, P_{new}\sin \theta)
+\label{eqn:xy}
+\end{equation}
 
 \end{document}

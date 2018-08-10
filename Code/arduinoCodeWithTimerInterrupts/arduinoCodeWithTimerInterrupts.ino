@@ -28,8 +28,9 @@ static void argInit_50x4_real_T(double result[200]);
 static void argInit_100_real_T(unsigned int result[100]);
 int directionalityAngle(volatile int x);
 
+const int ADC_FREQ = 100000;
 const int sampleCount = 400; //50*8
-double Fs = 18000;
+double Fs = 44117;
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
@@ -116,8 +117,9 @@ static void argInit_100_real_T(unsigned int result[100])
   }
 }
 
-void setup() {
-  Serial.begin(115200); // Begin Serial port
+void setup()
+{
+ Serial.begin(115200);
 
   argInit_100_real_T(calibration);
 
@@ -139,37 +141,59 @@ void setup() {
   // t0 = micros();
   offset = offset*0.00080586; 
   //Serial.println(offset, 8);
+  
+ adc_setup () ;         // setup ADC
+ 
+ pmc_enable_periph_clk (TC_INTERFACE_ID + 0*3+0) ;  // clock the TC0 channel 0
 
-  pmc_enable_periph_clk(ID_ADC);
+ TcChannel * t = &(TC0->TC_CHANNEL)[0] ;    // pointer to TC0 registers for its channel 0
+ t->TC_CCR = TC_CCR_CLKDIS ;  // disable internal clocking while setup regs
+ t->TC_IDR = 0xFFFFFFFF ;     // disable interrupts
+ t->TC_SR ;                   // read int status reg to clear pending
+ t->TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 |   // use TCLK1 (prescale by 2, = 42MHz)
+             TC_CMR_WAVE |                  // waveform mode
+             TC_CMR_WAVSEL_UP_RC |          // count-up PWM using RC as threshold
+             TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
+             TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
+             TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR ;
 
-  adc_init (ADC, SystemCoreClock, ADC_FREQ_MAX*2, 3);
+ //t->TC_RC =  437 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 96kHz
+ //t->TC_RA =  218 ;     // Duty cycle
+//t->TC_RC =  875 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 48kHz
+//t->TC_RA =  440 ; 
+t->TC_RC =  952 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 44.1kHz
+t->TC_RA =  476 ; 
+ t->TC_CMR = (t->TC_CMR & 0xFFF0FFFF) | TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET ;  // set clear and set from RA and RC compares
+ 
+ t->TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG ;  // re-enable local clocking and switch to hardware trigger source.
 
-  ADC->ADC_WPMR = 0x00;//Disables the write protect key, WPEN
-  ADC->ADC_MR = 0x00000000;//clear all the before setted characteristics of ADC 
+ setup_pio_TIOA0() ;  // drive Arduino pin 2 at 48kHz to bring clock out
 
-  PIOA->PIO_PDR |= PIO_PDR_P16; //Disable PIO Controller
-  ADC->ADC_MR = ADC_MR_PRESCAL(2); // set ADC prescale to 2
-  ADC->ADC_MR |= 0x80;  //set free running mode on ADC. Don't wait for triggers
-  //ADC->ADC_CHER = 0xF0; //enable ADC on pin A0-A3 // for A0 to A8 use 0x4FF
-  //ADC->ADC_CHER = 0xFF; //enable ADC on pin A0-A7 // for A0 to A8 use 0x4FF
-  ADC->ADC_CHER = 0x4FF; //enable ADC on pin A0-A8
-  //ADC->ADC_CHER = 0xF8; //enable ADC on pin A0-A4 // for A0 to A8 use 0x4FF
+}
 
-  ADC->ADC_MR |= ADC_MR_TRACKTIM(3); 
-  ADC->ADC_MR |= ADC_MR_STARTUP_SUT8; 
-  ADC->ADC_EMR = 0;
-  REG_ADC_MR = (REG_ADC_MR & 0xFFF0FFFF) | 0x00020000;
-  ADC->ADC_MR |= 0x40; // Set fast wakeup mode
-  ADC->ADC_MR |= ADC_MR_LOWRES_BITS_12;
-  adc_disable_ts(ADC);
+void setup_pio_TIOA0 ()  // Configure Ard pin 2 as output from TC0 channel A (copy of trigger event)
+{
+  PIOB->PIO_PDR = PIO_PB25B_TIOA0 ;  // disable PIO control
+  PIOB->PIO_IDR = PIO_PB25B_TIOA0 ;   // disable PIO interrupts
+  PIOB->PIO_ABSR |= PIO_PB25B_TIOA0 ;  // switch to B peripheral
+}
 
-  //Interupt Setup
-  NVIC_SetPriority(ADC_IRQn, 3);    
-  adc_disable_interrupt(ADC, 0xFFFFFFFF);
-  adc_enable_interrupt(ADC,ADC_IER_EOC7);
-  NVIC_EnableIRQ(ADC_IRQn); 
+void adc_setup ()
+{
+ NVIC_EnableIRQ (ADC_IRQn) ;   // enable ADC interrupt vector
+ ADC->ADC_IDR = 0xFFFFFFFF ;   // disable interrupts
+ ADC->ADC_IER = 0x80 ;         // enable AD7 End-Of-Conv interrupt (Arduino pin A0)
+ ADC->ADC_CHDR = 0xFFFF ;      // disable all channels
+ ADC->ADC_CHER = 0x4FF ;        // ch7:A0 ch6:A1 ch5:A2 ch4:A3 ch3:A4 ch2:A5 ch1:A6 ch0:A7
+ ADC->ADC_CGR = 0x15555555 ;   // All gains set to x1
+ ADC->ADC_COR = 0x00000000 ;   // All offsets off
+ 
+ ADC->ADC_MR = (ADC->ADC_MR & 0xFFFFFFF0) | (1 << 1) | ADC_MR_TRGEN ;  // 1 = trig source TIO from TC0
+}
 
-  // DAC Setup
+void dac_setup()
+{
+    // DAC Setup
   analogWrite(DAC1, 0);
   analogWriteResolution(12);
   pinMode(10, OUTPUT);
@@ -180,8 +204,9 @@ void setup() {
   argInit_50x4_real_T(outputAmplification);
 }
 
-void loop() {
-  //t0 = micros();
+void loop()
+{
+    //t0 = micros();
 
   // Serial.print("Time per sample: ");
   // Serial.println((float)t/400);
@@ -195,7 +220,13 @@ void loop() {
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
    for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-    Serial.println(inputVector[idx0]);
+    Serial.print(inputVector[idx0], 6);
+    Serial.print(",");
+    Serial.print(inputVector[idx0+2], 6);
+    Serial.print(",");
+    Serial.print(inputVector[idx0+4], 6);
+    Serial.print(",");
+    Serial.println(inputVector[idx0+6], 6);
    }
 
   // for (int idx0 = 0; idx0 < 8; idx0++) {
@@ -233,10 +264,10 @@ void loop() {
 
   for (int idx0 = 0; idx0 < 50; idx0++) {
     compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
-//    Serial.print(angle);
-//    // Serial.print(result[idx0]);
-//    Serial.print(",");
-//    Serial.println(compressedOutput[idx0]);
+  //  Serial.print(angle);
+  //  // Serial.print(result[idx0]);
+  //  Serial.print(",");
+  //  Serial.println(compressedOutput[idx0]);
 }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
@@ -251,14 +282,12 @@ void loop() {
   number_of_interrupts = 0;
 }
 
-// ADC Interrupt handler.
-void ADC_Handler(void)
-{ 
-  if ((adc_get_status(ADC) & ADC_IER_EOC7) == ADC_IER_EOC7) 
-  { 
-    adc_disable_interrupt(ADC, ADC_IER_EOC7);
-    number_of_interrupts++ ;
-    // Read in all the ADC values - 8 channels
+void ADC_Handler (void)
+{
+ //wait untill all 8 ADCs have finished thier converstion.
+ while(!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
+  && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
+
     adcResult0 = ADC->ADC_CDR[7];
     adcResult1 = ADC->ADC_CDR[6];
     adcResult2 = ADC->ADC_CDR[5];
@@ -269,7 +298,7 @@ void ADC_Handler(void)
     adcResult7 = ADC->ADC_CDR[0];
     adcResult9 = ADC->ADC_CDR[10]; //pot
 
-    // Read in all the ADC values - 4 channels
+        // Read in all the ADC values - 4 channels
     // adcResult0 = ADC->ADC_CDR[7];
     // adcResult1 = ADC->ADC_CDR[6];
     // adcResult2 = ADC->ADC_CDR[5];
@@ -282,7 +311,7 @@ void ADC_Handler(void)
     // adcResult3 = ADC->ADC_CDR[4];
     // adcResult4 = ADC->ADC_CDR[3];
 
-    if (alternate && sample_counter < sampleCount)
+    if (sample_counter < sampleCount)
     {
       // 8 channels 
       // to voltage
@@ -312,23 +341,10 @@ void ADC_Handler(void)
       alternate = 0;
 
     } 
-    else if(sample_counter < sampleCount)
-    {
-      alternate = 1;
-    }
-    // if (sample_counter == sampleCount)
-    // {
-    //   t = micros()-t0;  // calculate elapsed time
-    //   Serial.print("Time per sample: ");
-    //   Serial.println((float)t/400);
-    //   Serial.print("Frequency: ");
-    //   Serial.println((float)400*1000000/t);
-    //   Serial.println();
-    //   t0 = micros();
-
-    // }
-  }
-  adc_enable_interrupt(ADC,ADC_IER_EOC7);
+//    else if(sample_counter < sampleCount)
+//    {
+//      alternate = 1;
+//    }
 }
 
 int directionalityAngle(volatile int x)
@@ -354,3 +370,4 @@ int directionalityAngle(volatile int x)
   else return 18;
 
 }
+

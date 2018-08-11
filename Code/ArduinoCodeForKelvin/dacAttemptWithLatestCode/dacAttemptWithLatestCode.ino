@@ -25,7 +25,7 @@
 #include <math.h>
 
 static void argInit_50x4_real_T(double result[200]);
-static void argInit_100_real_T(unsigned int result[100]);
+static void argInit_100_real_T(double result[100]);
 int directionalityAngle(volatile int x);
 
 const int ADC_FREQ = 100000;
@@ -118,7 +118,7 @@ static void argInit_100_real_T(unsigned int result[100])
   }
 }
 
-static void argInit_100_real_T(double compressedOutput[50])
+static void argInit_50_real_T(double compressedOutput[50])
 {
   int idx0;
 
@@ -218,7 +218,7 @@ void dac_setup()
 
   DACC->DACC_MR = 
     DACC_MR_TRGEN_EN | DACC_MR_TRGSEL (1) |  // trigger 1 = TIO output of TC0
-    (0 << DACC_MR_USER_SEL_Pos) |  // select channel 0
+    (1 << DACC_MR_USER_SEL_Pos) |  // select channel 0
     DACC_MR_REFRESH (0x0F) |       // bit of a guess... I'm assuming refresh not needed at 48kHz
     (24 << DACC_MR_STARTUP_Pos) ;  // 24 = 1536 cycles which I think is in range 23..45us since DAC clock = 42MHz
 
@@ -229,12 +229,13 @@ void dac_setup()
 
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
-  argInit_50x4_real_T(compressedOutput);
+  argInit_50_real_T(compressedOutput);
+  
 }
 
 void dac_write (int val)
 {
-  DACC->DACC_CDR = val ;
+  DACC->DACC_CDR = val & 0xFFF ;
 }
 
 void loop()
@@ -251,10 +252,10 @@ void loop()
   memcpy(weightings, weightTable[9], 8 * sizeof(double));
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
-
-   for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
     int i=0;
-    compressedOutput[i]=inputVector[idx0];
+   for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+    
+//    compressedOutput[i]=inputVector[idx0];
 //    Serial.print(inputVector[idx0], 6);
 //    Serial.print(",");
 //    Serial.print(inputVector[idx0+2], 6);
@@ -262,53 +263,59 @@ void loop()
 //    Serial.print(inputVector[idx0+4], 6);
 //    Serial.print(",");
 //    Serial.println(inputVector[idx0+6], 6);
-      i=1+1;
+//      i=i+1;
    }
 
-  // for (int idx0 = 0; idx0 < 8; idx0++) {
-  //   Serial.print("Row in weight table: ");
-  //   Serial.print(angle);
-  //   Serial.print(" Weightings: ");
-  //   Serial.println(weightings[idx0],10);
-  // }
+//   for (int idx0 = 0; idx0 < 8; idx0++) {
+//     Serial.print("Row in weight table: ");
+//     Serial.print(angle);
+//     Serial.print(" Weightings: ");
+//     Serial.println(weightings[idx0],10);
+//   }
 
 
-//  timeDelay(inputVector, weightings, Fs, directionalOutput);
-//
-//  // Apply gains to the first filter signals
-//  for (int j = 0; j < 400; j = j + 2) {
-//    //outputAmplification[j] = directionalOutput[j]*gain12;
-//    outputAmplification[j] = directionalOutput[j]*1;
-//  }
-//  
-//  // Apply gains to the second filter signals
-//  for (int j = 1; j < 400; j = j + 2) {
-//    //outputAmplification[j] = directionalOutput[j]*gain15;
-//    outputAmplification[j] = directionalOutput[j]*1;
-//  }
-//
-//  // Adding the microphone signals together
-//  for (int idx1 = 0; idx1 < 50; idx1++) {
-//    double temp = 0;
-//    for (int idx0 = 0; idx0 < 8; idx0++) {
-//      temp += outputAmplification[idx0 + 8 * idx1] ;
-//    }
-//    result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
-//  }
-//
-//  rangeCompression(result, Fs, compressedOutput);
-//
-//  for (int idx0 = 0; idx0 < 50; idx0++) {
-//    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
-//  //  Serial.print(angle);
-//  //  // Serial.print(result[idx0]);
-//  //  Serial.print(",");
-//  //  Serial.println(compressedOutput[idx0]);
+  timeDelay(inputVector, weightings, Fs, directionalOutput);
+
+  // Apply gains to the first filter signals
+  for (int j = 0; j < 400; j = j + 2) {
+    //outputAmplification[j] = directionalOutput[j]*gain12;
+    outputAmplification[j] = directionalOutput[j]*1;
+  }
+  
+  // Apply gains to the second filter signals
+  for (int j = 1; j < 400; j = j + 2) {
+    //outputAmplification[j] = directionalOutput[j]*gain15;
+    outputAmplification[j] = directionalOutput[j]*1;
+  }
+
+  // Adding the microphone signals together
+  for (int idx1 = 0; idx1 < 50; idx1++) {
+    double temp = 0;
+    for (int idx0 = 0; idx0 < 8; idx0++) {
+      temp += outputAmplification[idx0 + 8 * idx1] ;
+    }
+    result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
+  }
+
+  rangeCompression(result, Fs, compressedOutput);
+
+  for (int idx0 = 0; idx0 < 50; idx0++) {
+    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);}
+  //  Serial.print(angle);
+  //  // Serial.print(result[idx0]);
+  //  Serial.print(",");
+  //  Serial.println(compressedOutput[idx0]);
+
+//  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+//    
+//    compressedOutput[i]=inputVector[idx0];
+//    i=i+1;
 //}
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
-  dac_counter = 0;
+  //dac_counter = 0;
+     
   
 
   // t = micros()-t0;  // calculate elapsed time
@@ -376,18 +383,33 @@ void ADC_Handler (void)
 
 //      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
 //      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
-      dac_write(compressedOutput[dac_counter]);
-
+      
       sample_counter+=8;
-      dac_counter+=1;
+      
       alternate = 0;
 
      
     } 
+    
 //    else if(sample_counter < sampleCount)
 //    {
 //      alternate = 1;
 //    }
+
+      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
+      dac_counter+=1;
+      if(dac_counter>50){
+        dac_counter=0;
+      }
+   
+
+//if(dac_counter < 50){
+//    dac_write(compressedOutput[dac_counter]);
+//    Serial.println(compressedOutput[dac_counter]);
+//    dac_counter+=1;
+
+//}
 }
 
 int directionalityAngle(volatile int x)

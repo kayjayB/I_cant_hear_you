@@ -1,3 +1,5 @@
+#include <FIR.h>
+
 #include <bluesteinSetup.h>
 #include <compressor.h>
 #include <exp.h>
@@ -28,14 +30,15 @@
 static void argInit_50x4_real_T(double result[200]);
 static void argInit_100_real_T(unsigned int result[100]);
 int directionalityAngle(volatile int x);
+static void argInit_50x4_volatile(volatile int input[400]);
 
-const int ADC_FREQ = 100000;
 const int sampleCount = 400; //50*8
 double Fs = 44117;
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
 volatile int sample_counter = 0;
+volatile int dac_counter = 0;
 volatile int number_of_interrupts = 0;
 volatile int potentiometerValue = 0;
 volatile bool alternate = 1;
@@ -48,11 +51,11 @@ unsigned int adcResult5 = 0;
 unsigned int adcResult6 = 0;
 unsigned int adcResult7 = 0;
 unsigned int adcResult8 = 0;
-unsigned int adcResult9 = 0;
 
 double directionalOutput[400];
 double outputAmplification[400];
 double result[50];
+double filteredResult[50];
 double compressedOutput[50];
 unsigned int calibration[100];
 float ADC_value1[5];
@@ -93,6 +96,25 @@ const double weightTable[19][8] = { { -0.000437317784256560, -0.0004373177842565
   {0.000437317784256560, 0.000437317784256560, 0.000291545189504373, 0.000291545189504373, 0.000145772594752187, 0.000145772594752187, 0, 0 }
 };
 
+FIR<float,11> lowPassFilter;
+
+//float LPFCoeff[11] = {0.000791483737692784, -0.0131586403028801, 0.0529987329121896, -0.123168166404755, 0.196090870850118, 0.772315788415271, 0.196090870850118, -0.123168166404755, 0.0529987329121896, -0.0131586403028801, 0.000791483737692784};
+
+float LPFCoeff[11] = {
+  -0.004557857489464665,
+  0.0008701087579668135,
+  0.03807406168849432,
+  -0.12564250596376228,
+  0.22601658317016893,
+  0.7287924258254459,
+  0.22601658317016893,
+  -0.12564250596376228,
+  0.03807406168849432,
+  0.0008701087579668135,
+  -0.004557857489464665
+};
+
+
 static void argInit_50x4_real_T(double result[400])
 {
   int idx0;
@@ -103,6 +125,20 @@ static void argInit_50x4_real_T(double result[400])
   for (idx0 = 0; idx0 < 50; idx0++) {
     for (idx1 = 0; idx1 < 8; idx1++) {
       result[idx0 + 50 * idx1] = 0.0;
+    }
+  }
+}
+
+static void argInit_50x4_volatile(volatile double input[400])
+{
+  int idx0;
+  int idx1;
+
+  // Loop over the array to initialize each element.
+  // 4 rows and 50 columns
+  for (idx0 = 0; idx0 < 50; idx0++) {
+    for (idx1 = 0; idx1 < 8; idx1++) {
+      input[idx0 + 50 * idx1] = 0;
     }
   }
 }
@@ -118,9 +154,20 @@ static void argInit_100_real_T(unsigned int result[100])
   }
 }
 
+static void argInit_50_real_T(double compressedOutput[50])
+{
+  int idx0;
+
+  // Loop over the array to initialize each element.
+  // 4 rows and 50 columns
+  for (idx0 = 0; idx0 < 50; idx0++) {
+      compressedOutput[idx0] = 0;
+  }
+}
+
 void setup()
 {
- Serial.begin(115200);
+  Serial.begin(115200);
 
   argInit_100_real_T(calibration);
 
@@ -134,41 +181,48 @@ void setup()
    // Serial.println(calibration[i]);
     delay(5);
   }
+
   for (int i=0; i<100; i++) 
   {
     offset += calibration[i];
   }
   offset = offset/100; // average
-  // t0 = micros();
+
   offset = offset*0.00080586; 
   //Serial.println(offset, 8);
   
- adc_setup () ;         // setup ADC
+  adc_setup () ;         // setup ADC
  
- pmc_enable_periph_clk (TC_INTERFACE_ID + 0*3+0) ;  // clock the TC0 channel 0
+  pmc_enable_periph_clk (TC_INTERFACE_ID + 0*3+0) ;  // clock the TC0 channel 0
 
- TcChannel * t = &(TC0->TC_CHANNEL)[0] ;    // pointer to TC0 registers for its channel 0
- t->TC_CCR = TC_CCR_CLKDIS ;  // disable internal clocking while setup regs
- t->TC_IDR = 0xFFFFFFFF ;     // disable interrupts
- t->TC_SR ;                   // read int status reg to clear pending
- t->TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 |   // use TCLK1 (prescale by 2, = 42MHz)
+  TcChannel * t = &(TC0->TC_CHANNEL)[0] ;    // pointer to TC0 registers for its channel 0
+  t->TC_CCR = TC_CCR_CLKDIS ;  // disable internal clocking while setup regs
+  t->TC_IDR = 0xFFFFFFFF ;     // disable interrupts
+  t->TC_SR ;                   // read int status reg to clear pending
+  t->TC_CMR = TC_CMR_TCCLKS_TIMER_CLOCK1 |   // use TCLK1 (prescale by 2, = 42MHz)
              TC_CMR_WAVE |                  // waveform mode
              TC_CMR_WAVSEL_UP_RC |          // count-up PWM using RC as threshold
              TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
              TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
              TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR ;
 
- //t->TC_RC =  437 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 96kHz
- //t->TC_RA =  218 ;     // Duty cycle
-//t->TC_RC =  875 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 48kHz
-//t->TC_RA =  440 ; 
-t->TC_RC =  952 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 44.1kHz
-t->TC_RA =  476 ; 
- t->TC_CMR = (t->TC_CMR & 0xFFF0FFFF) | TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET ;  // set clear and set from RA and RC compares
+  //t->TC_RC =  437 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 96kHz
+  //t->TC_RA =  218 ;     // Duty cycle
+  //t->TC_RC =  875 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 48kHz
+  //t->TC_RA =  440 ; 
+  t->TC_RC =  952 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 44.1kHz
+  t->TC_RA =  476 ; 
+  t->TC_CMR = (t->TC_CMR & 0xFFF0FFFF) | TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_SET ;  // set clear and set from RA and RC compares
  
- t->TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG ;  // re-enable local clocking and switch to hardware trigger source.
+  t->TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG ;  // re-enable local clocking and switch to hardware trigger source.
 
- setup_pio_TIOA0() ;  // drive Arduino pin 2 at 48kHz to bring clock out
+  setup_pio_TIOA0() ;  // drive Arduino pin 2 at 48kHz to bring clock out
+
+  // Filter setup 
+  lowPassFilter.setFilterCoeffs(LPFCoeff);
+
+  variableInit();
+  dac_setup();
 
 }
 
@@ -194,15 +248,27 @@ void adc_setup ()
 
 void dac_setup()
 {
-    // DAC Setup
-  analogWrite(DAC1, 0);
-  analogWriteResolution(12);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(12, OUTPUT);
 
+  pmc_enable_periph_clk (DACC_INTERFACE_ID) ; // start clocking DAC
+  DACC->DACC_CR = DACC_CR_SWRST ;  // reset DAC
+
+  DACC->DACC_MR = 
+    DACC_MR_TRGEN_EN | DACC_MR_TRGSEL (1) |  // trigger 1 = TIO output of TC0
+    (1 << DACC_MR_USER_SEL_Pos) |  // select channel 1
+    DACC_MR_REFRESH (0x0F) |       // bit of a guess... I'm assuming refresh not needed at 48kHz
+    (24 << DACC_MR_STARTUP_Pos) ;  // 24 = 1536 cycles which I think is in range 23..45us since DAC clock = 42MHz
+
+  DACC->DACC_IDR = 0xFFFFFFFF ; // no interrupts
+  DACC->DACC_CHER = DACC_CHER_CH1 << 0 ; // enable chan1
+  
+}
+
+void variableInit() 
+{
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
+  argInit_50_real_T(compressedOutput);
+  argInit_50x4_volatile(input);
 }
 
 void loop()
@@ -216,19 +282,19 @@ void loop()
   // Serial.println();
   // delay(1000);
   angle = directionalityAngle(potentiometerValue);
-  memcpy(weightings, weightTable[18], 8 * sizeof(double));
+  memcpy(weightings, weightTable[0], 8 * sizeof(double));
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
-   for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-    Serial.print(inputVector[idx0], 6);
-    Serial.print(",");
-    Serial.print(inputVector[idx0+1], 6);
-    Serial.print(",");
-    Serial.print(inputVector[idx0+2], 6);
-    Serial.print(",");
-    Serial.println(inputVector[idx0+3], 6);
-   }
+  //  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
+  //   Serial.print(inputVector[idx0], 6);
+  //   Serial.print(",");
+  //   Serial.print(inputVector[idx0+1], 6);
+  //   Serial.print(",");
+  //   Serial.print(inputVector[idx0+2], 6);
+  //   Serial.print(",");
+  //   Serial.println(inputVector[idx0+3], 6);
+  //  }
 
   // for (int idx0 = 0; idx0 < 8; idx0++) {
   //   Serial.print("Row in weight table: ");
@@ -237,9 +303,12 @@ void loop()
   //   Serial.println(weightings[idx0],10);
   // }
 
+  int dimInput[2] = {50,8};
+  int dimWeighting[2] = {1,8};
+  int dimOutput[2] = {50,8};
 
-  timeDelay(inputVector, weightings, Fs, directionalOutput);
-
+  timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
+            
   // Apply gains to the first filter signals
   for (int j = 0; j < 400; j = j + 2) {
     //outputAmplification[j] = directionalOutput[j]*gain12;
@@ -261,19 +330,24 @@ void loop()
     result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
   }
 
-  rangeCompression(result, Fs, compressedOutput);
+  for (int idx0 = 0; idx0 < 50; idx0++) {
+    filteredResult[idx0] = lowPassFilter.processReading(result[idx0]);
+    //filteredResult[idx0] = result[idx0];
+  }
+
+  rangeCompression(filteredResult, Fs, compressedOutput);
 
   for (int idx0 = 0; idx0 < 50; idx0++) {
-    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
+    compressedOutput[idx0] = ((filteredResult[idx0]+ offset)*4095/3.3);
   //  Serial.print(angle);
   //  // Serial.print(result[idx0]);
   //  Serial.print(",");
-  //  Serial.println(compressedOutput[idx0]);
+    Serial.println(compressedOutput[idx0]);
 }
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
+  //Serial.println(sample_counter);
   sample_counter = 0;
-  
 
   // t = micros()-t0;  // calculate elapsed time
   // Serial.print("Frequency: ");
@@ -281,6 +355,7 @@ void loop()
   // Serial.println();
 
   number_of_interrupts = 0;
+  //argInit_50x4_volatile(input);
 }
 
 void ADC_Handler (void)
@@ -297,7 +372,7 @@ void ADC_Handler (void)
     adcResult5 = ADC->ADC_CDR[2];
     adcResult6 = ADC->ADC_CDR[1];
     adcResult7 = ADC->ADC_CDR[0];
-    adcResult9 = ADC->ADC_CDR[10]; //pot
+    adcResult8 = ADC->ADC_CDR[10]; //pot
 
         // Read in all the ADC values - 4 channels
     // adcResult0 = ADC->ADC_CDR[7];
@@ -336,16 +411,20 @@ void ADC_Handler (void)
       // input[7 + sample_counter] = adcResult3*0.00080586 - 1.5875;
 
       // pot 
-      potentiometerValue = adcResult9;
+      potentiometerValue = adcResult8;
 
       sample_counter+=8;
       alternate = 0;
 
     } 
-//    else if(sample_counter < sampleCount)
-//    {
-//      alternate = 1;
-//    }
+
+    dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+    dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
+    dac_counter+=1;
+    if(dac_counter>50) // Should this be greater than or equal to?
+    {
+        dac_counter = 0;
+    }
 }
 
 int directionalityAngle(volatile int x)

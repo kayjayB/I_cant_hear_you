@@ -24,13 +24,16 @@
 #include <stdlib.h>
 #include <math.h>
 
-static void argInit_50x4_real_T(double result[200]);
-static void argInit_100_real_T(double result[100]);
-int directionalityAngle(volatile int x);
-
 const int ADC_FREQ = 100000;
-const int sampleCount = 400; //50*8
+const int outputSize = 50;
+const int numberOfInputs = 8;
+const int sampleCount = outputSize * numberOfInputs; //50*8
 double Fs = 44117;
+
+static void argInit_50x4_real_T(double result[sampleCount]);
+static void argInit_100_real_T(double result[100]);
+static void argInit_50_real_T(double compressedOutput[outputSize]);
+int directionalityAngle(volatile int x);
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
@@ -50,10 +53,11 @@ unsigned int adcResult7 = 0;
 unsigned int adcResult8 = 0;
 unsigned int adcResult9 = 0;
 
-double directionalOutput[400];
-double outputAmplification[400];
+double directionalOutput[sampleCount];
+double outputAmplification[sampleCount];
 double result[50];
-double compressedOutput[50];
+double compressedOutput[outputSize];
+double tempOutput[outputSize];
 unsigned int calibration[100];
 float ADC_value1[5];
 float ADC_value2[5];
@@ -93,15 +97,15 @@ const double weightTable[19][8] = { { -0.000437317784256560, -0.0004373177842565
   {0.000437317784256560, 0.000437317784256560, 0.000291545189504373, 0.000291545189504373, 0.000145772594752187, 0.000145772594752187, 0, 0 }
 };
 
-static void argInit_50x4_real_T(double result[400])
+static void argInit_50x4_real_T(double result[sampleCount])
 {
   int idx0;
   int idx1;
 
   // Loop over the array to initialize each element.
   // 4 rows and 50 columns
-  for (idx0 = 0; idx0 < 50; idx0++) {
-    for (idx1 = 0; idx1 < 8; idx1++) {
+  for (idx0 = 0; idx0 < outputSize; idx0++) {
+    for (idx1 = 0; idx1 < numberOfInputs; idx1++) {
       result[idx0 + 50 * idx1] = 0.0;
     }
   }
@@ -118,13 +122,13 @@ static void argInit_100_real_T(unsigned int result[100])
   }
 }
 
-static void argInit_50_real_T(double compressedOutput[50])
+static void argInit_50_real_T(double compressedOutput[outputSize])
 {
   int idx0;
 
   // Loop over the array to initialize each element.
   // 4 rows and 50 columns
-  for (idx0 = 0; idx0 < 50; idx0++) {
+  for (idx0 = 0; idx0 < outputSize; idx0++) {
       compressedOutput[idx0] = 0;
   }
 }
@@ -230,6 +234,7 @@ void dac_setup()
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
   argInit_50_real_T(compressedOutput);
+  argInit_50_real_T(tempOutput);
   
 }
 
@@ -253,18 +258,8 @@ void loop()
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
     int i=0;
-   for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-    
-//    compressedOutput[i]=inputVector[idx0];
-//    Serial.print(inputVector[idx0], 6);
-//    Serial.print(",");
-//    Serial.print(inputVector[idx0+2], 6);
-//    Serial.print(",");
-//    Serial.print(inputVector[idx0+4], 6);
-//    Serial.print(",");
-//    Serial.println(inputVector[idx0+6], 6);
-//      i=i+1;
-   }
+//   for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
+//   }
 
 //   for (int idx0 = 0; idx0 < 8; idx0++) {
 //     Serial.print("Row in weight table: ");
@@ -274,47 +269,52 @@ void loop()
 //   }
 
 
-  timeDelay(inputVector, weightings, Fs, directionalOutput);
+  int dimInput[2] = {outputSize,numberOfInputs};
+  int dimWeighting[2] = {1,numberOfInputs};
+  int dimOutput[2] = {outputSize,numberOfInputs};
+
+  timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
 
   // Apply gains to the first filter signals
-  for (int j = 0; j < 400; j = j + 2) {
+  for (int j = 0; j < sampleCount; j = j + 2) {
     //outputAmplification[j] = directionalOutput[j]*gain12;
     outputAmplification[j] = directionalOutput[j]*1;
   }
   
   // Apply gains to the second filter signals
-  for (int j = 1; j < 400; j = j + 2) {
+  for (int j = 1; j < sampleCount; j = j + 2) {
     //outputAmplification[j] = directionalOutput[j]*gain15;
     outputAmplification[j] = directionalOutput[j]*1;
   }
 
   // Adding the microphone signals together
-  for (int idx1 = 0; idx1 < 50; idx1++) {
+  for (int idx1 = 0; idx1 < outputSize; idx1++) {
     double temp = 0;
-    for (int idx0 = 0; idx0 < 8; idx0++) {
-      temp += outputAmplification[idx0 + 8 * idx1] ;
+    for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
+      temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
     }
     result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
   }
 
   rangeCompression(result, Fs, compressedOutput);
 
-  for (int idx0 = 0; idx0 < 50; idx0++) {
-    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);}
+  for (int idx0 = 0; idx0 < outputSize; idx0++) {
+    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
   //  Serial.print(angle);
   //  // Serial.print(result[idx0]);
   //  Serial.print(",");
   //  Serial.println(compressedOutput[idx0]);
+}
 
-//  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-//    
-//    compressedOutput[i]=inputVector[idx0];
-//    i=i+1;
-//}
+  for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
+    
+    tempOutput[i]=(inputVector[idx0] + offset)*4095/3.3;
+    i=i+1;
+}
   
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
-  //dac_counter = 0;
+  dac_counter = 0;
      
   
 
@@ -324,6 +324,7 @@ void loop()
   // Serial.println();
 
   number_of_interrupts = 0;
+  //argInit_50_real_T(compressedOutput);
 }
 
 void ADC_Handler (void)
@@ -381,10 +382,15 @@ void ADC_Handler (void)
       // pot 
       potentiometerValue = adcResult9;
 
-//      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-//      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
+      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
+      dac_counter+=1;
+//      if(dac_counter>=49){
+//        dac_counter=0;
+//        
+//      }
       
-      sample_counter+=8;
+      sample_counter+=numberOfInputs;
       
       alternate = 0;
 
@@ -396,12 +402,13 @@ void ADC_Handler (void)
 //      alternate = 1;
 //    }
 
-      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
-      dac_counter+=1;
-      if(dac_counter>50){
-        dac_counter=0;
-      }
+//      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+//      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
+//      dac_counter+=1;
+//      if(dac_counter>=49){
+//        dac_counter=0;
+//        
+//      }
    
 
 //if(dac_counter < 50){

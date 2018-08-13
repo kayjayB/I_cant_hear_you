@@ -75,6 +75,10 @@ int ADC_counter = 7;
 double weightings[8];
 long t0, t;
 double offset = 0;
+double temp = 0;
+int dimInput[2] = {outputSize,numberOfInputs};
+int dimWeighting[2] = {1,numberOfInputs};
+int dimOutput[2] = {outputSize,numberOfInputs};
 
 const double weightTable[19][8] = { { -0.000437317784256560, -0.000437317784256560, -0.000291545189504373, -0.000291545189504373, -0.000145772594752187, -0.000145772594752187, 0, 0},
   { -0.000430673944465980, -0.000430673944465980, -0.000287115962977320, -0.000287115962977320, -0.000143557981488660, -0.000143557981488660, 0, 0},
@@ -245,51 +249,30 @@ void dac_write (int val)
 
 void loop()
 {
-    //t0 = micros();
 
-  // Serial.print("Time per sample: ");
-  // Serial.println((float)t/400);
-  // Serial.print("Frequency: ");
-  // Serial.println((float)400*1000000/t);
-  // Serial.println();
-  // delay(1000);
   angle = directionalityAngle(potentiometerValue);
   memcpy(weightings, weightTable[9], 8 * sizeof(double));
 
   for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
-    int i=0;
-//   for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
-//   }
-
-//   for (int idx0 = 0; idx0 < 8; idx0++) {
-//     Serial.print("Row in weight table: ");
-//     Serial.print(angle);
-//     Serial.print(" Weightings: ");
-//     Serial.println(weightings[idx0],10);
-//   }
-
-
-  int dimInput[2] = {outputSize,numberOfInputs};
-  int dimWeighting[2] = {1,numberOfInputs};
-  int dimOutput[2] = {outputSize,numberOfInputs};
 
   timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
 
   // Apply gains to the first filter signals
-  for (int j = 0; j < sampleCount; j = j + 2) {
+  for (int j = 0; j < sampleCount-1; j = j + 2) {
     //outputAmplification[j] = directionalOutput[j]*gain12;
     outputAmplification[j] = directionalOutput[j]*1;
+    outputAmplification[j] = directionalOutput[j+1]*1;
   }
   
   // Apply gains to the second filter signals
-  for (int j = 1; j < sampleCount; j = j + 2) {
-    //outputAmplification[j] = directionalOutput[j]*gain15;
-    outputAmplification[j] = directionalOutput[j]*1;
-  }
+//  for (int j = 1; j < sampleCount; j = j + 2) {
+//    //outputAmplification[j] = directionalOutput[j]*gain15;
+//    outputAmplification[j] = directionalOutput[j]*1;
+//  }
 
   // Adding the microphone signals together
   for (int idx1 = 0; idx1 < outputSize; idx1++) {
-    double temp = 0;
+    temp = 0;
     for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
       temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
     }
@@ -298,14 +281,11 @@ void loop()
 
   rangeCompression(result, Fs, compressedOutput);
 
-  for (int idx0 = 0; idx0 < outputSize; idx0++) {
-    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
-  //  Serial.print(angle);
-  //  // Serial.print(result[idx0]);
-  //  Serial.print(",");
-  //  Serial.println(compressedOutput[idx0]);
-}
+//  for (int idx0 = 0; idx0 < outputSize; idx0++) {
+//    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
+//}
 
+  int i=0; // needs to stay
   for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
     
     tempOutput[i]=(inputVector[idx0] + offset)*4095/3.3;
@@ -315,16 +295,6 @@ void loop()
   //      dacc_write_conversion_data(DACC_INTERFACE, sum);
   sample_counter = 0;
   dac_counter = 0;
-     
-  
-
-  // t = micros()-t0;  // calculate elapsed time
-  // Serial.print("Frequency: ");
-  // Serial.println((float)9*number_of_interrupts*1000000/t);
-  // Serial.println();
-
-  number_of_interrupts = 0;
-  //argInit_50_real_T(compressedOutput);
 }
 
 void ADC_Handler (void)
@@ -360,14 +330,14 @@ void ADC_Handler (void)
     {
       // 8 channels 
       // to voltage
-      input[0 + sample_counter] = adcResult0*0.00080586 - offset;
-      input[1 + sample_counter] = adcResult1*0.00080586 - offset;
-      input[2 + sample_counter] = adcResult2*0.00080586 - offset;
-      input[3 + sample_counter] = adcResult3*0.00080586 - offset;
-      input[4 + sample_counter] = adcResult4*0.00080586 - offset;
-      input[5 + sample_counter] = adcResult5*0.00080586 - offset;
-      input[6 + sample_counter] = adcResult6*0.00080586 - offset;
-      input[7 + sample_counter] = adcResult7*0.00080586 - offset;
+      input[0 + sample_counter] = adcResult0 *0.00080586 - offset;
+      input[1 + sample_counter] = adcResult1 *0.00080586 - offset;
+      input[2 + sample_counter] = adcResult2 *0.00080586 - offset;
+      input[3 + sample_counter] = adcResult3 *0.00080586 - offset;
+      input[4 + sample_counter] = adcResult4 *0.00080586 - offset;
+      input[5 + sample_counter] = adcResult5 *0.00080586 - offset;
+      input[6 + sample_counter] = adcResult6 *0.00080586 - offset;
+      input[7 + sample_counter] = adcResult7 *0.00080586 - offset;
 
       // 4 channels
       // input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
@@ -383,8 +353,8 @@ void ADC_Handler (void)
       potentiometerValue = adcResult9;
 
       dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
-      dac_counter+=1;
+      dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
+      dac_counter++;
 //      if(dac_counter>=49){
 //        dac_counter=0;
 //        
@@ -396,27 +366,7 @@ void ADC_Handler (void)
 
      
     } 
-    
-//    else if(sample_counter < sampleCount)
-//    {
-//      alternate = 1;
-//    }
 
-//      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-//      dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
-//      dac_counter+=1;
-//      if(dac_counter>=49){
-//        dac_counter=0;
-//        
-//      }
-   
-
-//if(dac_counter < 50){
-//    dac_write(compressedOutput[dac_counter]);
-//    Serial.println(compressedOutput[dac_counter]);
-//    dac_counter+=1;
-
-//}
 }
 
 int directionalityAngle(volatile int x)

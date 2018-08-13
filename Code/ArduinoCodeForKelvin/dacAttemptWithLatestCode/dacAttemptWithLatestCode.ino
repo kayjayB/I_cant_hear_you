@@ -24,8 +24,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-const int ADC_FREQ = 100000;
-const int outputSize = 50;
+const int outputSize = 100;
 const int numberOfInputs = 8;
 const int sampleCount = outputSize * numberOfInputs; //50*8
 double Fs = 44117;
@@ -39,9 +38,9 @@ volatile double input[sampleCount];
 double inputVector[sampleCount];
 volatile int sample_counter = 0;
 volatile int dac_counter = 0;
-volatile int number_of_interrupts = 0;
 volatile int potentiometerValue = 0;
 volatile bool alternate = 1;
+volatile bool alternateDAC = 1;
 unsigned int adcResult0 = 0;
 unsigned int adcResult1 = 0;
 unsigned int adcResult2 = 0;
@@ -191,6 +190,8 @@ t->TC_RA =  476 ;
 
  dac_setup();
 
+ pinMode(3, OUTPUT);
+
 }
 
 void setup_pio_TIOA0 ()  // Configure Ard pin 2 as output from TC0 channel A (copy of trigger event)
@@ -242,63 +243,62 @@ void dac_setup()
   
 }
 
-void dac_write (int val)
-{
-  DACC->DACC_CDR = val & 0xFFF ;
-}
-
 void loop()
 {
-
+  
   angle = directionalityAngle(potentiometerValue);
   memcpy(weightings, weightTable[9], 8 * sizeof(double));
 
-  for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
-
-  timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
-
-  // Apply gains to the first filter signals
-  for (int j = 0; j < sampleCount-1; j = j + 2) {
-    //outputAmplification[j] = directionalOutput[j]*gain12;
-    outputAmplification[j] = directionalOutput[j]*1;
-    outputAmplification[j] = directionalOutput[j+1]*1;
-  }
-  
-  // Apply gains to the second filter signals
-//  for (int j = 1; j < sampleCount; j = j + 2) {
-//    //outputAmplification[j] = directionalOutput[j]*gain15;
-//    outputAmplification[j] = directionalOutput[j]*1;
-//  }
-
-  // Adding the microphone signals together
-  for (int idx1 = 0; idx1 < outputSize; idx1++) {
-    temp = 0;
-    for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
-      temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
-    }
-    result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
-  }
-
-  rangeCompression(result, Fs, compressedOutput);
-
-//  for (int idx0 = 0; idx0 < outputSize; idx0++) {
-//    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
-//}
-
-  int i=0; // needs to stay
-  for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
+  if (sample_counter == sampleCount)
+  {
+      for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
     
-    tempOutput[i]=(inputVector[idx0] + offset)*4095/3.3;
-    i=i+1;
-}
-  
-  //      dacc_write_conversion_data(DACC_INTERFACE, sum);
-  sample_counter = 0;
-  dac_counter = 0;
+      timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
+    
+      // Apply gains to the first filter signals
+      for (int j = 0; j < sampleCount-1; j = j + 2) {
+        //outputAmplification[j] = directionalOutput[j]*gain12;
+        outputAmplification[j] = directionalOutput[j]*1;
+        outputAmplification[j] = directionalOutput[j+1]*1;
+      }
+      
+      // Apply gains to the second filter signals
+    //  for (int j = 1; j < sampleCount; j = j + 2) {
+    //    //outputAmplification[j] = directionalOutput[j]*gain15;
+    //    outputAmplification[j] = directionalOutput[j]*1;
+    //  }
+    
+      // Adding the microphone signals together
+      for (int idx1 = 0; idx1 < outputSize; idx1++) {
+        temp = 0;
+        for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
+          temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
+        }
+        result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
+      }
+    
+    //  rangeCompression(result, Fs, compressedOutput);
+    
+    //  for (int idx0 = 0; idx0 < outputSize; idx0++) {
+    //    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
+    //}
+    
+      int i=0; // needs to stay
+      for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
+        
+        tempOutput[i]=(inputVector[idx0] + offset)*1240.909091;
+        i=i+1;
+    }
+      
+      //      dacc_write_conversion_data(DACC_INTERFACE, sum);
+      sample_counter = 0;
+      dac_counter = 0;
+  }
 }
 
 void ADC_Handler (void)
 {
+  digitalWrite(3, LOW);
  //wait untill all 8 ADCs have finished thier converstion.
  while(!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
   && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -326,7 +326,7 @@ void ADC_Handler (void)
     // adcResult3 = ADC->ADC_CDR[4];
     // adcResult4 = ADC->ADC_CDR[3];
 
-    if (sample_counter < sampleCount)
+    if (sample_counter < sampleCount && alternate)
     {
       // 8 channels 
       // to voltage
@@ -352,21 +352,35 @@ void ADC_Handler (void)
       // pot 
       potentiometerValue = adcResult9;
 
-      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-      dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
-      dac_counter++;
+      alternate = 0;
+
+//      dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+//      dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
+//      dac_counter++;
+
+      sample_counter+=numberOfInputs;
+     
+    } 
+    else if(sample_counter < sampleCount)
+    {
+       alternate = 1;
+    }
+
+        dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
+        dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
+        dac_counter++;
+        //alternateDAC = !alternateDAC;
+        
+    if (dac_counter >= outputSize)
+    {
+      dac_counter = 0;
+    }
+
 //      if(dac_counter>=49){
 //        dac_counter=0;
 //        
 //      }
-      
-      sample_counter+=numberOfInputs;
-      
-      alternate = 0;
-
-     
-    } 
-
+  digitalWrite(3, HIGH);
 }
 
 int directionalityAngle(volatile int x)

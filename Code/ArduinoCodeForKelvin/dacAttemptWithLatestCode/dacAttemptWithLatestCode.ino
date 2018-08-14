@@ -147,9 +147,7 @@ void setup()
 
   for (int i=0; i<100;i++)
   {
-    //while ((ADC->ADC_ISR & 0xFF) != 0xFF);
     calibration[i] = analogRead(A11);
-   // Serial.println(calibration[i]);
     delay(5);
   }
   for (int i=0; i<100; i++) 
@@ -216,12 +214,7 @@ void adc_setup ()
 
 void dac_setup()
 {
-    // DAC Setup
-//  analogWrite(DAC1, 0);
-//  analogWriteResolution(12);
-//  pinMode(10, OUTPUT);
-//  pinMode(11, OUTPUT);
-//  pinMode(12, OUTPUT);
+
   pmc_enable_periph_clk (DACC_INTERFACE_ID) ; // start clocking DAC
   DACC->DACC_CR = DACC_CR_SWRST ;  // reset DAC
 
@@ -233,8 +226,6 @@ void dac_setup()
 
   DACC->DACC_IDR = 0xFFFFFFFF ; // no interrupts
   DACC->DACC_CHER = DACC_CHER_CH1 << 0 ; // enable chan0
-
-
 
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
@@ -290,7 +281,6 @@ void loop()
         i=i+1;
     }
       
-      //      dacc_write_conversion_data(DACC_INTERFACE, sum);
       sample_counter = 0;
       dac_counter = 0;
   }
@@ -298,7 +288,7 @@ void loop()
 
 void ADC_Handler (void)
 {
-  digitalWrite(3, LOW);
+ // digitalWrite(3, LOW);
  //wait untill all 8 ADCs have finished thier converstion.
  while(!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
   && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -313,7 +303,7 @@ void ADC_Handler (void)
     adcResult7 = ADC->ADC_CDR[0];
     adcResult9 = ADC->ADC_CDR[10]; //pot
 
-        // Read in all the ADC values - 4 channels
+    // Read in all the ADC values - 4 channels
     // adcResult0 = ADC->ADC_CDR[7];
     // adcResult1 = ADC->ADC_CDR[6];
     // adcResult2 = ADC->ADC_CDR[5];
@@ -362,25 +352,30 @@ void ADC_Handler (void)
      
     } 
     else if(sample_counter < sampleCount)
-    {
+   {
        alternate = 1;
     }
+
+    if (dac_counter < outputSize && alternateDAC)
+    {
 
         dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
         dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
         dac_counter++;
+        alternateDAC = 0;
         //alternateDAC = !alternateDAC;
+    }
+    else if (dac_counter < outputSize)
+    {
+      alternateDAC = 1;
+    }
         
     if (dac_counter >= outputSize)
     {
       dac_counter = 0;
     }
-
-//      if(dac_counter>=49){
-//        dac_counter=0;
-//        
-//      }
-  digitalWrite(3, HIGH);
+    
+//  digitalWrite(3, HIGH);
 }
 
 int directionalityAngle(volatile int x)

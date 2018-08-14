@@ -43,6 +43,7 @@ static void argInit_50x4_volatile(volatile double input[sampleCount]);
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
+double inputVectorOmni[outputSize*2];
 volatile int sample_counter = 0;
 volatile int dac_counter = 0;
 volatile int number_of_interrupts = 0;
@@ -62,6 +63,7 @@ unsigned int adcResult9 = 0;
 
 double directionalOutput[sampleCount];
 double outputAmplification[sampleCount];
+double outputAmplificationOmni[outputSize*2];
 double result[outputSize];
 double filteredResult[outputSize];
 double compressedOutput[outputSize];
@@ -78,11 +80,8 @@ double weightings[8];
 long t0, t;
 double offset = 0;
 double temp = 0;
-int dimInput[2] = {outputSize, numberOfInputs};
-int dimWeighting[2] = {1, numberOfInputs};
-int dimOutput[2] = {outputSize, numberOfInputs};
 
-
+bool mode = 1;
 
 const double weightTable[19][8] = { { -0.000437317784256560, -0.000437317784256560, -0.000291545189504373, -0.000291545189504373, -0.000145772594752187, -0.000145772594752187, 0, 0},
   { -0.000430673944465980, -0.000430673944465980, -0.000287115962977320, -0.000287115962977320, -0.000143557981488660, -0.000143557981488660, 0, 0},
@@ -186,11 +185,11 @@ void setup()
   lowPassFilter.setFilterCoeffs(LPFCoeff);
 
   variableInit();
-  
+
   dac_setup();
-  
+
   pinMode(3, OUTPUT);
-  
+
   // argInit_50_real_T(tempOutput);
 }
 
@@ -287,44 +286,83 @@ void variableInit()
 void loop()
 {
 
-  if (sample_counter == sampleCount)
+  if (mode) // if directional mode is selected
   {
-    angle = directionalityAngle(potentiometerValue);
-    memcpy(weightings, weightTable[9], 8 * sizeof(double));
+    if (sample_counter == sampleCount)
+    {
+      angle = directionalityAngle(potentiometerValue);
+      memcpy(weightings, weightTable[9], 8 * sizeof(double));
 
-    for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
+      for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
-    timeDelay(inputVector, weightings, Fs, directionalOutput);
+      timeDelay(inputVector, weightings, Fs, directionalOutput);
 
-    // Apply gains to the signals
-    for (int j = 0; j < sampleCount - 1; j = j + 2) {
-      outputAmplification[j] = directionalOutput[j] * 1;
-      outputAmplification[j] = directionalOutput[j + 1] * 1;
-    }
-
-    // Adding the microphone signals together
-    for (int idx1 = 0; idx1 < outputSize; idx1++) {
-      double temp = 0;
-      for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
-        temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
+      // Apply gains to the signals
+      for (int j = 0; j < sampleCount - 1; j = j + 2) {
+        outputAmplification[j] = directionalOutput[j] * 1;
+        outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
       }
-      result[idx1] = temp / 4; // Divide by 4 to create the correct amplitude
+
+      // Adding the microphone signals together
+      for (int idx1 = 0; idx1 < outputSize; idx1++) {
+        double temp = 0;
+        for (int idx0 = 0; idx0 < numberOfInputs; idx0++) {
+          temp += outputAmplification[idx0 + numberOfInputs * idx1] ;
+        }
+        result[idx1] = temp / 4; // Divide by 4 to create the correct amplitude
+      }
+
+      //  rangeCompression(result, Fs, compressedOutput);
+
+      for (int idx0 = 0; idx0 < outputSize; idx0++) {
+        compressedOutput[idx0] = ((result[idx0] + offset) * 1240.909091);
+      }
+
+      sample_counter = 0;
+      __asm__("nop\n\t"); //nop
+      // dac_counter = 0;
     }
+  }
+  else {
+    if (sample_counter == sampleCount)
+    {
+      int index = 0;
+      for (int j = 0; j < sampleCount - 1; j = j + 8) // For directional mode, only use mic 2 (A2 and A3)
+      {
+        inputVectorOmni[index] = input[j];
+        inputVectorOmni[index+1] = input[j+1];
+        index = index + 2;
+      }
 
-    // for (int idx0 = 0; idx0 < outputSize; idx0++) {
-    //   filteredResult[idx0] = lowPassFilter.processReading(result[idx0]);
-    //   //filteredResult[idx0] = result[idx0];
-    // }
+      // Apply gains to the signals
+      for (int j = 0; j < outputSize*2 - 1; j = j + 2)
+      {
+        outputAmplificationOmni[j] = inputVectorOmni[j] * 1;
+        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * 1;
+      }
 
-    //  rangeCompression(result, Fs, compressedOutput);
+      // Adding the microphone signals together
+      for (int idx1 = 0; idx1 < outputSize; idx1++)
+      {
+        double temp = 0;
+        for (int idx0 = 0; idx0 < 2; idx0++)
+        {
+          temp += outputAmplificationOmni[idx0 + 2 * idx1] ;
+        }
+        result[idx1] = temp; // Divide by 4 to create the correct amplitude
+      }
 
-    for (int idx0 = 0; idx0 < outputSize; idx0++) {
-      compressedOutput[idx0] = ((result[idx0] + offset) * 1240.909091);
+      //  rangeCompression(result, Fs, compressedOutput);
+
+      for (int idx0 = 0; idx0 < outputSize; idx0++) 
+      {
+        compressedOutput[idx0] = ((result[idx0] + offset) * 1240.909091);
+      }
+
+      sample_counter = 0;
+      __asm__("nop\n\t"); //nop
+      // dac_counter = 0;
     }
-
-    sample_counter = 0;
-    __asm__("nop\n\t"); //nop
-    // dac_counter = 0;
   }
 }
 

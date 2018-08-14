@@ -69,8 +69,6 @@ int angle = 0;
 const int analogInputA0 = A0;
 const float gain12 = audiogram[11];
 const float gain15 = audiogram[14]; // filt 12 and filt 15
-float sum;
-int ADC_counter = 7;
 double weightings[8];
 long t0, t;
 double offset = 0;
@@ -109,7 +107,7 @@ static void argInit_50x4_real_T(double result[sampleCount])
   // 4 rows and 50 columns
   for (idx0 = 0; idx0 < outputSize; idx0++) {
     for (idx1 = 0; idx1 < numberOfInputs; idx1++) {
-      result[idx0 + 50 * idx1] = 0.0;
+      result[idx0 + outputSize * idx1] = 0.0;
     }
   }
 }
@@ -236,12 +234,13 @@ void dac_setup()
 
 void loop()
 {
-  
-  angle = directionalityAngle(potentiometerValue);
-  memcpy(weightings, weightTable[9], 8 * sizeof(double));
+ 
 
   if (sample_counter == sampleCount)
   {
+      angle = directionalityAngle(potentiometerValue);
+      memcpy(weightings, weightTable[9], 8 * sizeof(double));
+      
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
     
       timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
@@ -268,11 +267,11 @@ void loop()
         result[idx1] = temp/4; // Divide by 4 to create the correct amplitude
       }
     
-    //  rangeCompression(result, Fs, compressedOutput);
+      rangeCompression(result, Fs, compressedOutput);
     
-    //  for (int idx0 = 0; idx0 < outputSize; idx0++) {
-    //    compressedOutput[idx0] = ((compressedOutput[idx0]+ offset)*4095/3.3);
-    //}
+//      for (int idx0 = 0; idx0 < outputSize; idx0++) {
+//        compressedOutput[idx0] = ((result[idx0]+ offset)*4095/3.3);
+//      }
     
       int i=0; // needs to stay
       for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
@@ -288,7 +287,7 @@ void loop()
 
 void ADC_Handler (void)
 {
- // digitalWrite(3, LOW);
+  digitalWrite(3, LOW);
  //wait untill all 8 ADCs have finished thier converstion.
  while(!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
   && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -363,7 +362,6 @@ void ADC_Handler (void)
         dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
         dac_counter++;
         alternateDAC = 0;
-        //alternateDAC = !alternateDAC;
     }
     else if (dac_counter < outputSize)
     {
@@ -375,7 +373,7 @@ void ADC_Handler (void)
       dac_counter = 0;
     }
     
-//  digitalWrite(3, HIGH);
+  digitalWrite(3, HIGH);
 }
 
 int directionalityAngle(volatile int x)

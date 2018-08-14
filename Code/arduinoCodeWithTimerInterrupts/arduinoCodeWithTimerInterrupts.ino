@@ -33,7 +33,7 @@
 const int outputSize = 100;
 const int numberOfInputs = 8;
 const int sampleCount = outputSize * numberOfInputs; //50*8
-double Fs = 22117;
+double Fs = 22059;
 
 static void argInit_50x4_real_T(double result[sampleCount]);
 static void argInit_100_real_T(unsigned int result[100]);
@@ -121,7 +121,6 @@ float LPFCoeff[11] = {
   0.0008701087579668135,
   -0.004557857489464665
 };
-
 
 static void argInit_50x4_real_T(double result[sampleCount])
 {
@@ -279,43 +278,18 @@ void variableInit()
 
 void loop()
 {
-    //t0 = micros();
 
-  // Serial.print("Time per sample: ");
-  // Serial.println((float)t/400);
-  // Serial.print("Frequency: ");
-  // Serial.println((float)400*1000000/t);
-  // Serial.println();
-  // delay(1000);
   if (sample_counter == sampleCount)
   {
     angle = directionalityAngle(potentiometerValue);
-    memcpy(weightings, weightTable[8], 8 * sizeof(double));
+    memcpy(weightings, weightTable[9], 8 * sizeof(double));
 
     for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
-
-    //  for (int idx0 = 0; idx0 < 400; idx0 = idx0 + 8) {
-    //   Serial.print(inputVector[idx0], 6);
-    //   Serial.print(",");
-    //   Serial.print(inputVector[idx0+1], 6);
-    //   Serial.print(",");
-    //   Serial.print(inputVector[idx0+2], 6);
-    //   Serial.print(",");
-    //   Serial.println(inputVector[idx0+3], 6);
-    //  }
-
-    // for (int idx0 = 0; idx0 < 8; idx0++) {
-    //   Serial.print("Row in weight table: ");
-    //   Serial.print(angle);
-    //   Serial.print(" Weightings: ");
-    //   Serial.println(weightings[idx0],10);
-    // }
 
     timeDelay(inputVector, weightings, Fs, directionalOutput);
               
       // Apply gains to the signals
       for (int j = 0; j < sampleCount-1; j = j + 2) {
-        //outputAmplification[j] = directionalOutput[j]*gain12;
         outputAmplification[j] = directionalOutput[j]*1;
         outputAmplification[j] = directionalOutput[j+1]*1;
       }
@@ -338,27 +312,18 @@ void loop()
 
      for (int idx0 = 0; idx0 < outputSize; idx0++) {
        compressedOutput[idx0] = ((result[idx0]+ offset)*1240.909091);
-     //  Serial.print(angle);
-     //  // Serial.print(result[idx0]);
-     //  Serial.print(",");
-     //  Serial.println(compressedOutput[idx0]);
    }
 
-//    int i=0; // needs to stay
-//     for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
-//       
-//       tempOutput[i]=(inputVector[idx0] + offset)*1240.909091;
-//       i=i+1;
-//   }
-
     sample_counter = 0;
-    dac_counter = 0;
+    __asm__("nop\n\t"); //nop 
+   // dac_counter = 0;
   }
 }
 
 void ADC_Handler (void)
 {
   digitalWrite(3, LOW);
+ // delay(0.004);
  //wait untill all 8 ADCs have finished thier converstion.
  while(!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
   && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -423,6 +388,7 @@ void ADC_Handler (void)
    {
        alternate = 1;
     }
+    
 
     if (dac_counter < outputSize && alternateDAC)
     {
@@ -442,7 +408,8 @@ void ADC_Handler (void)
       dac_counter = 0;
     }
     
-  digitalWrite(3, HIGH);
+   digitalWrite(3, HIGH);
+  //delay(0.003);
 }
 
 int directionalityAngle(volatile int x)

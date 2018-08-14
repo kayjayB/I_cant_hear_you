@@ -174,6 +174,28 @@ void setup()
 {
   Serial.begin(115200);
 
+  calibration_setup() ;
+
+  timer_setup() ;
+
+  adc_setup () ;         // setup ADC
+
+  setup_pio_TIOA0() ;  // drive Arduino pin 2 at 48kHz to bring clock out
+
+  // Filter setup
+  lowPassFilter.setFilterCoeffs(LPFCoeff);
+
+  variableInit();
+  
+  dac_setup();
+  
+  pinMode(3, OUTPUT);
+  
+  // argInit_50_real_T(tempOutput);
+}
+
+void calibration_setup()
+{
   argInit_100_real_T(calibration);
 
   analogReadResolution(12);
@@ -193,22 +215,6 @@ void setup()
   offset = offset / 100; // average
 
   offset = offset * 0.00080586;
-  //Serial.println(offset, 8);
-
-  timer_setup() ;
-
-  adc_setup () ;         // setup ADC
-
-  setup_pio_TIOA0() ;  // drive Arduino pin 2 at 48kHz to bring clock out
-
-  // Filter setup
-  lowPassFilter.setFilterCoeffs(LPFCoeff);
-
-  variableInit();
-  dac_setup();
-  pinMode(3, OUTPUT);
-  argInit_50_real_T(tempOutput);
-
 }
 
 void timer_setup()

@@ -1,7 +1,7 @@
-#include <FIR.h>
-
+#include <abs.h>
 #include <bluesteinSetup.h>
 #include <compressor.h>
+#include <CompressorBase.h>
 #include <exp.h>
 #include <fft.h>
 #include <fft1.h>
@@ -9,6 +9,7 @@
 #include <ifftshift.h>
 #include <mpower.h>
 #include <nextpow2.h>
+#include <power.h>
 #include <rangeCompression.h>
 #include <rangeCompression_initialize.h>
 #include <rangeCompression_rtwutil.h>
@@ -22,6 +23,8 @@
 #include <timeDelay.h>
 #include <tmwtypes.h>
 
+#include <FIR.h>
+
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -30,7 +33,7 @@
 const int outputSize = 100;
 const int numberOfInputs = 8;
 const int sampleCount = outputSize * numberOfInputs; //50*8
-double Fs = 44117;
+double Fs = 22117;
 
 static void argInit_50x4_real_T(double result[sampleCount]);
 static void argInit_100_real_T(unsigned int result[100]);
@@ -287,7 +290,7 @@ void loop()
   if (sample_counter == sampleCount)
   {
     angle = directionalityAngle(potentiometerValue);
-    memcpy(weightings, weightTable[9], 8 * sizeof(double));
+    memcpy(weightings, weightTable[8], 8 * sizeof(double));
 
     for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
@@ -308,7 +311,7 @@ void loop()
     //   Serial.println(weightings[idx0],10);
     // }
 
-    timeDelay(inputVector, dimInput, weightings, dimWeighting, Fs, directionalOutput, dimOutput);
+    timeDelay(inputVector, weightings, Fs, directionalOutput);
               
       // Apply gains to the signals
       for (int j = 0; j < sampleCount-1; j = j + 2) {
@@ -331,22 +334,22 @@ void loop()
     //   //filteredResult[idx0] = result[idx0];
     // }
 
-    rangeCompression(result, Fs, compressedOutput);
+  //  rangeCompression(result, Fs, compressedOutput);
 
-  //   for (int idx0 = 0; idx0 < outputSize; idx0++) {
-  //     compressedOutput[idx0] = ((filteredResult[idx0]+ offset)*4095/3.3);
-  //   //  Serial.print(angle);
-  //   //  // Serial.print(result[idx0]);
-  //   //  Serial.print(",");
-  //   //  Serial.println(compressedOutput[idx0]);
-  // }
-
-    int i=0; // needs to stay
-     for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
-       
-       tempOutput[i]=(inputVector[idx0] + offset)*1240.909091;
-       i=i+1;
+     for (int idx0 = 0; idx0 < outputSize; idx0++) {
+       compressedOutput[idx0] = ((result[idx0]+ offset)*1240.909091);
+     //  Serial.print(angle);
+     //  // Serial.print(result[idx0]);
+     //  Serial.print(",");
+     //  Serial.println(compressedOutput[idx0]);
    }
+
+//    int i=0; // needs to stay
+//     for (int idx0 = 0; idx0 < sampleCount; idx0 = idx0 + 8) {
+//       
+//       tempOutput[i]=(inputVector[idx0] + offset)*1240.909091;
+//       i=i+1;
+//   }
 
     sample_counter = 0;
     dac_counter = 0;
@@ -425,7 +428,7 @@ void ADC_Handler (void)
     {
 
         dacc_set_channel_selection(DACC_INTERFACE, 1);       //select DAC channel 1
-        dacc_write_conversion_data(DACC_INTERFACE, tempOutput[dac_counter]);//write on DAC
+        dacc_write_conversion_data(DACC_INTERFACE, compressedOutput[dac_counter]);//write on DAC
         dac_counter++;
         alternateDAC = 0;
     }

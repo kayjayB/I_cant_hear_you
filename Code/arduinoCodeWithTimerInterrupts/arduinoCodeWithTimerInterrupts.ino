@@ -39,7 +39,7 @@ static void argInit_50x4_real_T(double result[sampleCount]);
 static void argInit_100_real_T(unsigned int result[100]);
 int directionalityAngle(volatile int x);
 static void argInit_50_real_T(double compressedOutput[outputSize]);
-static void argInit_50x4_volatile(volatile int input[sampleCount]);
+static void argInit_50x4_volatile(volatile double input[sampleCount]);
 
 volatile double input[sampleCount];
 double inputVector[sampleCount];
@@ -137,7 +137,7 @@ static void argInit_50x4_real_T(double result[sampleCount])
   }
 }
 
-static void argInit_50x4_volatile(volatile double input[400])
+static void argInit_50x4_volatile(volatile double input[sampleCount])
 {
   int idx0;
   int idx1;
@@ -211,7 +211,7 @@ void setup()
 
 }
 
-void timer_setup() 
+void timer_setup()
 {
   pmc_enable_periph_clk (TC_INTERFACE_ID + 0 * 3 + 0) ; // clock the TC0 channel 0
 
@@ -275,7 +275,7 @@ void variableInit()
   argInit_50x4_real_T(directionalOutput);
   argInit_50x4_real_T(outputAmplification);
   argInit_50_real_T(compressedOutput);
-  // argInit_50x4_volatile(input);
+  argInit_50x4_volatile(input);
 }
 
 void loop()

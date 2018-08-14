@@ -162,8 +162,6 @@ static void argInit_50_real_T(double compressedOutput[outputSize])
 {
   int idx0;
 
-  // Loop over the array to initialize each element.
-  // 4 rows and 50 columns
   for (idx0 = 0; idx0 < outputSize; idx0++) {
     compressedOutput[idx0] = 0;
   }
@@ -251,7 +249,7 @@ void adc_setup ()
   ADC->ADC_IDR = 0xFFFFFFFF ;   // disable interrupts
   ADC->ADC_IER = 0x80 ;         // enable AD7 End-Of-Conv interrupt (Arduino pin A0)
   ADC->ADC_CHDR = 0xFFFF ;      // disable all channels
-  ADC->ADC_CHER = 0x4FF ;        // ch7:A0 ch6:A1 ch5:A2 ch4:A3 ch3:A4 ch2:A5 ch1:A6 ch0:A7
+  ADC->ADC_CHER = 0x4FF ;        // ch7:A0 ch6:A1 ch5:A2 ch4:A3 ch3:A4 ch2:A5 ch1:A6 ch0:A7 ch10:A8
   ADC->ADC_CGR = 0x15555555 ;   // All gains set to x1
   ADC->ADC_COR = 0x00000000 ;   // All offsets off
 

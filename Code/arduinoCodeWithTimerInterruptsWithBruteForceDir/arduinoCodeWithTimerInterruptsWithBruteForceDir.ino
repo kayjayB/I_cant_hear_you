@@ -88,6 +88,8 @@ bool mode = 1;
 // Stuff for new directionality
 const double shift0Deg[4] = {0, 3, 6, 9};
 const double shift180Deg[4] = {9, 6, 3, 0};
+const double shift60Deg[4] = {0, 2, 4, 6};
+const double shift120Deg[4] = {6, 4, 2, 0};
 double mic1[outputSize];
 double mic2[outputSize];
 double mic3[outputSize];
@@ -259,15 +261,25 @@ void loop()
 
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
-
+      angle = directionalityAngle(potentiometerValue);
       // Apply gains to the signals
       for (int j = 0; j < sampleCount - 1; j = j + 2) {
         outputAmplification[j] = directionalOutput[j] * 1;
         outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
       }
 
-      //directionality90(result, inputVector);
-      directionality90(result, inputVector);
+      if (angle == 0)
+      {
+        directionality0(result, inputVector);
+      }
+      else if (angle == 90)
+      {
+        directionality90(result, inputVector);
+      }
+      else if (angle == 180)
+      {
+        directionality180(result, inputVector);
+      }
 
       //rangeCompression(result, Fs, compressedOutput);
 
@@ -294,8 +306,8 @@ void loop()
       // Apply gains to the signals
       for (int j = 0; j < outputSize * 2 - 1; j = j + 2)
       {
-        outputAmplificationOmni[j] = inputVectorOmni[j] * 1;
-        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * 1;
+        outputAmplificationOmni[j] = inputVectorOmni[j] * gain12;
+        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * gain15;
       }
 
       // Adding the microphone signals together
@@ -420,25 +432,29 @@ void ADC_Handler (void)
 
 int directionalityAngle(volatile int x)
 {
-  if (x >= 0 && x <= 106 ) return 0;
-  else if (x >= 107 && x <= 213 ) return 1;
-  else if (x >= 214 && x <= 320 ) return 2;
-  else if (x >= 321 && x <= 427 ) return 3;
-  else if (x >= 428 && x <= 534 ) return 4;
-  else if (x >= 535 && x <= 641 ) return 5;
-  else if (x >= 642 && x <= 748 ) return 6;
-  else if (x >= 749 && x <= 855 ) return 7;
-  else if (x >= 856 && x <= 962 ) return 8;
-  else if (x >= 963 && x <= 1069 ) return 9;
-  else if (x >= 1070 && x <= 1176 ) return 10;
-  else if (x >= 1177 && x <= 1283 ) return 11;
-  else if (x >= 1284 && x <= 1390 ) return 12;
-  else if (x >= 1391 && x <= 1497 ) return 13;
-  else if (x >= 1498 && x <= 1604 ) return 14;
-  else if (x >= 1605 && x <= 1711 ) return 15;
-  else if (x >= 1712 && x <= 1818 ) return 16;
-  else if (x >= 1819 && x <= 1925 ) return 17;
-  else return 18;
+  //  if (x >= 0 && x <= 106 ) return 0;
+  //  else if (x >= 107 && x <= 213 ) return 1;
+  //  else if (x >= 214 && x <= 320 ) return 2;
+  //  else if (x >= 321 && x <= 427 ) return 3;
+  //  else if (x >= 428 && x <= 534 ) return 4;
+  //  else if (x >= 535 && x <= 641 ) return 5;
+  //  else if (x >= 642 && x <= 748 ) return 6;
+  //  else if (x >= 749 && x <= 855 ) return 7;
+  //  else if (x >= 856 && x <= 962 ) return 8;
+  //  else if (x >= 963 && x <= 1069 ) return 9;
+  //  else if (x >= 1070 && x <= 1176 ) return 10;
+  //  else if (x >= 1177 && x <= 1283 ) return 11;
+  //  else if (x >= 1284 && x <= 1390 ) return 12;
+  //  else if (x >= 1391 && x <= 1497 ) return 13;
+  //  else if (x >= 1498 && x <= 1604 ) return 14;
+  //  else if (x >= 1605 && x <= 1711 ) return 15;
+  //  else if (x >= 1712 && x <= 1818 ) return 16;
+  //  else if (x >= 1819 && x <= 1925 ) return 17;
+  //  else return 18;
+
+  if (x >= 0 && x < 505) return 0;
+  else if (x >= 505 && x < 1515) return 90;
+  else return 180;
 
 }
 
@@ -500,17 +516,84 @@ void directionality180(double result[outputSize], double inputVector[sampleCount
   {
     mic4[i] = inputVector[i * 8 + 6] + inputVector[i * 8 + 7];
 
-    if (i >= shift0Deg[1])
+    if (i >= shift180Deg[1])
     {
       mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
 
     }
-    else if (i >= shift0Deg[2])
+    else if (i >= shift180Deg[2])
     {
       mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
       mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
     }
-    else if (i >= shift0Deg[3])
+    else if (i >= shift180Deg[3])
+    {
+      mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
+      mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
+      mic1[i] = inputVector[i * 8] + inputVector[i * 8 + 1];
+    }
+    result[i] = mic1[i] + mic2[i] + mic3[i] + mic4[i];
+    result[i] = result[i] / 4;
+  }
+}
+
+void directionality60(double result[outputSize], double inputVector[sampleCount])
+{
+  for (int i = 0; i < outputSize; i++)
+  {
+    mic1[i] = 0;
+    mic2[i] = 0;
+    mic3[i] = 0;
+    mic4[i] = 0;
+  }
+  for (int i = 0; i < outputSize; i++)
+  {
+    mic1[i] = inputVector[i * 8] + inputVector[i * 8 + 1];
+
+    if (i >= shift60Deg[1])
+    {
+      mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
+    }
+    else if (i >= shift60Deg[2])
+    {
+      mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
+      mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
+    }
+    else if (i >= shift60Deg[3])
+    {
+      mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
+      mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
+      mic4[i] = inputVector[i * 8 + 6] + inputVector[i * 8 + 7];
+    }
+    result[i] = mic1[i] + mic2[i] + mic3[i] + mic4[i];
+    result[i] = result[i] / 4;
+  }
+}
+
+void directionality120(double result[outputSize], double inputVector[sampleCount])
+{
+  for (int i = 0; i < outputSize; i++)
+  {
+    mic1[i] = 0;
+    mic2[i] = 0;
+    mic3[i] = 0;
+    mic4[i] = 0;
+  }
+  for (int i = 0; i < outputSize; i++)
+  {
+    mic4[i] = inputVector[i * 8 + 6] + inputVector[i * 8 + 7];
+
+    if (i >= shift120Deg[1])
+    {
+      mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
+
+    }
+    else if (i >= shift120Deg[2])
+    {
+      mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
+      mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];
+    }
+    else if (i >= shift120Deg[3])
     {
       mic3[i] = inputVector[i * 8 + 4] + inputVector[i * 8 + 5];
       mic2[i] = inputVector[i * 8 + 2] + inputVector[i * 8 + 3];

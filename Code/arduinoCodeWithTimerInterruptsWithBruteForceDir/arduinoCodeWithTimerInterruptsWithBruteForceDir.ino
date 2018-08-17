@@ -72,6 +72,7 @@ double filteredResult[outputSize];
 double compressedOutput[outputSize];
 double tempOutput[outputSize];
 unsigned int calibration[100];
+const int modeSwitchPin = 5;
 
 const float audiogram[16] = {5.623, 4.842, 3.981, 3.162, 3.162, 3.162, 3.162, 3.652, 4.467, 5.623, 4.870, 4.039, 3.162, 2.371, 2.304, 10.0};
 unsigned int j;
@@ -85,11 +86,18 @@ double temp = 0;
 
 bool mode = 1;
 
-// Stuff for new directionality
+// Stuff for new directionality -- for Fs of 44kHz
 const double shift0Deg[4] = {0, 3, 6, 9};
 const double shift180Deg[4] = {9, 6, 3, 0};
 const double shift60Deg[4] = {0, 2, 4, 6};
 const double shift120Deg[4] = {6, 4, 2, 0};
+
+//// for Fs of 48kHz
+//const double shift0Deg[4] = {0, 2, 4, 6};
+//const double shift180Deg[4] = {6, 4, 2, 0};
+//const double shift60Deg[4] = {0, 2, 4, 6};
+//const double shift120Deg[4] = {6, 4, 2, 0};
+
 double mic1[outputSize];
 double mic2[outputSize];
 double mic3[outputSize];
@@ -158,6 +166,7 @@ void setup()
 
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+  pinMode(modeSwitchPin, INPUT);
 }
 
 void calibration_setup()
@@ -197,6 +206,9 @@ void timer_setup()
               TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
               TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
               TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR ;
+
+//t->TC_RC =  875 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 48kHz
+//t->TC_RA =  440 ; 
 
   t->TC_RC =  952 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 44.1kHz
   t->TC_RA =  476 ;
@@ -253,8 +265,9 @@ void variableInit()
 
 void loop()
 {
-
-  if (mode) // if directional mode is selected
+  mode = digitalRead(modeSwitchPin);
+  mode = 1;
+  if (mode == 1) // if directional mode is selected
   {
     if (sample_counter == sampleCount)
     {
@@ -262,11 +275,12 @@ void loop()
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
       angle = directionalityAngle(potentiometerValue);
-      // Apply gains to the signals
-      for (int j = 0; j < sampleCount - 1; j = j + 2) {
-        outputAmplification[j] = directionalOutput[j] * 1;
-        outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
-      }
+      angle = 90;
+//      // Apply gains to the signals
+//      for (int j = 0; j < sampleCount - 1; j = j + 2) {
+//        outputAmplification[j] = directionalOutput[j] * 1;
+//        outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
+//      }
 
       if (angle == 0)
       {
@@ -280,6 +294,14 @@ void loop()
       {
         directionality180(result, inputVector);
       }
+      else if (angle == 60)
+      {
+        directionality60(result, inputVector);
+      }
+      else if (angle == 120)
+      {
+        directionality120(result, inputVector);
+      }
 
       //rangeCompression(result, Fs, compressedOutput);
 
@@ -288,15 +310,16 @@ void loop()
       }
 
       sample_counter = 0;
-      // __asm__("nop\n\t"); //nop
+      __asm__("nop\n\t"); //nop
       // dac_counter = 0;
     }
   }
-  else {
+  else if (mode == 0){
     if (sample_counter == sampleCount)
     {
+      for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
       int index = 0;
-      for (int j = 0; j < sampleCount - 1; j = j + 8) // For directional mode, only use mic 2 (A2 and A3)
+      for (int j = 6; j < sampleCount; j = j + 8) // For directional mode, only use mic 2 (A2 and A3)
       {
         inputVectorOmni[index] = input[j];
         inputVectorOmni[index + 1] = input[j + 1];
@@ -452,8 +475,14 @@ int directionalityAngle(volatile int x)
   //  else if (x >= 1819 && x <= 1925 ) return 17;
   //  else return 18;
 
-  if (x >= 0 && x < 505) return 0;
-  else if (x >= 505 && x < 1515) return 90;
+//  if (x >= 0 && x < 505) return 0;
+//  else if (x >= 505 && x < 1515) return 90;
+//  else return 180;
+
+  if (x>=0 && x< 336) return 0;
+  else if (x>=336 && x< 840) return 60;
+  else if (x>=840 && x< 1176) return 90;
+  else if (x>=1176 && x< 1680) return 120;
   else return 180;
 
 }

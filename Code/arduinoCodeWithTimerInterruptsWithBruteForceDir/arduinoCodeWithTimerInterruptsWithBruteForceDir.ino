@@ -310,7 +310,7 @@ void loop()
       }
 
       sample_counter = 0;
-      __asm__("nop\n\t"); //nop
+     // __asm__("nop\n\t"); //nop
       // dac_counter = 0;
     }
   }
@@ -329,8 +329,8 @@ void loop()
       // Apply gains to the signals
       for (int j = 0; j < outputSize * 2 - 1; j = j + 2)
       {
-        outputAmplificationOmni[j] = inputVectorOmni[j] * gain12;
-        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * gain15;
+        outputAmplificationOmni[j] = inputVectorOmni[j] * 1;
+        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * 1;
       }
 
       // Adding the microphone signals together
@@ -362,7 +362,7 @@ void ADC_Handler (void)
 {
   digitalWrite(3, LOW);
   digitalWrite(4, LOW);
-  // delay(0.004);
+
   //wait untill all 8 ADCs have finished thier converstion.
   while (!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
            && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -379,19 +379,6 @@ void ADC_Handler (void)
   while (!(ADC->ADC_ISR & ADC_ISR_EOC10));
   adcResult9 = ADC->ADC_CDR[10]; //pot
 
-  // Read in all the ADC values - 4 channels
-  // adcResult0 = ADC->ADC_CDR[7];
-  // adcResult1 = ADC->ADC_CDR[6];
-  // adcResult2 = ADC->ADC_CDR[5];
-  // adcResult3 = ADC->ADC_CDR[4];
-
-  // Read in all the ADC values - 4 channels + pot on channel A4
-  // adcResult0 = ADC->ADC_CDR[7];
-  // adcResult1 = ADC->ADC_CDR[6];
-  // adcResult2 = ADC->ADC_CDR[5];
-  // adcResult3 = ADC->ADC_CDR[4];
-  // adcResult4 = ADC->ADC_CDR[3];
-
   if (sample_counter < sampleCount && alternate)
   {
     // 8 channels
@@ -404,16 +391,6 @@ void ADC_Handler (void)
     input[5 + sample_counter] = adcResult5 * 0.00080586 - offset;
     input[6 + sample_counter] = adcResult6 * 0.00080586 - offset;
     input[7 + sample_counter] = adcResult7 * 0.00080586 - offset;
-
-    // 4 channels
-    // input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
-    // input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
-    // input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
-    // input[3 + sample_counter] = adcResult3*0.00080586 - 1.5875;
-    // input[4 + sample_counter] = adcResult0*0.00080586 - 1.5875;
-    // input[5 + sample_counter] = adcResult1*0.00080586 - 1.5875;
-    // input[6 + sample_counter] = adcResult2*0.00080586 - 1.5875;
-    // input[7 + sample_counter] = adcResult3*0.00080586 - 1.5875;
 
     // pot
     potentiometerValue = adcResult9;
@@ -450,7 +427,6 @@ void ADC_Handler (void)
 
   digitalWrite(3, HIGH);
   digitalWrite(4, HIGH);
-  //delay(0.003);
 }
 
 int directionalityAngle(volatile int x)

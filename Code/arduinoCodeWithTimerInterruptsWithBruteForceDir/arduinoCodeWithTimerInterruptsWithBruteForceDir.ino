@@ -85,6 +85,7 @@ double offset = 0;
 double temp = 0;
 
 bool mode = 1;
+const int ledPin =  LED_BUILTIN;// the number of the LED pin
 
 // Stuff for new directionality -- for Fs of 44kHz
 const double shift0Deg[4] = {0, 3, 6, 9};
@@ -166,6 +167,7 @@ void setup()
 
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+  pinMode(6, OUTPUT);
   pinMode(modeSwitchPin, INPUT);
 }
 
@@ -266,21 +268,17 @@ void variableInit()
 void loop()
 {
   mode = digitalRead(modeSwitchPin);
-  mode = 1;
+//  mode = 1;
   if (mode == 1) // if directional mode is selected
   {
+    digitalWrite(ledPin, LOW);
     if (sample_counter == sampleCount)
     {
 
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
       angle = directionalityAngle(potentiometerValue);
-      angle = 90;
-//      // Apply gains to the signals
-//      for (int j = 0; j < sampleCount - 1; j = j + 2) {
-//        outputAmplification[j] = directionalOutput[j] * 1;
-//        outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
-//      }
+      //angle = 90;
 
       if (angle == 0)
       {
@@ -310,11 +308,11 @@ void loop()
       }
 
       sample_counter = 0;
-     // __asm__("nop\n\t"); //nop
-      // dac_counter = 0;
     }
   }
+  
   else if (mode == 0){
+    digitalWrite(ledPin, HIGH);
     if (sample_counter == sampleCount)
     {
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
@@ -431,35 +429,12 @@ void ADC_Handler (void)
 
 int directionalityAngle(volatile int x)
 {
-  //  if (x >= 0 && x <= 106 ) return 0;
-  //  else if (x >= 107 && x <= 213 ) return 1;
-  //  else if (x >= 214 && x <= 320 ) return 2;
-  //  else if (x >= 321 && x <= 427 ) return 3;
-  //  else if (x >= 428 && x <= 534 ) return 4;
-  //  else if (x >= 535 && x <= 641 ) return 5;
-  //  else if (x >= 642 && x <= 748 ) return 6;
-  //  else if (x >= 749 && x <= 855 ) return 7;
-  //  else if (x >= 856 && x <= 962 ) return 8;
-  //  else if (x >= 963 && x <= 1069 ) return 9;
-  //  else if (x >= 1070 && x <= 1176 ) return 10;
-  //  else if (x >= 1177 && x <= 1283 ) return 11;
-  //  else if (x >= 1284 && x <= 1390 ) return 12;
-  //  else if (x >= 1391 && x <= 1497 ) return 13;
-  //  else if (x >= 1498 && x <= 1604 ) return 14;
-  //  else if (x >= 1605 && x <= 1711 ) return 15;
-  //  else if (x >= 1712 && x <= 1818 ) return 16;
-  //  else if (x >= 1819 && x <= 1925 ) return 17;
-  //  else return 18;
 
-//  if (x >= 0 && x < 505) return 0;
-//  else if (x >= 505 && x < 1515) return 90;
-//  else return 180;
-
-  if (x>=0 && x< 336) return 0;
-  else if (x>=336 && x< 840) return 60;
-  else if (x>=840 && x< 1176) return 90;
-  else if (x>=1176 && x< 1680) return 120;
-  else return 180;
+  if (x>=0 && x< 1248) return 180;
+  else if (x>=1248 && x< 1840) return 120;
+  else if (x>=1840 && x< 2395) return 90;
+  else if (x>=2395 && x< 3081) return 60;
+  else return 0;
 
 }
 

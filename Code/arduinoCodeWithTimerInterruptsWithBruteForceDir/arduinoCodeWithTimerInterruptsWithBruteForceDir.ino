@@ -168,7 +168,10 @@ void setup()
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(6, OUTPUT);
+  pinMode(ledPin, OUTPUT);
   pinMode(modeSwitchPin, INPUT);
+
+  digitalWrite(ledPin, LOW);
 }
 
 void calibration_setup()
@@ -268,7 +271,7 @@ void variableInit()
 void loop()
 {
   mode = digitalRead(modeSwitchPin);
-//  mode = 1;
+  //mode = 0;
   if (mode == 1) // if directional mode is selected
   {
     digitalWrite(ledPin, LOW);
@@ -278,7 +281,7 @@ void loop()
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
       angle = directionalityAngle(potentiometerValue);
-      //angle = 90;
+      //angle = 180;
 
       if (angle == 0)
       {
@@ -290,7 +293,7 @@ void loop()
       }
       else if (angle == 180)
       {
-        directionality180(result, inputVector);
+        directionality0(result, inputVector);
       }
       else if (angle == 60)
       {

@@ -51,7 +51,7 @@ rawMic=[199,159,131,146,100,140,156];
 % polarpattern(angles,gainDB180);
 
 f = 3340;
-n = 4; %no of microphones
+n = 10; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
 d=5*10^-2;
@@ -78,7 +78,7 @@ for r=1:length(theta)
     end
 end
 
-taper = weightTableImag(19,:);
+taper = weightTableImag(10,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
@@ -129,6 +129,8 @@ figure
 polarpattern(interAngles,interDB120Deg)
 figure
 polarpattern(interAngles,interDB180Deg,idealAngle,Ddata)
+figure
+polarpattern(idealAngle,Ddata)
 
 
 

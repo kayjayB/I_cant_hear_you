@@ -520,7 +520,7 @@ void directionality180(double result[outputSize], double inputVector[sampleCount
   }
 }
 
-void directionality60(double result[outputSize], double inputVector[sampleCount])
+void directionality120(double result[outputSize], double inputVector[sampleCount])
 {
   for (int i = 0; i < outputSize; i++)
   {
@@ -553,7 +553,7 @@ void directionality60(double result[outputSize], double inputVector[sampleCount]
   }
 }
 
-void directionality120(double result[outputSize], double inputVector[sampleCount])
+void directionality60(double result[outputSize], double inputVector[sampleCount])
 {
   for (int i = 0; i < outputSize; i++)
   {

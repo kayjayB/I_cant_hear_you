@@ -45,7 +45,7 @@
 }
 
 \definecolor{lightblue}{rgb}{0.145,0.6666,0.9} % Defines the color used for content box headers
-\definecolor{black}{rgb}{0.2,0.2,0.2}
+\definecolor{black}{rgb}{0.3,0.3,0.3}
 \begin{document}
 
 \begin{poster}
@@ -82,12 +82,13 @@ linewidth=1.5pt % Width of the border lines around content boxes
 
 \headerbox{Introduction}{name=introduction,column=0,row=0}{
 
-Hearing loss is a prevalent problem that affects people in all parts of the world. It is caused by many factors including age, disease and trauma, and often results in a decreased quality of life for people suffering from it \cite{Evaluation_of_a_hearing_compensation_algorithm}. Hearing aids that exist on the market are expensive, and are thus inaccessible to the majority of the population, particularly in South Africa. It is therefore necessary to develop an inexpensive hearing aid that has all of the functionality of a high-end hearing aid.
+Hearing loss is a prevalent problem that affects people in all parts of the world. It is caused by many factors including age, disease and trauma, and often results in a decreased quality of life~\cite{Evaluation_of_a_hearing_compensation_algorithm}. Existing hearing aids are expensive, which makes them inaccessible to the majority of South Africans. It is therefore necessary to develop an inexpensive hearing aid that has all of the functionality of a high-end hearing aid.
 
 This functionality includes:
 \begin{itemize}\compresslist
-	\item The application of specific amplifications to specific frequency bands according to a person's audiogram
-	\item The ability of the user to select the direction in which they wish to listen and to hear that direction louder than other directions
+	\vspace{-0.7em}
+	\item Amplifying specific frequency bands according to a person's audiogram
+	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than other directions
 \end{itemize}
 }
 
@@ -122,24 +123,25 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 
 \headerbox{Methodology}{name=method,column=0,below=objectives, above=bottom}{ % This block's bottom aligns with the bottom of the conclusion block
 
-{\Large \textbf{Simulated Hearing Aid}}\\
+{\large \textbf{Simulated Hearing Aid}}\\
 block diagram
 
-{\Large \textbf{Hardware Hearing Aid}}\\
+{\large \textbf{Hardware Hearing Aid}}\\
 block diagram
 
-{\Large \textbf{Testing}}
+{\large \textbf{Testing}}
 \begin{itemize}\compresslist
+	\vspace{-0.7em}
 	\item Hearing aid placed on a rotating platform and rotated in ${30}^o$ increments with a constant direction selected on the device
-	\item Sinusoidal signals with frequencies of 3340~Hz and 6000~Hz were played from a set direction and the output signals from the hearing aid were recorded
-	\item Different amplifications were applied to the two frequency bands and the input and output signals were recorded
+	\item Sinusoidal signals with frequencies of 3340~Hz and 6000~Hz were played from a set direction
+	\item Amplifications were applied to the frequency bands
+	\item  Output signals from the hearing aid were recorded
 \end{itemize}
 
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{directionalityLabTest.png}
+	\includegraphics[width=0.6\linewidth]{directionalityLabTest.png}
 	\captionof{figure}{Procedure for testing the hearing aid}
 \end{center}
-
 }
 
 
@@ -172,6 +174,15 @@ block diagram
 
 \begin{multicols}{2}
 \vspace{1em}
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{fftSoftware.png}
+	\captionof{figure}{FFT Software}
+\end{center}
+
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{polar90degSoftware.png}
+	\captionof{figure}{${90}^o$}
+\end{center}
 
 \end{multicols}
 
@@ -180,7 +191,31 @@ block diagram
 \begin{multicols}{2}
 \vspace{1em}
 
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{deg0hardware.png}
+	\captionof{figure}{${0}^o$ }
+\end{center}
 
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{deg60hardware.png}
+	\captionof{figure}{${60}^o$ }
+\end{center}
+
+\end{multicols}
+
+\begin{multicols}{2}
+	\vspace{1em}
+	
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{deg90hardware.png}
+		\captionof{figure}{${90}^o$ }
+	\end{center}
+	
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{audiogram.png}
+		\captionof{figure}{Audiogram}
+	\end{center}
+	
 \end{multicols}
 }
 

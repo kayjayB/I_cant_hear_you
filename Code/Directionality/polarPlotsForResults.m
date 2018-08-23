@@ -51,7 +51,7 @@ rawMic=[199,159,131,146,100,140,156];
 % polarpattern(angles,gainDB180);
 
 f = 3340;
-n = 10; %no of microphones
+n = 4; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
 d=5*10^-2;
@@ -119,18 +119,42 @@ interDB90Deg(length(interDB90Deg))=interDB90Deg(1);
 interDB120Deg(length(interDB120Deg))=interDB120Deg(1);
 interDB180Deg(length(interDB180Deg))=interDB180Deg(1);
 
+% random image for white background
+a = rand(100,100);
+
+% initial axis
+h = axes('position',[0  0  1  1]);
+colormap white
+
+%plotting image
+f1 = imagesc(a);
+h2 = axes('position',[0  0  1  1]);
+
 figure
-polarpattern(interAngles,interDB0Deg)
+polarpattern(h2, interAngles,interDB0Deg)
+
+% removing background of polar plot - so image shows through
+ph=findall(h2,'type','patch');
+set(ph,'FaceColor','white')
+
+%%
+h2 = axes('position',[0  0  1  1]);
 figure
-polarpattern(interAngles,interDB60Deg)
+polarpattern(h2, interAngles,interDB60Deg)
+h2 = axes('position',[0  0  1  1]);
 figure
-polarpattern(interAngles,interDB90Deg)
+polarpattern(h2,interAngles,interDB90Deg)
+h2 = axes('position',[0  0  1  1]);
 figure
-polarpattern(interAngles,interDB120Deg)
+polarpattern(h2,interAngles,interDB120Deg)
+
+%%
+h2 = axes('position',[0  0  1  1]);
 figure
-polarpattern(interAngles,interDB180Deg,idealAngle,Ddata)
+polarpattern(h2,interAngles,interDB180Deg,idealAngle,Ddata)
+h2 = axes('position',[0  0  1  1]);
 figure
-polarpattern(idealAngle,Ddata)
+polarpattern(h2,idealAngle,Ddata)
 
 
 

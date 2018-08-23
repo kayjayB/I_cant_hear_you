@@ -72,6 +72,7 @@ double filteredResult[outputSize];
 double compressedOutput[outputSize];
 double tempOutput[outputSize];
 unsigned int calibration[100];
+const int modeSwitchPin = 5;
 
 const float audiogram[16] = {5.623, 4.842, 3.981, 3.162, 3.162, 3.162, 3.162, 3.652, 4.467, 5.623, 4.870, 4.039, 3.162, 2.371, 2.304, 10.0};
 unsigned int j;
@@ -84,12 +85,20 @@ double offset = 0;
 double temp = 0;
 
 bool mode = 1;
+const int ledPin =  LED_BUILTIN;// the number of the LED pin
 
-// Stuff for new directionality
+// Stuff for new directionality -- for Fs of 44kHz
 const double shift0Deg[4] = {0, 3, 6, 9};
 const double shift180Deg[4] = {9, 6, 3, 0};
 const double shift60Deg[4] = {0, 2, 4, 6};
 const double shift120Deg[4] = {6, 4, 2, 0};
+
+//// for Fs of 48kHz
+//const double shift0Deg[4] = {0, 2, 4, 6};
+//const double shift180Deg[4] = {6, 4, 2, 0};
+//const double shift60Deg[4] = {0, 2, 4, 6};
+//const double shift120Deg[4] = {6, 4, 2, 0};
+
 double mic1[outputSize];
 double mic2[outputSize];
 double mic3[outputSize];
@@ -158,6 +167,11 @@ void setup()
 
   pinMode(3, OUTPUT);
   pinMode(4, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(modeSwitchPin, INPUT);
+
+  digitalWrite(ledPin, LOW);
 }
 
 void calibration_setup()
@@ -197,6 +211,9 @@ void timer_setup()
               TC_CMR_EEVT_XC0 |     // Set external events from XC0 (this setup TIOB as output)
               TC_CMR_ACPA_CLEAR | TC_CMR_ACPC_CLEAR |
               TC_CMR_BCPB_CLEAR | TC_CMR_BCPC_CLEAR ;
+
+//t->TC_RC =  875 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 48kHz
+//t->TC_RA =  440 ; 
 
   t->TC_RC =  952 ;     // counter resets on RC, so sets period in terms of 42MHz clock - 44.1kHz
   t->TC_RA =  476 ;
@@ -253,20 +270,18 @@ void variableInit()
 
 void loop()
 {
-
-  if (mode) // if directional mode is selected
+  mode = digitalRead(modeSwitchPin);
+  //mode = 0;
+  if (mode == 1) // if directional mode is selected
   {
+    digitalWrite(ledPin, LOW);
     if (sample_counter == sampleCount)
     {
 
       for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
 
       angle = directionalityAngle(potentiometerValue);
-      // Apply gains to the signals
-      for (int j = 0; j < sampleCount - 1; j = j + 2) {
-        outputAmplification[j] = directionalOutput[j] * 1;
-        outputAmplification[j + 1] = directionalOutput[j + 1] * 1;
-      }
+      //angle = 180;
 
       if (angle == 0)
       {
@@ -278,7 +293,15 @@ void loop()
       }
       else if (angle == 180)
       {
-        directionality180(result, inputVector);
+        directionality0(result, inputVector);
+      }
+      else if (angle == 60)
+      {
+        directionality60(result, inputVector);
+      }
+      else if (angle == 120)
+      {
+        directionality120(result, inputVector);
       }
 
       //rangeCompression(result, Fs, compressedOutput);
@@ -288,15 +311,16 @@ void loop()
       }
 
       sample_counter = 0;
-      // __asm__("nop\n\t"); //nop
-      // dac_counter = 0;
     }
   }
-  else {
+  
+  else if (mode == 0){
+    digitalWrite(ledPin, HIGH);
     if (sample_counter == sampleCount)
     {
+      for (int j = 0; j < sampleCount; j++) inputVector[j] = input[j];
       int index = 0;
-      for (int j = 0; j < sampleCount - 1; j = j + 8) // For directional mode, only use mic 2 (A2 and A3)
+      for (int j = 6; j < sampleCount; j = j + 8) // For directional mode, only use mic 2 (A2 and A3)
       {
         inputVectorOmni[index] = input[j];
         inputVectorOmni[index + 1] = input[j + 1];
@@ -306,8 +330,8 @@ void loop()
       // Apply gains to the signals
       for (int j = 0; j < outputSize * 2 - 1; j = j + 2)
       {
-        outputAmplificationOmni[j] = inputVectorOmni[j] * gain12;
-        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * gain15;
+        outputAmplificationOmni[j] = inputVectorOmni[j] * 1;
+        outputAmplificationOmni[j + 1] = inputVectorOmni[j + 1] * 1;
       }
 
       // Adding the microphone signals together
@@ -339,7 +363,7 @@ void ADC_Handler (void)
 {
   digitalWrite(3, LOW);
   digitalWrite(4, LOW);
-  // delay(0.004);
+
   //wait untill all 8 ADCs have finished thier converstion.
   while (!((ADC->ADC_ISR & ADC_ISR_EOC7) && (ADC->ADC_ISR & ADC_ISR_EOC6) && (ADC->ADC_ISR & ADC_ISR_EOC5) && (ADC->ADC_ISR & ADC_ISR_EOC4)
            && (ADC->ADC_ISR & ADC_ISR_EOC3) && (ADC->ADC_ISR & ADC_ISR_EOC2) && (ADC->ADC_ISR & ADC_ISR_EOC1) && (ADC->ADC_ISR & ADC_ISR_EOC0)));
@@ -356,19 +380,6 @@ void ADC_Handler (void)
   while (!(ADC->ADC_ISR & ADC_ISR_EOC10));
   adcResult9 = ADC->ADC_CDR[10]; //pot
 
-  // Read in all the ADC values - 4 channels
-  // adcResult0 = ADC->ADC_CDR[7];
-  // adcResult1 = ADC->ADC_CDR[6];
-  // adcResult2 = ADC->ADC_CDR[5];
-  // adcResult3 = ADC->ADC_CDR[4];
-
-  // Read in all the ADC values - 4 channels + pot on channel A4
-  // adcResult0 = ADC->ADC_CDR[7];
-  // adcResult1 = ADC->ADC_CDR[6];
-  // adcResult2 = ADC->ADC_CDR[5];
-  // adcResult3 = ADC->ADC_CDR[4];
-  // adcResult4 = ADC->ADC_CDR[3];
-
   if (sample_counter < sampleCount && alternate)
   {
     // 8 channels
@@ -381,16 +392,6 @@ void ADC_Handler (void)
     input[5 + sample_counter] = adcResult5 * 0.00080586 - offset;
     input[6 + sample_counter] = adcResult6 * 0.00080586 - offset;
     input[7 + sample_counter] = adcResult7 * 0.00080586 - offset;
-
-    // 4 channels
-    // input[0 + sample_counter] = adcResult0*0.00080586 - 1.5875;
-    // input[1 + sample_counter] = adcResult1*0.00080586 - 1.5875;
-    // input[2 + sample_counter] = adcResult2*0.00080586 - 1.5875;
-    // input[3 + sample_counter] = adcResult3*0.00080586 - 1.5875;
-    // input[4 + sample_counter] = adcResult0*0.00080586 - 1.5875;
-    // input[5 + sample_counter] = adcResult1*0.00080586 - 1.5875;
-    // input[6 + sample_counter] = adcResult2*0.00080586 - 1.5875;
-    // input[7 + sample_counter] = adcResult3*0.00080586 - 1.5875;
 
     // pot
     potentiometerValue = adcResult9;
@@ -427,34 +428,16 @@ void ADC_Handler (void)
 
   digitalWrite(3, HIGH);
   digitalWrite(4, HIGH);
-  //delay(0.003);
 }
 
 int directionalityAngle(volatile int x)
 {
-  //  if (x >= 0 && x <= 106 ) return 0;
-  //  else if (x >= 107 && x <= 213 ) return 1;
-  //  else if (x >= 214 && x <= 320 ) return 2;
-  //  else if (x >= 321 && x <= 427 ) return 3;
-  //  else if (x >= 428 && x <= 534 ) return 4;
-  //  else if (x >= 535 && x <= 641 ) return 5;
-  //  else if (x >= 642 && x <= 748 ) return 6;
-  //  else if (x >= 749 && x <= 855 ) return 7;
-  //  else if (x >= 856 && x <= 962 ) return 8;
-  //  else if (x >= 963 && x <= 1069 ) return 9;
-  //  else if (x >= 1070 && x <= 1176 ) return 10;
-  //  else if (x >= 1177 && x <= 1283 ) return 11;
-  //  else if (x >= 1284 && x <= 1390 ) return 12;
-  //  else if (x >= 1391 && x <= 1497 ) return 13;
-  //  else if (x >= 1498 && x <= 1604 ) return 14;
-  //  else if (x >= 1605 && x <= 1711 ) return 15;
-  //  else if (x >= 1712 && x <= 1818 ) return 16;
-  //  else if (x >= 1819 && x <= 1925 ) return 17;
-  //  else return 18;
 
-  if (x >= 0 && x < 505) return 0;
-  else if (x >= 505 && x < 1515) return 90;
-  else return 180;
+  if (x>=0 && x< 1248) return 180;
+  else if (x>=1248 && x< 1840) return 120;
+  else if (x>=1840 && x< 2395) return 90;
+  else if (x>=2395 && x< 3081) return 60;
+  else return 0;
 
 }
 
@@ -537,7 +520,7 @@ void directionality180(double result[outputSize], double inputVector[sampleCount
   }
 }
 
-void directionality60(double result[outputSize], double inputVector[sampleCount])
+void directionality120(double result[outputSize], double inputVector[sampleCount])
 {
   for (int i = 0; i < outputSize; i++)
   {
@@ -570,7 +553,7 @@ void directionality60(double result[outputSize], double inputVector[sampleCount]
   }
 }
 
-void directionality120(double result[outputSize], double inputVector[sampleCount])
+void directionality60(double result[outputSize], double inputVector[sampleCount])
 {
   for (int i = 0; i < outputSize; i++)
   {

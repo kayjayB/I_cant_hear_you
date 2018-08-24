@@ -5,6 +5,11 @@ angles = 0:30:360;
 
 %angles=deg2rad(angles);
 
+% raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3];
+% raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5];
+% raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5];
+% raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6];
+% raw180=[34.3,35.9,34.3,18.7,50,25,32.8];
 
 raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3,1,1,1,1,1,35.9];
 raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5,1,1,1,1,1,42.1];
@@ -84,6 +89,7 @@ microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
 c = 343; %speed of sound
 
+%idealAngle=-180:1:180;
 idealAngle=-180:1:180;
 Ddata= directivity(array,f,idealAngle,'PropagationSpeed',c);
 
@@ -158,11 +164,20 @@ set(ph,'FaceColor','white')
 
 %%
 %error stuffs
-dir0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3];
-dir60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5];
-dir90=[28.1,54.6,48.4,109,70.3,45.3,62.5];
-dir120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6];
-dir180=[34.3,35.9,34.3,18.7,50,25,32.8];
+
+%normalize
+db0DegMax=max(db0Deg);
+db60DegMax=max(db60Deg);
+db90DegMax=max(db90Deg);
+db120DegMax=max(db120Deg);
+db180DegMax=max(db180Deg);
+measured0=zeros(length(db0Deg));
+measured60=zeros(length(db60Deg));
+measured90=zeros(length(db90Deg));
+measured120=zeros(length(db120Deg));
+measured180=zeros(length(db180Deg));
+
+measured0=db0Deg-db0DegMax;
 
 
 

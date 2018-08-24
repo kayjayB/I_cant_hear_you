@@ -30,6 +30,7 @@
 \usepackage{enumitem} % Used to reduce itemize/enumerate spacing
 \usepackage{palatino} % Use the Palatino font
 \usepackage[font=small,labelfont=bf]{caption} % Required for specifying captions to tables and figures
+\usepackage{nth}
 
 \usepackage{multicol} % Required for multiple columns
 \setlength{\columnsep}{1.5em} % Slightly increase the space between columns
@@ -124,14 +125,22 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 \headerbox{Methodology}{name=method,column=0,below=objectives, above=bottom}{ % This block's bottom aligns with the bottom of the conclusion block
 
 {\large \textbf{Simulated Hearing Aid}}\\
-block diagram
+
+\begin{itemize}\compresslist
+	\vspace{-0.7em}
+	\item Filter bank: 16 \nth{14} order band pass filters with a $\frac{1}{3}$ octave bandwidth
+	\item System bandwidth = 250~Hz to 8000~Hz
+\end{itemize}
 
 {\large \textbf{Hardware Hearing Aid}}
 \begin{center}
 	\includegraphics[width=1\linewidth]{posterBlockDiagram.pdf}
 	\captionof{figure}{Block diagram of the hardware hearing aid}
 \end{center}
-
+\begin{itemize}\compresslist
+	\vspace{-0.7em}
+	\item Filter bank: 2 second order band pass filters
+\end{itemize}
 
 {\large \textbf{Testing}}
 \begin{itemize}\compresslist

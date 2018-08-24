@@ -51,7 +51,7 @@ rawMic=[199,159,131,146,100,140,156];
 % polarpattern(angles,gainDB180);
 
 f = 3340;
-n = 4; %no of microphones
+n = 10; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
 d=5*10^-2;
@@ -137,24 +137,37 @@ polarpattern(h2,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')
 
-%%
-h2 = axes('position',[0  0  1  1]);
-figure
-polarpattern(h2, interAngles,interDB60Deg)
-h2 = axes('position',[0  0  1  1]);
-figure
-polarpattern(h2,interAngles,interDB90Deg)
-h2 = axes('position',[0  0  1  1]);
-figure
-polarpattern(h2,interAngles,interDB120Deg)
+% %%
+% h2 = axes('position',[0  0  1  1]);
+% figure
+% polarpattern(h2, interAngles,interDB60Deg)
+% h2 = axes('position',[0  0  1  1]);
+% figure
+% polarpattern(h2,interAngles,interDB90Deg)
+% h2 = axes('position',[0  0  1  1]);
+% figure
+% polarpattern(h2,interAngles,interDB120Deg)
+% 
+% %%
+% h2 = axes('position',[0  0  1  1]);
+% figure
+% polarpattern(h2,interAngles,interDB180Deg,idealAngle,Ddata)
+% h2 = axes('position',[0  0  1  1]);
+% figure
+% polarpattern(h2,idealAngle,Ddata)
 
 %%
-h2 = axes('position',[0  0  1  1]);
-figure
-polarpattern(h2,interAngles,interDB180Deg,idealAngle,Ddata)
-h2 = axes('position',[0  0  1  1]);
-figure
-polarpattern(h2,idealAngle,Ddata)
+%error stuffs
+dir0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3];
+dir60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5];
+dir90=[28.1,54.6,48.4,109,70.3,45.3,62.5];
+dir120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6];
+dir180=[34.3,35.9,34.3,18.7,50,25,32.8];
+
+
+
+
+
 
 
 

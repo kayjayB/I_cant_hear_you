@@ -18,7 +18,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[landscape,a1paper,fontscale=0.45]{baposter} % Adjust the font scale/size here
+\documentclass[landscape,a1paper,fontscale=0.5]{baposter} % Adjust the font scale/size here
 
 \usepackage{graphicx} % Required for including images
 \graphicspath{{figures/}} % Directory in which figures are stored
@@ -129,7 +129,8 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 	\captionof{figure}{Hearing aid system overview}
 \end{center}
 
-{\large \textbf{Simulated vs Hardware Hearing Aid}}\\
+{\large \textbf{Simulated vs Hardware Hearing Aid}}
+	\vspace{-1em}
 \begin{center}
 \captionof{table}{Comparison of Simulated and Hardware hearing aids}
 	\resizebox{\columnwidth}{!}{%
@@ -139,11 +140,11 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 \midrule
 	\# of Microphones & 10 & 4 \\ 
 
-	Bandwidth & 250-8000~Hz & 2800-3500Hz and 5600-7000~Hz \\ 
+	Bandwidth & 0.25-8~kHz & 2.8-3.5kHz and 5.6-7~kHz \\ 
 
 	Filter order & 14 & 2 \\ 
 
-	Type of filters & 1/3 Octave bandpass filters & 1/3 Octave bandpass filters \\ 
+	Type of filters & $\frac{1}{3}$ Octave bandpass & $\frac{1}{3}$ Octave bandpass \\ 
 
 	Number of filters & 16 per microphone & 2 per microphone \\ 
 \bottomrule
@@ -152,16 +153,8 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 \end{center}
 
 {\large \textbf{Testing}}
-\begin{itemize}\compresslist
-	\vspace{-0.7em}
-	\item Hearing aid placed on a rotating platform and rotated in ${30}^o$ increments with a constant direction selected on the device
-	\item Sinusoidal signals with frequencies of 3340~Hz and 6000~Hz were played from a set direction
-	\item Amplifications were applied to the frequency bands
-	\item  Output signals from the hearing aid were recorded
-\end{itemize}
-
 \begin{center}
-	\includegraphics[width=0.2\linewidth]{directionalityLabTest.png}
+	\includegraphics[width=0.4\linewidth]{directionalityLabTest.png}
 	\captionof{figure}{Procedure for testing the hearing aid}
 \end{center}
 }

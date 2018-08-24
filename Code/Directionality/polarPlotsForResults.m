@@ -131,8 +131,8 @@ f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 
 figure
-polarpattern(h2, interAngles,interDB0Deg)
-
+%polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
+polarpattern(h2,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')

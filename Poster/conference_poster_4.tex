@@ -124,23 +124,32 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 
 \headerbox{Methodology}{name=method,column=0,below=objectives, above=bottom}{ % This block's bottom aligns with the bottom of the conclusion block
 
-{\large \textbf{Simulated Hearing Aid}}\\
-
-\begin{itemize}\compresslist
-	\vspace{-0.7em}
-	\item Filter bank: 16 \nth{14} order band pass filters with a $\frac{1}{3}$ octave bandwidth
-	\item System bandwidth = 250~Hz to 8000~Hz
-\end{itemize}
-
-{\large \textbf{Hardware Hearing Aid}}
 \begin{center}
 	\includegraphics[width=1\linewidth]{posterBlockDiagram.pdf}
-	\captionof{figure}{Block diagram of the hardware hearing aid}
+	\captionof{figure}{Hearing aid system overview}
 \end{center}
-\begin{itemize}\compresslist
-	\vspace{-0.7em}
-	\item Filter bank: 2 second order band pass filters
-\end{itemize}
+
+{\large \textbf{Simulated vs Hardware Hearing Aid}}\\
+\begin{center}
+\captionof{table}{Comparison of Simulated and Hardware hearing aids}
+	\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccc}
+\toprule
+	\textbf{Property} & \textbf{Simulation} & \textbf{Hardware} \\ 
+\midrule
+	\# of Microphones & 10 & 4 \\ 
+
+	Bandwidth & 250-8000~Hz & 2800-3500Hz and 5600-7000~Hz \\ 
+
+	Filter order & 14 & 2 \\ 
+
+	Type of filters & 1/3 Octave bandpass filters & 1/3 Octave bandpass filters \\ 
+
+	Number of filters & 16 per microphone & 2 per microphone \\ 
+\bottomrule
+\end{tabular} 
+}
+\end{center}
 
 {\large \textbf{Testing}}
 \begin{itemize}\compresslist
@@ -203,7 +212,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 	\vspace{1em}
 	
 	\begin{center}
-		\includegraphics[width=0.8\linewidth]{polar90degSoftware.png}
+		\includegraphics[width=0.6\linewidth]{polar90degSoftware.png}
 		\captionof{figure}{${90}^o$}
 	\end{center}
 
@@ -215,12 +224,12 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 \vspace{1em}
 
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{deg0hardware.png}
+	\includegraphics[width=0.6\linewidth]{deg0hardware.png}
 	\captionof{figure}{${0}^o$ }
 \end{center}
 
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{deg60hardware.png}
+	\includegraphics[width=0.6\linewidth]{deg60hardware.png}
 	\captionof{figure}{${60}^o$ }
 \end{center}
 
@@ -230,7 +239,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 	\vspace{1em}
 	
 	\begin{center}
-		\includegraphics[width=0.8\linewidth]{deg90hardware.png}
+		\includegraphics[width=0.6\linewidth]{deg90hardware.png}
 		\captionof{figure}{${90}^o$ }
 	\end{center}
 

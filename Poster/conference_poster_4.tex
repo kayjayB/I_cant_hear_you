@@ -103,7 +103,7 @@ To develop an inexpensive hearing aid that has all of the functionality of a hig
 \begin{itemize}\compresslist
 	\vspace{-0.4em}
 	\item Amplifying specific frequency bands according to a person's audiogram
-	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than other directions
+	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than other directions \cite{Evaluation_of_a_hearing_compensation_algorithm}
 \end{itemize}
 
 This will be done in the form of:
@@ -112,6 +112,49 @@ This will be done in the form of:
 		\item A full software hearing aid simulation
 		\item A hardware proof of concept of a hearing aid which demonstrates limited functionality
 \end{itemize}
+}
+
+
+%----------------------------------------------------------------------------------------
+%	METHODOLOGY
+%----------------------------------------------------------------------------------------
+
+\headerbox{System Design}{name=method,column=0,below=objectives, above=bottom}{ % This block's bottom aligns with the bottom of the conclusion block
+	
+	\begin{center}
+		\includegraphics[width=1\linewidth]{posterBlockDiagram.pdf}
+		\captionof{figure}{Hearing aid system overview}
+	\end{center}
+	
+	{\large \textbf{Simulated vs Hardware Hearing Aid}}
+	\vspace{-1em}
+	\begin{center}
+		\captionof{table}{Comparison of simulated and hardware hearing aids}
+		\resizebox{\columnwidth}{!}{%
+			\begin{tabular}{ccc}
+				\toprule
+				\textbf{Property} & \textbf{Simulation} & \textbf{Hardware} \\ 
+				\midrule
+				Number of Microphones & 10 & 4 \\ 
+				
+				Bandwidth & 0.25-8~kHz & 2.8-3.5kHz and 5.6-7~kHz \\ 
+				
+				Filter order & 14 & 2 \\ 
+				
+				Type of filters & $\frac{1}{3}$ Octave bandpass & $\frac{1}{3}$ Octave bandpass \\ 
+				
+				Number of filters & 16 per microphone & 2 per microphone \\ 
+				Number of steerable angles & 19 (${10}^o$ increments) & 5 (${0}^o$, ${60}^o$, ${90}^o$, ${120}^o$, ${180}^o$) \\ 
+				\bottomrule
+			\end{tabular} 
+		}
+	\end{center}
+	
+	{\large \textbf{Device Testing}}
+	\begin{center}
+		\includegraphics[width=0.4\linewidth]{directionalityLabTest.png}
+		\captionof{figure}{Procedure for testing the hearing aid}
+	\end{center}
 }
 
 %----------------------------------------------------------------------------------------
@@ -154,54 +197,12 @@ The error in the directionality feature was calculated by comparing the measured
 \headerbox{Future Work}{name=FutureWork,column=2,below=results3}{
 For future development of the hearing aid, a number of improvements could be made including:
 \begin{itemize}\compresslist
+	\vspace{-0.4em}
 	\item Making use of higher quality omni-directional microphones
 	\item Creating an integrated circuit chip to handle the preprocessing of the audio signals
 	\item Making use of more microphones to improve the precision of the directionality feature
 	\item Emdedding the microphones and circuitry into headphones to reduce the size of the device
 \end{itemize}
-}
-
-
-%----------------------------------------------------------------------------------------
-%	METHODOLOGY
-%----------------------------------------------------------------------------------------
-
-\headerbox{System Design}{name=method,column=0,below=objectives, above=bottom}{ % This block's bottom aligns with the bottom of the conclusion block
-
-\begin{center}
-	\includegraphics[width=1\linewidth]{posterBlockDiagram.pdf}
-	\captionof{figure}{Hearing aid system overview}
-\end{center}
-
-{\large \textbf{Simulated vs Hardware Hearing Aid}}
-	\vspace{-1em}
-\begin{center}
-\captionof{table}{Comparison of simulated and hardware hearing aids}
-	\resizebox{\columnwidth}{!}{%
-\begin{tabular}{ccc}
-\toprule
-	\textbf{Property} & \textbf{Simulation} & \textbf{Hardware} \\ 
-\midrule
-	Number of Microphones & 10 & 4 \\ 
-
-	Bandwidth & 0.25-8~kHz & 2.8-3.5kHz and 5.6-7~kHz \\ 
-
-	Filter order & 14 & 2 \\ 
-
-	Type of filters & $\frac{1}{3}$ Octave bandpass & $\frac{1}{3}$ Octave bandpass \\ 
-
-	Number of filters & 16 per microphone & 2 per microphone \\ 
-	Number of steerable angles & 19 (${10}^o$ increments) & 5 (${0}^o$, ${60}^o$, ${90}^o$, ${120}^o$, ${180}^o$) \\ 
-\bottomrule
-\end{tabular} 
-}
-\end{center}
-
-{\large \textbf{Device Testing}}
-\begin{center}
-	\includegraphics[width=0.4\linewidth]{directionalityLabTest.png}
-	\captionof{figure}{Procedure for testing the hearing aid}
-\end{center}
 }
 
 

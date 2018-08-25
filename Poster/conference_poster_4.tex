@@ -101,13 +101,14 @@ columns =3
 \headerbox{Objectives}{name=objectives,column=0,row=0}{
 To develop an inexpensive hearing aid that has all of the functionality of a high-end hearing aid, including:
 \begin{itemize}\compresslist
-	\vspace{-0.7em}
+	\vspace{-0.4em}
 	\item Amplifying specific frequency bands according to a person's audiogram
 	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than other directions
 \end{itemize}
 
 This will be done in the form of:
 \begin{itemize}\compresslist
+		\vspace{-0.4em}
 		\item A full software hearing aid simulation
 		\item A hardware proof of concept of a hearing aid which demonstrates limited functionality
 \end{itemize}
@@ -120,21 +121,17 @@ This will be done in the form of:
 The error in the directionality feature was calculated by comparing the measured and the simulated polar plots for each steerable angle. Compensatory gain error was calculated using the difference between the desired and measured gain at the centre of each frequency band
 \begin{center}
 	\captionof{table}{Average error in the directionality feature}
-	\resizebox{0.5\columnwidth}{!}{%
-\begin{tabular}{|c|c|}
-	\hline 
-	Angle & Average Error (\%) \\ 
-	\hline 
+	\resizebox{0.3\columnwidth}{!}{%
+\begin{tabular}{cc}
+	\toprule
+	\textbf{Angle${}^o$} & \textbf{Average Error (\%)} \\
+	\midrule 
 	0 & 46.6 \\ 
-	\hline 
 	60 & 30.7 \\ 
-	\hline 
 	90 & 12.7 \\ 
-	\hline 
 	120 & 22.7 \\ 
-	\hline 
 	180 & 51.7 \\ 
-	\hline 
+	\bottomrule
 \end{tabular} 
 	}
 \end{center}
@@ -142,14 +139,13 @@ The error in the directionality feature was calculated by comparing the measured
 \begin{center}
 	\captionof{table}{Error in the compensatory gain feature}
 	\resizebox{0.5\columnwidth}{!}{%
-		\begin{tabular}{|c|c|}
-			\hline 
-			Compensated frequency (Hz) & Error (\%) \\ 
-			\hline 
+		\begin{tabular}{cc}
+			\toprule
+			\textbf{Compensated frequency band (Hz)} &\textbf{Error (\%)} \\ 
+			\midrule
 			2820 - 3550 & 0.81 \\ 
-			\hline 
 			5620 - 7080 & 19.56 \\ 
-			\hline 
+			\bottomrule
 		\end{tabular} 
 	}
 \end{center}
@@ -186,7 +182,7 @@ For future development of the hearing aid, a number of improvements could be mad
 \toprule
 	\textbf{Property} & \textbf{Simulation} & \textbf{Hardware} \\ 
 \midrule
-	\# of Microphones & 10 & 4 \\ 
+	Number of Microphones & 10 & 4 \\ 
 
 	Bandwidth & 0.25-8~kHz & 2.8-3.5kHz and 5.6-7~kHz \\ 
 
@@ -239,7 +235,7 @@ This project is a proof of concept that an inexpensive, fully functional, adapti
 
 \headerbox{Results: Simulation}{name=results,column=1,row=0}{
 
-The frequency spectrum of the output from the hearing aid is compared to that of the original signal so that the effects of the compensatory amplification can be seen
+In the figure below, the frequency spectrum of the output from the hearing aid is compared to that of the original signal so that the effects of compensatory amplification can be seen
 \begin{center}
 	\includegraphics[width=0.6\linewidth]{fftSoftware.png}
 	\captionof{figure}{FFT of the input signal and the output signal from the hearing aid}
@@ -256,12 +252,15 @@ The polar plot shows the normalised magnitudes of the signal at various angles, 
 \headerbox{Results: Hardware}{name=results2,column=1, bottomaligned=references, below=results}{
 %\begin{multicols}{2}
 %	\vspace{1em}
+The effects of compensatory gain are illustrated below through the application of different amplifications to the two frequency bands
 	\begin{center}
 		\includegraphics[width=0.6\linewidth]{hardwareGain.png}
 		\captionof{figure}{FFT of the output signal from the hearing aid with various amplifications}
 	\end{center}
+
+A simulated response was created using 4 microphones. This response was compared to the measured response acquired during device testing
 	\begin{center}
-		\includegraphics[width=0.4\linewidth]{deg90hardware.png}
+		\includegraphics[width=0.3\linewidth]{deg90hardware.png}
 		\captionof{figure}{Gain applied to the output signal when the beam is steered to ${90}^o$}
 	\end{center}
 

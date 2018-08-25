@@ -103,10 +103,10 @@ To develop an inexpensive hearing aid that has all of the functionality of a hig
 \begin{itemize}\compresslist
 	\vspace{-0.4em}
 	\item Amplifying specific frequency bands according to a person's audiogram
-	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than other directions \cite{Evaluation_of_a_hearing_compensation_algorithm}
+	\item The ability of the user to select the direction in which they wish to listen and to hear sounds in that direction louder than those from other directions \cite{Evaluation_of_a_hearing_compensation_algorithm}
 \end{itemize}
 
-This will be done in the form of:
+This is achieved by creating:
 \begin{itemize}\compresslist
 		\vspace{-0.4em}
 		\item A full software hearing aid simulation
@@ -144,7 +144,7 @@ This will be done in the form of:
 				Type of filters & $\frac{1}{3}$ Octave bandpass & $\frac{1}{3}$ Octave bandpass \\ 
 				
 				Number of filters & 16 per microphone & 2 per microphone \\ 
-				Number of steerable angles & 19 (${10}^o$ increments) & 5 (${0}^o$, ${60}^o$, ${90}^o$, ${120}^o$, ${180}^o$) \\ 
+				Number of steerable angles & 19 (10\textsuperscript{o} increments) & 5 (0\textsuperscript{o}, 60\textsuperscript{o}, 90\textsuperscript{o}, 120\textsuperscript{o}, 180\textsuperscript{o}) \\ 
 				\bottomrule
 			\end{tabular} 
 		}
@@ -163,26 +163,23 @@ This will be done in the form of:
 \headerbox{Results: Hardware}{name=results3,column=2,row=0}{
 	Compensatory gain error was calculated using the difference between the desired and measured gain at the centre of each frequency band
 	\begin{center}
-		\captionof{table}{Error in the compensatory gain feature}
-		\resizebox{0.5\columnwidth}{!}{%
+		\captionof{table}{Error in compensatory gain}
 			\begin{tabular}{cc}
 				\toprule
-				\textbf{Frequency band (Hz)} &\textbf{Error (\%)} \\ 
+				\textbf{Frequency band (kHz)} &\textbf{Error (\%)} \\ 
 				\midrule
-				2820 - 3550 & 0.81 \\ 
-				5620 - 7080 & 19.56 \\ 
+				2.8 - 3.5 & 0.81 \\ 
+				5.6 - 7 & 19.56 \\ 
 				\bottomrule
 			\end{tabular} 
-		}
 	\end{center}
 
-The error in the beam steering ability of the directionality feature was calculated by comparing the measured and the simulated polar plots for each steerable angle.
+The error in the beam steering ability of the directionality feature was calculated by comparing the measured and the simulated polar plots for each steerable angle
 \begin{center}
-	\captionof{table}{Average error in the directionality feature}
-	\resizebox{0.3\columnwidth}{!}{%
+	\captionof{table}{Average error in directionality}
 \begin{tabular}{cc}
 	\toprule
-	\textbf{Angle${}^o$} & \textbf{Average Error (\%)} \\
+	\textbf{Angle (\textsuperscript{o})} & \textbf{Average Error (\%)} \\
 	\midrule 
 	0 & 46.6 \\ 
 	60 & 30.7 \\ 
@@ -191,7 +188,6 @@ The error in the beam steering ability of the directionality feature was calcula
 	180 & 51.7 \\ 
 	\bottomrule
 \end{tabular} 
-	}
 \end{center}
 
 \vspace{0.3em}
@@ -214,11 +210,11 @@ For future development of the hearing aid, a number of improvements could be mad
 
 \headerbox{Conclusion}{name=conclusion,column=2,below=FutureWork}{ % This block's bottom aligns with the bottom of the conclusion block
 This project is a proof of concept that an inexpensive, fully functional, adaptive hearing aid can be produced.
-This was achieved by:
+This was proven by:
 
 \begin{itemize}\compresslist
 	\item Amplifying specific frequency bands in accordance with individual audiograms
-	\item Steering the acoustic beam to attenuate directions other than the selected one (by making use of array theory)
+	\item Steering the acoustic beam to attenuate signals in directions other than the selected one
 	\item Creating a hearing aid that costs R1500
 \end{itemize}
 
@@ -257,7 +253,7 @@ In the figure below, the frequency spectrum of the output from the hearing aid i
 The polar plot shows the normalised magnitudes of the signal at various angles, with respect to the user, when the dial is facing $90^{o}$
 	\begin{center}
 	\includegraphics[width=0.3\linewidth]{polar90degSoftware.png}
-	\captionof{figure}{Gain applied to the output signal when the beam is steered to ${90}^o$}
+	\captionof{figure}{Gain applied to the output signal when the beam is steered to 90\textsuperscript{o}}
 \end{center}
 
 }
@@ -274,7 +270,7 @@ The effects of compensatory gain are illustrated below through the application o
 A simulated response was created using 4 microphones. This response was compared to the measured response acquired during device testing
 	\begin{center}
 		\includegraphics[width=0.3\linewidth]{deg90hardware.png}
-		\captionof{figure}{Gain applied to the output signal when the beam is steered to ${90}^o$}
+		\captionof{figure}{Gain applied to the output signal when the beam is steered to 90\textsuperscript{o}}
 	\end{center}
 
 	

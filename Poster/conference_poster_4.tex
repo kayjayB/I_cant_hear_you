@@ -66,7 +66,8 @@ headerheight=0.1\textheight, % Height of the header
 headershape=roundedright, % Specify the rounded corner in the content box headers, can be: rectangle, small-rounded, roundedright, roundedleft or rounded
 headerfont=\Large\bf\textsc, % Large, bold and sans serif font in the headers of content boxes
 %textfont={\setlength{\parindent}{1.5em}}, % Uncomment for paragraph indentation
-linewidth=1.5pt % Width of the border lines around content boxes
+linewidth=1.5pt, % Width of the border lines around content boxes
+columns =3
 }
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION 
@@ -115,7 +116,7 @@ This will be done in the form of:
 %----------------------------------------------------------------------------------------
 %	FUTURE WORK
 %----------------------------------------------------------------------------------------
-\headerbox{Results: Hardware}{name=results3,column=3,row=0}{
+\headerbox{Results: Hardware}{name=results3,column=2,row=0}{
 The error in the directionality feature was calculated by comparing the measured to the simulated polar plots for each steerable angle
 \begin{center}
 	\captionof{table}{Average error in the directionality feature}
@@ -139,7 +140,7 @@ The error in the directionality feature was calculated by comparing the measured
 \end{center}
 }
 
-\headerbox{Future Work}{name=FutureWork,column=3,below=results3}{
+\headerbox{Future Work}{name=FutureWork,column=2,below=results3}{
 This project has been a proof of concept that an inexpensive adaptive hearing aid can be produced. For future development of the hearing aid, a number of improvements could be made including:
 \begin{itemize}\compresslist
 	\item Making use of higher quality omni-directional microphones
@@ -186,7 +187,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 
 {\large \textbf{Testing}}
 \begin{center}
-	\includegraphics[width=0.4\linewidth]{directionalityLabTest.png}
+	\includegraphics[width=0.3\linewidth]{directionalityLabTest.png}
 	\captionof{figure}{Procedure for testing the hearing aid}
 \end{center}
 }
@@ -196,7 +197,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 %	CONCLUSION
 %----------------------------------------------------------------------------------------
 
-\headerbox{Conclusion}{name=conclusion,column=3,below=FutureWork}{ % This block's bottom aligns with the bottom of the conclusion block
+\headerbox{Conclusion}{name=conclusion,column=2,below=FutureWork}{ % This block's bottom aligns with the bottom of the conclusion block
 \begin{itemize}\compresslist
 	\item With 10 microphones, 	
 \end{itemize}	
@@ -206,7 +207,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 %	REFERENCES
 %----------------------------------------------------------------------------------------
 
-\headerbox{References}{name=references,column=3,above=bottom, below=conclusion}{
+\headerbox{References}{name=references,column=2,above=bottom, below=conclusion}{
 	
 	\renewcommand{\section}[2]{\vskip 0.05em} % Get rid of the default "References" section title
 	\nocite{*} % Insert publications even if they are not cited in the poster
@@ -219,62 +220,33 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 %	RESULTS
 %----------------------------------------------------------------------------------------
 
-\headerbox{Results: Simulation}{name=results,column=1,span=2,row=0}{
+\headerbox{Results: Simulation}{name=results,column=1,row=0}{
 
-\begin{multicols}{2}
-\vspace{1em}
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{audiogram.png}
-	\captionof{figure}{Audiogram}
-\end{center}
-\begin{center}
-	\includegraphics[width=0.8\linewidth]{fftSoftwareBold.png}
+	\includegraphics[width=0.6\linewidth]{fftSoftwareBold.png}
 	\captionof{figure}{FFT Software}
 \end{center}
-
-\end{multicols}
-
-\begin{multicols}{2}
-	\vspace{1em}
-	
 	\begin{center}
-		\includegraphics[width=0.5\linewidth]{polar90degSoftware.png}
-		\captionof{figure}{${90}^o$}
-	\end{center}
+	\includegraphics[width=0.4\linewidth]{polar90degSoftware.png}
+	\captionof{figure}{${90}^o$}
+\end{center}
 
-\end{multicols}
 }
 %------------------------------------------------
-\headerbox{Results: Hardware}{name=results2,column=1,span=2, bottomaligned=references, below=results}{
-\begin{multicols}{2}
-\vspace{1em}
-\begin{center}
-	\includegraphics[width=0.5\linewidth]{deg0hardware.png}
-	\captionof{figure}{${0}^o$ }
-\end{center}
-
-\begin{center}
-	\includegraphics[width=0.5\linewidth]{deg60hardware.png}
-	\captionof{figure}{${60}^o$ }
-\end{center}
-
-\end{multicols}
-
-\begin{multicols}{2}
-	\vspace{1em}
-	
+\headerbox{Results: Hardware}{name=results2,column=1, bottomaligned=references, below=results}{
+%\begin{multicols}{2}
+%	\vspace{1em}
 	\begin{center}
-		\includegraphics[width=0.5\linewidth]{deg90hardware.png}
+		\includegraphics[width=0.6\linewidth]{hardwareGain.png}
+		\captionof{figure}{FFT of the output signal from the hearing aid with various amplifications}
+	\end{center}
+	\begin{center}
+		\includegraphics[width=0.4\linewidth]{deg90hardware.png}
 		\captionof{figure}{${90}^o$ }
 	\end{center}
 
-	\begin{center}
-	\includegraphics[width=0.8\linewidth]{hardwareGain.png}
-	\captionof{figure}{FFT of the output signal from the hearing aid with various amplifications}
-\end{center}
-
 	
-\end{multicols}
+%\end{multicols}
 }
 
 

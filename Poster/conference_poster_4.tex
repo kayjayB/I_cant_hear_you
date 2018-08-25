@@ -107,8 +107,30 @@ This functionality includes:
 %----------------------------------------------------------------------------------------
 %	FUTURE WORK
 %----------------------------------------------------------------------------------------
+\headerbox{Results: Hardware}{name=results3,column=3,row=0}{
+\begin{center}
+	\captionof{table}{Average error }
+	\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|c|c|}
+	\hline 
+	Angle & Average Error (\%) \\ 
+	\hline 
+	0 & 46.6 \\ 
+	\hline 
+	60 & 30.7 \\ 
+	\hline 
+	90 & 12.7 \\ 
+	\hline 
+	120 & 22.7 \\ 
+	\hline 
+	180 & 51.7 \\ 
+	\hline 
+\end{tabular} 
+	}
+\end{center}
+}
 
-\headerbox{Future Work}{name=FutureWork,column=3,row=0,bottomaligned=introduction}{
+\headerbox{Future Work}{name=FutureWork,column=3,below=results3}{
 This project has been a proof of concept that an inexpensive adaptive hearing aid can be produced. For future development of the hearing aid, a number of improvements could be made including:
 \begin{itemize}\compresslist
 	\item Making use of higher quality omni-directional microphones
@@ -166,7 +188,7 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 
 \headerbox{Conclusion}{name=conclusion,column=3,below=FutureWork}{ % This block's bottom aligns with the bottom of the conclusion block
 \begin{itemize}\compresslist
-	\item With 10 microphones, 
+	\item With 10 microphones, 	
 \end{itemize}	
 }
 
@@ -187,11 +209,10 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 %	RESULTS
 %----------------------------------------------------------------------------------------
 
-\headerbox{Results}{name=results,column=1,span=2,row=0, bottomaligned=references}{
+\headerbox{Results: Simulation}{name=results,column=1,span=2,row=0}{
 
 \begin{multicols}{2}
 \vspace{1em}
-{\large \textbf{Simulation Results}}
 \begin{center}
 	\includegraphics[width=0.8\linewidth]{audiogram.png}
 	\captionof{figure}{Audiogram}
@@ -212,12 +233,11 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 	\end{center}
 
 \end{multicols}
-
+}
 %------------------------------------------------
-
+\headerbox{Results: Hardware}{name=results2,column=1,span=2, bottomaligned=references, below=results}{
 \begin{multicols}{2}
 \vspace{1em}
-{\large \textbf{Hardware Results}}
 \begin{center}
 	\includegraphics[width=0.5\linewidth]{deg0hardware.png}
 	\captionof{figure}{${0}^o$ }
@@ -237,6 +257,11 @@ This project has been a proof of concept that an inexpensive adaptive hearing ai
 		\includegraphics[width=0.5\linewidth]{deg90hardware.png}
 		\captionof{figure}{${90}^o$ }
 	\end{center}
+
+	\begin{center}
+	\includegraphics[width=0.8\linewidth]{hardwareGain.png}
+	\captionof{figure}{FFT of the output signal from the hearing aid with various amplifications}
+\end{center}
 
 	
 \end{multicols}

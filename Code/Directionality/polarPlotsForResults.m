@@ -83,7 +83,7 @@ for r=1:length(theta)
     end
 end
 
-taper = weightTableImag(19,:);
+taper = weightTableImag(10,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
@@ -192,15 +192,15 @@ normDdata=Ddata-DdataMax;
 a=0:30:180;
 
 normDdata=db2mag(normDdata);
-measured180=db2mag(measured180);
+measured90=db2mag(measured90);
 
 figure
-plot(a,normDdata,a,measured180)
+plot(a,normDdata,a,measured90)
 % hold on;
 % plot(a,measured90)
 % hold off;
 
-avError= abs(((measured180-transpose(normDdata))./transpose(normDdata)).*100)
+avError= abs(((measured90-transpose(normDdata))./transpose(normDdata)).*100)
 
 
 %%

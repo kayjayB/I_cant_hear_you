@@ -123,7 +123,7 @@ This will be done in the form of:
 	
 	\begin{center}
 		\includegraphics[width=1\linewidth]{posterBlockDiagram.pdf}
-		\captionof{figure}{Hearing aid system overview}
+		\captionof{figure}{Hearing aid system overview \cite{Evaluation_of_digital_hearing_aid_algorithms}}
 	\end{center}
 	
 	{\large \textbf{Simulated vs Hardware Hearing Aid}}
@@ -161,7 +161,7 @@ This will be done in the form of:
 %	FUTURE WORK
 %----------------------------------------------------------------------------------------
 \headerbox{Results: Hardware}{name=results3,column=2,row=0}{
-The error in the directionality feature was calculated by comparing the measured and the simulated polar plots for each steerable angle. Compensatory gain error was calculated using the difference between the desired and measured gain at the centre of each frequency band
+The error in the beam steering ability of the directionality feature was calculated by comparing the measured and the simulated polar plots for each steerable angle.
 \begin{center}
 	\captionof{table}{Average error in the directionality feature}
 	\resizebox{0.3\columnwidth}{!}{%
@@ -179,12 +179,13 @@ The error in the directionality feature was calculated by comparing the measured
 	}
 \end{center}
 
+Compensatory gain error was calculated using the difference between the desired and measured gain at the centre of each frequency band
 \begin{center}
 	\captionof{table}{Error in the compensatory gain feature}
 	\resizebox{0.5\columnwidth}{!}{%
 		\begin{tabular}{cc}
 			\toprule
-			\textbf{Compensated frequency band (Hz)} &\textbf{Error (\%)} \\ 
+			\textbf{Frequency band (Hz)} &\textbf{Error (\%)} \\ 
 			\midrule
 			2820 - 3550 & 0.81 \\ 
 			5620 - 7080 & 19.56 \\ 
@@ -192,12 +193,12 @@ The error in the directionality feature was calculated by comparing the measured
 		\end{tabular} 
 	}
 \end{center}
+\vspace{0.3em}
 }
 
 \headerbox{Future Work}{name=FutureWork,column=2,below=results3}{
 For future development of the hearing aid, a number of improvements could be made including:
 \begin{itemize}\compresslist
-	\vspace{-0.4em}
 	\item Making use of higher quality omni-directional microphones
 	\item Creating an integrated circuit chip to handle the preprocessing of the audio signals
 	\item Making use of more microphones to improve the precision of the directionality feature
@@ -212,13 +213,13 @@ For future development of the hearing aid, a number of improvements could be mad
 
 \headerbox{Conclusion}{name=conclusion,column=2,below=FutureWork}{ % This block's bottom aligns with the bottom of the conclusion block
 This project is a proof of concept that an inexpensive, fully functional, adaptive hearing aid can be produced. 
+
 \begin{itemize}\compresslist
-	\vspace{-0.4em}
-	\item Amplification to to specific frequency bands in accordance with provided audiograms can be achieved
+	\item Amplification of specific frequency bands in accordance with individual audiograms can be achieved
 	\item Achieving directionality in hearing aid devices is possible by utilizing array theory
 	\item The total cost to construct the device is R1500 
-	\item Average error between simulated and measured beam steering = 32.9\% 
-	\item Average error with respect to	dsired and measured compensatory gain is 10.2\%.
+	\item Average error between simulated and measured beam steering is 32.9\% 
+	\item Average error in the measured gain when compared to the desired gain is 10.2\%.
 \end{itemize}
 }
 

@@ -364,4 +364,117 @@ P_{new}= \frac{P_{old} - min}{max - min}
 \label{eqn:xy}
 \end{equation}
 
+\section*{MEETING 9}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+\begin{itemize}
+	\item Weekly progress report
+	\item Arduino sampling frequency
+	\item Project title changes
+\end{itemize}
+
+\subsection*{Minutes of meeting:}
+Start date: 08/08/2018 \\
+Start time: 10:00
+
+Arduino sampling frequency:
+\begin{itemize}
+	\item Monotone sounds that are being sampled are distorted due to a low sampling frequency. 
+	\item The sampling frequency gets lower as more lines of code get added.
+	\item The obvious solution is to remove one frequency band per microphone to keep sampling frequency as high as possible (Plan B).
+	\item Another proposed solution is the use of two Arduinos that serially communicate with one another.
+	\item Have each Arduino deal with separate frequency bands and synchronize them to avoid significant undesirable delays.
+	\item MAke use of an external ADC chip for reading potentiometer values to ensure that sampling frequency of Arduino is maximised. Do not waste a channel on simply reading a potentiometer voltage
+\end{itemize}
+
+Advice on report content:
+\begin{itemize}
+	\item State that a major limitation of the hardware design is the use of the Arduino Due.
+	\item State the reasoning for use of two Arduinos: Increasing sampling frequency and preventing interference between each frequency band.
+\end{itemize}
+
+Title changes:
+\begin{itemize}
+	\item Action required for title changes only involves sending the new title to Mr Hugh Hunt.
+\end{itemize}
+
+Arduino interrupts:
+\begin{itemize}
+	\item To determine the sampling frequency, it is recommended that a timer is started at the end of program set-up and ended once the sample counter is 50 (end of interrupt).
+\end{itemize}
+
+To do:
+\begin{itemize}
+	\item Investigate the use of timer-based interrupts to improve sampling frequency.
+	\item Only move onto the approach using two Arduinos once the system functions as expected when dealing with a single frequency band.
+\end{itemize}
+
+\section*{MEETING 10}
+\subsection*{Attendees:}
+Kayla-Jade Butkow, Kelvin da Silva, Prof. David Rubin
+\subsection*{Agenda:} 
+\begin{itemize}
+	\item Weekly progress report
+	\item Directionality feature issues
+	\item Poster details
+	\item Open-Day demonstration
+\end{itemize}
+
+\subsection*{Minutes of meeting:}
+Start date: 15/08/2018 \\
+Start time: 10:00
+
+Sampling frequency:
+\begin{itemize}
+	\item The issue was rectified by making use of a timer based interrupt.
+\end{itemize}
+
+Directionality:
+\begin{itemize}
+	\item The converted MATLAB code for directionality only functions correctly for a single direction ($90^{\circ}$).
+	\item If directionality is cannot be achieved in other directions, reasoning must be provided in the report.
+	\item It is suggested that a logic analyser should be used to monitor the behaviour of each channel of the Arduino for the purpose of determining the reason why the program malfunctions.
+\end{itemize}
+
+Open-Day:
+\begin{itemize}
+	\item Hardware demonstration: Connect an oscilloscope to the output of the device and move a sound source around to demonstrate a change in signal magnitude when in directional mode.
+	\item Hardware demonstration: A similar procedure is to be taken in omnidirectional mode.
+	\item Software demonstration: Make use of the developed GUI.
+	\item Permission granted for use of Professor Rubin's digital oscilloscope for testing and on Open-Day.
+\end{itemize}
+
+Testing of software:
+\begin{itemize}
+	\item Test the software solution in exactly the same way that the hardware is tested.
+	\item Prove that the gain applied to a signal (in accordance with a given audiogram) manipulates the signal appropriately.
+	\item Test for a range of frequencies and gain.
+	\item Test directionality by obtaining polar plots when the acoustic beam is facing different directions and show the effect on magnitude of the applied signal.
+\end{itemize}
+
+Poster:
+\begin{itemize}
+	\item The poster must mainly consist of pictures and as few words as possible.
+	\item Make use of bullet points, large font and include a high level block diagram of the developed system.
+	\item An abstract should be included whereby the reader is informed about what the project entails.
+	\item Polar plots and frequency spectrum plots will be useful aids for a results section.
+	\item Present the error in directionality as well as compensatory gain.
+\end{itemize}
+
+To do:
+\begin{itemize}
+	\item Look at technical conference posters for guidance.
+	\item Design a casing for the hardware solution to be housed in.
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
 \end{document}

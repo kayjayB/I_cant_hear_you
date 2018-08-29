@@ -170,10 +170,10 @@ end
     xlim([0 8000])
     ylim([-115 -20])
     hold off
-    xlabel('Frequency (Hz)', 'FontSize',16)
-    ylabel('Magnitude (dB)', 'FontSize',16)
-    set(gca,'fontsize',16)
-    legend("Original signal", "Compensated signal")
+    xlabel('Frequency (Hz)', 'FontSize',20)
+    ylabel('Magnitude (dB)', 'FontSize',20)
+    legend({"Original signal", "Compensated signal"}, 'FontSize',20)
+    set(gca,'fontsize',20)
     %%
  
 %     transferFuncEstimator = dsp.TransferFunctionEstimator...

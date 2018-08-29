@@ -11,6 +11,17 @@ Fs= 40000; % sampling frequency (Hz)
 %% Audiogram 
 frequencies = [250 500 1000 2000 4000 6000 8000];
 values = [15 10 10 15 10 5 20];
+%values = values;
+semilogx(frequencies, values, '-o', 'MarkerSize', 25, 'LineWidth',4)
+ylim([-30 5])
+xlabel('Frequency (Hz)', 'FontSize',24)
+ylabel('Air Threshold (dB)', 'FontSize',24)
+set(gca,'fontsize',24)
+grid on
+% set(gcf, 'Position', [100 100 150 150]);
+% saveas(gcf, 'test.png');
+% export_fig test2.png
+%%
 requiredFrequencies = linspace(1, 8*10^3, 8*10^3);
 vq = interp1(frequencies,values,requiredFrequencies);
 
@@ -47,7 +58,8 @@ SpecAna.ChannelNames = {'Original signal','Amplified signal'};
 counter = 1;
 finalllllResult = zeros(1000,1);
 figure
-while ~isDone(audioInput2)
+%while ~isDone(audioInput2)
+for i=1:5
     
     buffer = audioInput2();  % Load a frame of audio
 
@@ -77,7 +89,7 @@ while ~isDone(audioInput2)
     xlim([0 8000])
     drawnow
     hold off
-    audioWriter2(output);
+   % audioWriter2(output);
     
     
     
@@ -128,3 +140,68 @@ end
 % release(SpecAna)
 
 %% 
+    output = filterOctave(oneThirdOctaveFilterBank,buffer, audiogram);
+    n=length(output);   % create a scaling variable equal to the 
+                            % length of the data
+                    
+    xFourier = fft(output)/n; % fourier transform of the data
+    xFourier = 2*xFourier(1:length(output)/2+1); % create a one sided
+                                                    % frequency spectrum                                     
+    magnitudeFiltered = 20*log10(abs(xFourier));
+    freqx = linspace(0,Fs/2,length(output)/2+1);
+    
+    nOriginal=length(buffer); 
+    originalFourier = fft(buffer)/nOriginal;
+    originalFourier = 2*originalFourier(1:length(buffer)/2+1); 
+    magnitudeOriginal = 20*log10(abs(originalFourier));
+    freqx2 = linspace(0,Fs/2,length(buffer)/2+1);
+    
+    frequencies = [224 282 355 447 562 708 891 1120 1410 1780 2240 2820 3550 4470 5620 7080 8910];
+    stuff = ones(length(frequencies))*-20;
+   
+    plot(freqx2, magnitudeOriginal,'r', 'LineWidth',2);
+    hold on
+    plot(freqx, magnitudeFiltered, 'b', 'LineWidth',2);
+    hold on
+    h =stem(frequencies, stuff, 'LineWidth',0.9);
+    set(h,'BaseValue',-115);
+    set(h, 'Marker', 'none')
+    set(h, 'Color', [169/255,169/255,169/255]);
+    xlim([0 8000])
+    ylim([-115 -20])
+    hold off
+    xlabel('Frequency (Hz)', 'FontSize',16)
+    ylabel('Magnitude (dB)', 'FontSize',16)
+    set(gca,'fontsize',16)
+    legend("Original signal", "Compensated signal")
+    %%
+ 
+%     transferFuncEstimator = dsp.TransferFunctionEstimator...
+%                                  ('FrequencyRange','onesided',...
+%                                   'SpectralAverages',20);
+%     L = 2000;
+% yw = zeros(L,16);
+%     buffer2 = randn(L,1);
+%     for i=1:16
+%         oneThirdOctaveFilter = oneThirdOctaveFilterBank{i};
+%         yw(:,i) = oneThirdOctaveFilter(buffer2);
+%         %yw(:,i) = yw(:,i) * audiogram(i);
+%     end
+%    y = yw(:,1)+ yw(:,2)+ yw(:,3)+ yw(:,4) +yw(:,5)+ yw(:,6)+ yw(:,7)+ yw(:,8)+ yw(:,9)+ yw(:,10)+ yw(:,11)+ yw(:,12)+ yw(:,13)+ yw(:,14)+ yw(:,15)+ yw(:,16);
+%    z  = transferFuncEstimator(repmat(buffer2,1,17),[ yw(:,1), yw(:,2), yw(:,3), yw(:,4) ,yw(:,5), yw(:,6), yw(:,7), yw(:,8), yw(:,9), yw(:,10), yw(:,11), yw(:,12), yw(:,13), yw(:,14), yw(:,15), yw(:,16), y]);
+% 
+%    freqNew = transpose(freqx2);
+%    z = 20*log10(abs(z));
+%    plot(freqNew, z)
+%   
+%    hold on
+%    plot(freqx2, magnitudeOriginal,'r');
+%    hold on
+%    plot(freqx, magnitudeFiltered, 'b');
+%    xlim([0 8000])
+%    ylim([-115 5])
+%    hold off
+%     xlabel('Frequency (Hz)', 'FontSize',24)
+%     ylabel('Magnitude (dB)', 'FontSize',24)
+%     set(gca,'fontsize',24)
+%     legend("Original signal", "Compensated signal")

@@ -37,7 +37,7 @@ array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper))
 c = 343; %speed of sound
 
 %idealAngle=-180:1:180;
-idealAngle=0:1:180;
+idealAngle=-180:1:180;
 f= 3150;
 f1=1000;
 f2=6300;
@@ -70,7 +70,7 @@ array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper))
 c = 343; %speed of sound
 
 %idealAngle=-180:1:180;
-idealAngle=0:1:180;
+idealAngle=-180:1:180;
 f= 3150;
 f1=1000;
 f2=6300;
@@ -102,7 +102,7 @@ array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper))
 c = 343; %speed of sound
 
 %idealAngle=-180:1:180;
-idealAngle=0:1:180;
+idealAngle=-180:1:180;
 f= 3150;
 f1=1000;
 f2=6300;

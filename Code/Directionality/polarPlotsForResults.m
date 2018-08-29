@@ -56,7 +56,7 @@ rawMic=[199,159,131,146,100,140,156];
 % polarpattern(angles,gainDB180);
 
 f = 3340;
-n = 4; %no of microphones
+n = 10; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
 d=5*10^-2;
@@ -83,15 +83,20 @@ for r=1:length(theta)
     end
 end
 
-taper = weightTableImag(10,:);
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
+taper = weightTableImag(10,:);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
 c = 343; %speed of sound
 
 %idealAngle=-180:1:180;
-idealAngle=0:30:180;
+idealAngle=0:1:180;
+f= 3150;
+f1=1000;
+f2=6300;
 Ddata= directivity(array,f,idealAngle,'PropagationSpeed',c);
+Ddata1= directivity(array,f1,idealAngle,'PropagationSpeed',c);
+Ddata2= directivity(array,f2,idealAngle,'PropagationSpeed',c);
 
 %%
 %interRaw0=interp(gainDB0,2);
@@ -136,9 +141,8 @@ colormap white
 f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 
-figure
 %polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
-polarpattern(h2,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
+polarpattern(h2,idealAngle,Ddata,idealAngle,Ddata1, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')

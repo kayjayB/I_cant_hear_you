@@ -56,9 +56,9 @@ f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 
 %polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
-polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
+polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
-legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 14)
+legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 22)
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')
 
@@ -89,9 +89,9 @@ f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 
 %polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
-polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
+polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
-legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 14)
+legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 22)
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')
 
@@ -121,8 +121,8 @@ f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 
 %polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
-polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
+polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
-legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 14)
+legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 22)
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')

@@ -17,8 +17,8 @@ raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5,1,1,1,1,1,28.1];
 raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6,1,1,1,1,1,17.1];
 raw180=[34.3,35.9,34.3,18.7,50,25,32.8,1,1,1,1,1,34.3];
 
-rawOmni=[141,84.3,84.3,140,68.7,68.7,59.3];
-rawMic=[199,159,131,146,100,140,156];
+rawOmni=[141,84.3,84.3,140,68.7,68.7,59.3,1,1,1,1,1,1];
+rawMic=[199,159,131,146,100,140,156,1,1,1,1,1,1];
 
 %normalize
 
@@ -116,6 +116,8 @@ for i=1:length(raw0)
     db90Deg(1,i)=20*log(raw90(i));
     db120Deg(1,i)=20*log(raw120(i));
     db180Deg(1,i)=20*log(raw180(i));
+    dbOmni(1,i)=20*log(rawOmni(i));
+    dbMic(1,i)=20*log(rawMic(i));
 end
 
 interDB0Deg=interp(db0Deg,2);
@@ -123,12 +125,16 @@ interDB60Deg=interp(db60Deg,2);
 interDB90Deg=interp(db90Deg,2);
 interDB120Deg=interp(db120Deg,2);
 interDB180Deg=interp(db180Deg,2);
+interDBOmni=interp(dbOmni,2);
+interDBMic=interp(dbMic,2);
 
 interDB0Deg(length(interDB0Deg))=interDB0Deg(1);
 interDB60Deg(length(interDB60Deg))=interDB60Deg(1);
 interDB90Deg(length(interDB90Deg))=interDB90Deg(1);
 interDB120Deg(length(interDB120Deg))=interDB120Deg(1);
 interDB180Deg(length(interDB180Deg))=interDB180Deg(1);
+interDBOmni(length(interDBOmni))=interDBOmni(1);
+interDBMic(length(interDBMic))=interDBMic(1);
 
 % random image for white background
 a = rand(100,100);
@@ -142,8 +148,9 @@ f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
 polarpattern(h2, interAngles,interDB90Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 %polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
+%polarpattern(h2, interAngles,interDBOmni,interAngles,interDBMic,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
-legend({'Measured', 'Simulated',}, 'FontSize', 22)
+legend({'DAC', 'Microphone',}, 'FontSize', 22)
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')
 

@@ -5,17 +5,17 @@ angles = 0:30:360;
 
 %angles=deg2rad(angles);
 
-raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3];
-raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5];
-raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5];
-raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6];
-raw180=[34.3,35.9,34.3,18.7,50,25,32.8];
+% raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3];
+% raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5];
+% raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5];
+% raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6];
+% raw180=[34.3,35.9,34.3,18.7,50,25,32.8];
 
-% raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3,1,1,1,1,1,35.9];
-% raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5,1,1,1,1,1,42.1];
-% raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5,1,1,1,1,1,28.1];
-% raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6,1,1,1,1,1,17.1];
-% raw180=[34.3,35.9,34.3,18.7,50,25,32.8,1,1,1,1,1,34.3];
+raw0=[35.9,32.8,34.3,15.6,46.8,34.3,34.3,1,1,1,1,1,35.9];
+raw60=[42.1,43.7,29.6,34.3,62.5,31.2,37.5,1,1,1,1,1,42.1];
+raw90=[28.1,54.6,48.4,109,70.3,45.3,62.5,1,1,1,1,1,28.1];
+raw120=[17.1,35.9,67.1,84.3,42.1,45.3,40.6,1,1,1,1,1,17.1];
+raw180=[34.3,35.9,34.3,18.7,50,25,32.8,1,1,1,1,1,34.3];
 
 rawOmni=[141,84.3,84.3,140,68.7,68.7,59.3];
 rawMic=[199,159,131,146,100,140,156];
@@ -56,7 +56,7 @@ rawMic=[199,159,131,146,100,140,156];
 % polarpattern(angles,gainDB180);
 
 f = 3340;
-n = 10; %no of microphones
+n = 4; %no of microphones
 lambda = 343/f;
 %d=lambda/2;
 d=5*10^-2;
@@ -84,14 +84,14 @@ for r=1:length(theta)
 end
 
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
-taper = weightTableImag(10,:);
+taper = weightTableImag(19,:);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
 c = 343; %speed of sound
 
 %idealAngle=-180:1:180;
-idealAngle=0:1:180;
-f= 3150;
+idealAngle=-180:1:180;
+f= 3340;
 f1=1000;
 f2=6300;
 Ddata= directivity(array,f,idealAngle,'PropagationSpeed',c);
@@ -118,17 +118,17 @@ for i=1:length(raw0)
     db180Deg(1,i)=20*log(raw180(i));
 end
 
-% interDB0Deg=interp(db0Deg,2);
-% interDB60Deg=interp(db60Deg,2);
-% interDB90Deg=interp(db90Deg,2);
-% interDB120Deg=interp(db120Deg,2);
-% interDB180Deg=interp(db180Deg,2);
-% 
-% interDB0Deg(length(interDB0Deg))=interDB0Deg(1);
-% interDB60Deg(length(interDB60Deg))=interDB60Deg(1);
-% interDB90Deg(length(interDB90Deg))=interDB90Deg(1);
-% interDB120Deg(length(interDB120Deg))=interDB120Deg(1);
-% interDB180Deg(length(interDB180Deg))=interDB180Deg(1);
+interDB0Deg=interp(db0Deg,2);
+interDB60Deg=interp(db60Deg,2);
+interDB90Deg=interp(db90Deg,2);
+interDB120Deg=interp(db120Deg,2);
+interDB180Deg=interp(db180Deg,2);
+
+interDB0Deg(length(interDB0Deg))=interDB0Deg(1);
+interDB60Deg(length(interDB60Deg))=interDB60Deg(1);
+interDB90Deg(length(interDB90Deg))=interDB90Deg(1);
+interDB120Deg(length(interDB120Deg))=interDB120Deg(1);
+interDB180Deg(length(interDB180Deg))=interDB180Deg(1);
 
 % random image for white background
 a = rand(100,100);
@@ -140,11 +140,10 @@ colormap white
 %plotting image
 f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
-
-%polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',4,'FontSize',24,'MagnitudeLim',[-100 0])
-polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
+polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
+%polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
-legend({'1.00kHz', '3.15kHz','6.30kHz'}, 'FontSize', 14)
+legend({'Measured', 'Simulated',}, 'FontSize', 22)
 ph=findall(h2,'type','patch');
 set(ph,'FaceColor','white')
 

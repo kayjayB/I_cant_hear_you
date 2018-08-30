@@ -59,7 +59,7 @@ end
 %% Octave Filter Bank
 Fs = 40000;
 N = 22;
-oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N);
+oneThirdOctaveFilterBank = createOneThirdOctaveFilters(N, Fs);
  
 transferFuncEstimator = dsp.TransferFunctionEstimator...
                                  ('FrequencyRange','onesided',...

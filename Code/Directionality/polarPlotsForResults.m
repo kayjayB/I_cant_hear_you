@@ -84,7 +84,7 @@ for r=1:length(theta)
 end
 
 microphone = phased.OmnidirectionalMicrophoneElement('FrequencyRange',[20 20e3],'BackBaffled',true);
-taper = weightTableImag(19,:);
+taper = weightTableImag(10,:);
 
 array = phased.ULA(n,d,'Element',microphone,'ArrayAxis','x','Taper',conj(taper));
 c = 343; %speed of sound
@@ -140,7 +140,7 @@ colormap white
 %plotting image
 f1 = imagesc(a);
 h2 = axes('position',[0  0  1  1]);
-polarpattern(h2, interAngles,interDB180Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
+polarpattern(h2, interAngles,interDB90Deg,idealAngle,Ddata,'NormalizeData',1,'LineWidth',2,'FontSize',22,'MagnitudeLim',[-100 0])
 %polarpattern(h2,idealAngle,Ddata1,idealAngle,Ddata, idealAngle,Ddata2,'NormalizeData',1,'LineWidth',2,'FontSize',14,'MagnitudeLim',[-100 0])
 % removing background of polar plot - so image shows through
 legend({'Measured', 'Simulated',}, 'FontSize', 22)

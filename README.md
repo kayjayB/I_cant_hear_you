@@ -12,4 +12,4 @@ The MATLAB GUI provides a fully functioning hearing aid that uses pre-recorded a
 ![GUI demonstration - directionality](Demo/dirGUISmall.png)
 
 ## Hardware Device
-![Hardware solution](Demo/Device.JPG)
+![Hardware solution](Demo/device.JPG)
